@@ -130,6 +130,11 @@ body.ultcine #moves,body.ultcine #pauseBtn,body.ultcine.fighting #pad{visibility
 body:not(.fighting) #pauseBtn{display:none}
 #cineSkip{position:absolute;z-index:6;right:14px;top:12px;font-family:var(--display);font-size:12px;letter-spacing:.06em;color:var(--ink);background:rgba(22,15,42,.75);border:1px solid var(--line);padding:7px 14px;cursor:pointer}
 #cineSkip:focus-visible{outline:2px solid var(--gold)}
+#qteBtn{position:absolute;z-index:6;left:50%;bottom:calc(8.5% + 18px);transform:translateX(-50%);font-family:var(--display);font-size:clamp(18px,3.2vw,30px);letter-spacing:.08em;color:#160f2a;background:var(--gold);border:0;padding:14px 46px;clip-path:polygon(6% 0,100% 0,94% 100%,0 100%);cursor:pointer;touch-action:manipulation;animation:qtePulse .7s ease-in-out infinite alternate}
+#qteBtn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#qteBtn:active{filter:brightness(1.2)}
+@keyframes qtePulse{to{transform:translateX(-50%) scale(1.07)}}
+@media (prefers-reduced-motion:reduce){#qteBtn{animation:none}}
 
 .overlay{position:absolute;inset:0;z-index:5;overflow-y:auto;display:flex;padding-block:12px;background:linear-gradient(180deg,rgba(22,15,42,.5),rgba(22,15,42,.93) 55%)}
 .overlay>*{margin:auto;width:100%}
@@ -267,6 +272,30 @@ body.pvp .mbtn .mn{display:none}
 .bcopy .rates{font-size:12px;color:var(--ink)}
 .sumrow .btn{flex:1 1 200px}
 .sres{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.sreveal{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:4%;padding:0 6%;overflow:hidden;cursor:pointer;background:#0b0716;background:radial-gradient(circle at 42% 52%,color-mix(in srgb,var(--rc) 55%,#0b0716) 0,color-mix(in srgb,var(--rc) 16%,#0b0716) 38%,#0b0716 72%)}
+.sreveal>*{margin:0;width:auto}
+.rv-rays{position:absolute;left:42%;top:52%;width:240vmax;height:240vmax;transform:translate(-50%,-50%);background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.09) 0 5deg,transparent 5deg 15deg);animation:rvSpin 22s linear infinite;pointer-events:none;-webkit-mask:radial-gradient(circle,#000 0,transparent 45%);mask:radial-gradient(circle,#000 0,transparent 45%)}
+@keyframes rvSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.rv-card{position:relative;height:84%;aspect-ratio:4/5;flex:none;filter:drop-shadow(0 0 28px var(--rc))}
+.rv-card canvas{width:100%;height:100%;display:block}
+.rv-tag{position:absolute;left:4%;top:6%;font-family:var(--display);font-size:clamp(16px,3vw,30px);color:#160f2a;background:var(--gold);padding:4px 14px;transform:rotate(-8deg)}
+.rv-tag:empty{display:none}
+.rv-info{position:relative;max-width:40%;z-index:1}
+.rv-rar{font-family:var(--display);font-size:clamp(16px,2.6vw,28px);letter-spacing:.18em;color:var(--rc);text-shadow:0 0 18px var(--rc),3px 3px 0 #160f2a}
+.rv-info h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,6vw,64px);line-height:1;margin:6px 0 8px;text-shadow:4px 4px 0 #160f2a}
+.rv-sub{font-size:clamp(13px,1.8vw,18px);color:#f6efe4;text-shadow:0 2px 6px #000}
+.rv-count{position:absolute;right:max(18px,env(safe-area-inset-right,0px));top:14px;font-family:var(--display);font-size:16px;color:#f6efe4}
+.rv-hint{position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#e6dcf5;animation:rvBlink 1.2s ease-in-out infinite alternate}
+@keyframes rvBlink{from{opacity:.35}}
+.rv-next{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;background:none;cursor:pointer;z-index:2}
+.sreveal.go .rv-card{animation:rvIn .45s cubic-bezier(.2,1.4,.4,1) both}
+.sreveal.go .rv-info{animation:rvInfo .5s .12s ease-out both}
+.sreveal.go.legend .rv-card{animation:rvIn .45s cubic-bezier(.2,1.4,.4,1) both,rvGlow 1.4s .45s ease-in-out infinite alternate}
+@keyframes rvIn{from{opacity:0;transform:scale(.55) translateY(30px)}}
+@keyframes rvInfo{from{opacity:0;transform:translateX(40px)}}
+@keyframes rvGlow{to{filter:drop-shadow(0 0 54px var(--rc)) brightness(1.12)}}
+@media (prefers-reduced-motion:reduce){.rv-rays,.rv-hint,.sreveal.go .rv-card,.sreveal.go .rv-info{animation:none}}
+#summonRes .screen{max-width:none;width:100%}
 body.land .sres{grid-template-columns:repeat(10,minmax(0,1fr))}
 .sres.one,body.land .sres.one{grid-template-columns:minmax(0,200px);justify-content:center}
 .rcard{position:relative;min-width:0;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 4px 8px;border:2px solid var(--rc);background:linear-gradient(180deg,var(--panel) 30%,color-mix(in srgb,var(--rc) 35%,var(--panel)));animation:rpop .45s cubic-bezier(.2,1.4,.4,1) backwards;animation-delay:calc(var(--i)*110ms)}
@@ -543,6 +572,7 @@ body.fighting #townFade{display:none}
       <canvas id="hud" aria-hidden="true"></canvas>
       <button id="pauseBtn" type="button" aria-label="Pause">Pause</button>
       <button id="cineSkip" type="button" hidden>Skip ›</button>
+      <button id="qteBtn" type="button" hidden>ULTIMATE</button>
       <div id="moves" aria-label="Special moves">
         <div class="mgrp" id="mg1">
           <button class="mbtn" type="button" id="m1-sp1" data-p="1" data-k="sp1"><span class="mk">SP1</span><span class="mn">Special</span><span class="mc">◆</span></button>
@@ -707,6 +737,14 @@ body.fighting #townFade{display:none}
         <p class="sub">Scroll through every banner. A ×10 summon always includes at least one Improved or Vision fighter. Duplicates add a star, up to 14★. Each star adds 4% health and power; past 14★ a duplicate turns into 50 coins.</p>
         <div class="blist" id="blist"></div>
       </div>
+    </section>
+
+    <section id="sreveal" class="overlay sreveal" hidden aria-live="polite" aria-label="Summon reveal">
+      <div class="rv-rays" aria-hidden="true"></div>
+      <div class="rv-card"><canvas id="rvArt" width="640" height="800" aria-hidden="true"></canvas><span class="rv-tag" id="rvTag"></span></div>
+      <div class="rv-info"><p class="rv-rar" id="rvRar"></p><h2 id="rvName"></h2><p class="rv-sub" id="rvSub"></p></div>
+      <p class="rv-count" id="rvCount"></p><p class="rv-hint">Tap to continue</p>
+      <button type="button" id="rvNext" class="rv-next" aria-label="Next"></button>
     </section>
 
     <section id="summonRes" class="overlay" hidden>
@@ -3304,6 +3342,7 @@ const camS={x:0,dist:1000,y:0};let camK=1;
 function updateCamera(){
   if(G.mode==='town'){townCamera();return;}
   if(G.ult&&G.mode==='fight'&&G.teams){ultCamera();return;}
+  if(G.mode==='cine'&&CINE.on&&CINE.qte&&CINE.qte.ph==='aim'){qteCamera();return;}
   let tx=0,dist=1000,ty=0;
   if(G.mode==='cine'&&CINE.on){[tx,dist,ty]=cineCam();}
   else if(G.teams&&G.mode!=='menu'){
@@ -3508,7 +3547,7 @@ function paintHeads(root){root.querySelectorAll('canvas[data-head]').forEach(cv=
 function drawPortrait(target,id,c){const x=target.getContext('2d');x.clearRect(0,0,target.width,target.height);x.drawImage(portrait(id,c),0,0,target.width,target.height);}
 
 /* ---------------- menus ---------------- */
-const SCREENS=['#start','#menu','#vsload','#story','#storyIntro','#select','#shop','#collection','#pause','#result','#summon','#summonRes','#events','#missions','#online'];
+const SCREENS=['#start','#menu','#vsload','#story','#storyIntro','#select','#shop','#collection','#pause','#result','#summon','#sreveal','#summonRes','#events','#missions','#online'];
 function show(id){for(const s of SCREENS)$(s).hidden=s!==id;refreshCoins();const el=id&&$(id);if(el)el.scrollTop=0;}
 function refreshCoins(){document.querySelectorAll('[data-coins]').forEach(e=>{e.textContent=SAVE.coins;e.setAttribute('aria-label',SAVE.coins+' coins');});
   document.querySelectorAll('[data-tokens]').forEach(e=>{e.textContent=SAVE.tokens||0;e.setAttribute('aria-label',(SAVE.tokens||0)+' tokens');});
@@ -3869,7 +3908,7 @@ function renderBannerList(){
   const L=$('#blist');L.innerHTML='';
   BANNERS.forEach((b,i)=>{const card=document.createElement('article');card.className='bcard';card.id='bcard-'+i;card.style.setProperty('--bc',b.col);
     card.innerHTML=`<div class="banner"><canvas width="960" height="400" aria-hidden="true"></canvas><div class="bcopy"><p class="eyebrow">Banner ${i+1} of ${BANNERS.length} · ${b.feat.length?'featured':'standard'}</p><h3>${esc(b.name)}</h3><p>${esc(b.sub)}</p><p class="rates">${bannerRates(b)}</p></div></div>
-      <div class="row sumrow"><button class="btn" type="button" data-n="1" ${SAVE.coins<100?'disabled':''}>Summon ×1 · 100 ◆</button><button class="btn" type="button" data-n="10" ${SAVE.coins<900?'disabled':''}>Summon ×10 · 900 ◆</button><button class="btn alt" type="button" data-n="10" data-tok="1" ${SAVE.tokens<300?'disabled':''}>Summon ×10 · 300 ✦</button></div>`;
+      <div class="row sumrow"><button class="btn" type="button" data-n="10" ${SAVE.coins<900?'disabled':''}>Summon ×10 · 900 ◆</button><button class="btn alt" type="button" data-n="10" data-tok="1" ${SAVE.tokens<300?'disabled':''}>Summon ×10 · 300 ✦</button></div>`;
     paintBanner(b,card.querySelector('canvas'));
     card.querySelectorAll('[data-n]').forEach(x=>x.addEventListener('click',()=>{curBanner=i;doSummon(+x.dataset.n,!!x.dataset.tok);}));
     L.appendChild(card);});
@@ -4011,7 +4050,7 @@ function rollOne(b,guar){
 }
 let lastTok=false;
 function doSummon(n,tok){
-  const cost=tok?300:n===10?900:100,have=tok?SAVE.tokens:SAVE.coins;if(have<cost){toast(tok?'Not enough tokens. Earn them from missions and raid bosses.':'Not enough coins yet. Win fights to earn more.');return;}
+  n=10;const cost=tok?300:n===10?900:100,have=tok?SAVE.tokens:SAVE.coins;if(have<cost){toast(tok?'Not enough tokens. Earn them from missions and raid bosses.':'Not enough coins yet. Win fights to earn more.');return;}
   unlock();if(tok)SAVE.tokens-=cost;else SAVE.coins-=cost;lastPull=n;lastTok=!!tok;track('summons',n);const b=BANNERS[curBanner],res=[];
   for(let i=0;i<n;i++){
     const guar=n===10&&i===n-1&&!res.some(r=>r.d.rarity!=='rare'),d=rollOne(b,guar);let kind,st;
@@ -4021,8 +4060,40 @@ function doSummon(n,tok){
   }
   const cos=rollCos(b,n);SAVE.pulls=(SAVE.pulls||0)+n;persist();
   const best=res.some(r=>r.d.rarity==='legend')?'legend':res.some(r=>r.d.rarity==='epic')?'epic':'rare';
-  playSummonCine(best,()=>showSummonResults(res,cos));
+  playSummonCine(best,()=>startReveal(res,cos));
 }
+/* full-screen reveal: each pull on its own, tap for the next, then every pull together */
+let RV=null;
+function portraitHi(id){
+  const out=document.createElement('canvas');out.width=640;out.height=800;const d=ROSTER[RIDX(id)],x=out.getContext('2d');
+  if(!ensurePR()){x.drawImage(portrait(id,0),0,0,640,800);return out;}
+  pr.setSize(640,800,false);const f={def:d,costume:0,pose:cp(WIN[d.id]||P.win),x:W/2,y:FLOOR,face:1,flash:0,state:'idle',t:0,portrait:true};
+  f.rig=makeRig(f,ps,true);updateRig(f);f.rig.shadow.visible=false;pr.render(ps,pc);x.drawImage(pr.domElement,0,0);
+  ps.remove(f.rig.root);ps.remove(f.rig.shadow);for(const m of f.rig.all)m.dispose();pr.setSize(320,400,false);return out;
+}
+function startReveal(res,cos){
+  RV={items:[...res.map(r=>({r})),...(cos||[]).map(c=>({c}))],i:-1,res,cos,at:0};
+  show('#sreveal');revealNext();
+}
+function revealNext(){
+  if(!RV)return;const now=performance.now();if(now-RV.at<260)return;RV.at=now;RV.i++;
+  if(RV.i>=RV.items.length){const {res,cos}=RV;RV=null;showSummonResults(res,cos);return;}
+  const it=RV.items[RV.i],el=$('#sreveal'),cv=$('#rvArt'),x=cv.getContext('2d');x.clearRect(0,0,640,800);
+  el.classList.remove('go','legend','epic','rare','cos');void el.offsetWidth;
+  if(it.r){const r=it.r,R=RAR[r.d.rarity];el.style.setProperty('--rc',R.col);el.classList.add(r.d.rarity);
+    x.drawImage(portraitHi(r.d.id),0,0);
+    $('#rvRar').textContent=R.name.toUpperCase()+' · '+r.d.cls.toUpperCase();$('#rvName').textContent=r.d.name;
+    $('#rvSub').textContent=r.kind==='new'?`${r.d.title}. Joined your roster!`:r.kind==='star'?`${r.d.title}. Star up to ${r.st}\u2605!`:'Max stars: +50 coins';
+    $('#rvTag').textContent=r.kind==='new'?'NEW!':r.kind==='star'?r.st+'\u2605':'+50 \u25c6';
+    sfx(r.d.rarity==='legend'?'super':r.d.rarity==='epic'?'special':'ui');if(r.d.rarity!=='rare')sfx('bell');}
+  else{const c=it.c,nm=c.cos==='i'?iconName(c.id):PBAN[c.id].name;el.style.setProperty('--rc','#7fe3ff');el.classList.add('cos');
+    if(c.cos==='i')drawPIcon(x,c.id,320,400,236,'#7fe3ff');else{x.save();x.translate(320,400);x.rotate(-0.14);drawPBanner(x,c.id,-300,-110,600,220);x.restore();}
+    $('#rvRar').textContent=c.cos==='i'?'PROFILE ICON':'PROFILE BANNER';$('#rvName').textContent=nm;$('#rvSub').textContent='Equip it in Menu \u203a Account';$('#rvTag').textContent='NEW!';sfx('bell');}
+  $('#rvCount').textContent=`${RV.i+1} / ${RV.items.length}`;
+  el.classList.add('go');$('#rvNext').focus({preventScroll:true});
+}
+$('#rvNext').addEventListener('click',e=>{e.stopPropagation();revealNext();});
+addEventListener('keydown',e=>{if(RV&&!$('#sreveal').hidden&&(e.key==='Enter'||e.key===' '||e.key==='ArrowRight'||e.code==='KeyJ')){e.preventDefault();e.stopPropagation();revealNext();}},true);
 function showSummonResults(res,cos){
   const best=res.some(r=>r.d.rarity==='legend')?'legend':res.some(r=>r.d.rarity==='epic')?'epic':'rare';
   $('#srTitle').textContent=best==='legend'?'Vision summoned!':best==='epic'?'Improved pull!':'Summon complete';
@@ -5284,6 +5355,7 @@ function padBack(ui){
 function padEdges(b,prev,ax){
   const P=SAVE.binds.pad,hit=k=>b[k]&&!prev[k];
   if(PAD.wait){for(let k=0;k<b.length;k++)if(hit(k)){assignBind('pad',PAD.wait,k);return;}return;}
+  if(G.mode==='cine'&&CINE.on&&CINE.qte&&CINE.qte.ph==='aim'&&(hit(0)||hit(P.light))){qtePress();return;}
   const ui=uiLayer();
   if(ui){
     let dir=0;if(hit(12)||hit(14))dir=-1;else if(hit(13)||hit(15))dir=1;
@@ -5324,16 +5396,16 @@ function showVsLoading(m,role,done){
    Two random fighters from the roster clash for about ten seconds before the results.
    How it ends hints at your best pull: a comeback win means a Vision; a clean win or a teammate jumping in
    means Improved or better (or a lucky Fresh); a loss means Fresh only. */
-const CINE={on:false,actors:[],t:0,kind:'win',beats:null,done:null,flash:0,flashCol:'#ffffff'};
+const CINE={on:false,actors:[],t:0,kind:'win',beats:null,done:null,flash:0,flashCol:'#ffffff',qte:null,fin:null};
 const CINE_LEN=600;
 function playSummonCine(best,done){
-  const ids=ROSTER.map(d=>d.id).sort(()=>Math.random()-0.5);
+  const ids=ROSTER.map(d=>d.id).filter(id=>id!=='kai').sort(()=>Math.random()-0.5);
   toMenu();show(null);G.mode='cine';
   setStage(HOME_STAGES[Math.floor(Math.random()*HOME_STAGES.length)]);
   const mk=(id,side,x)=>{const f=makeFighter(ROSTER[RIDX(id)],{side},0,30,3);Object.assign(f,{x,y:FLOOR,z:side===2?40:0,face:side===1?-1:1,state:'cine',t:0,onGround:true,vy:0,kvx:0,dec:1,cpose:null});f.pose=cp(IDLE[id]||P.idle);return f;};
-  const H=mk(ids[0],0,W/2-300),R=mk(ids[1],1,W/2+300),X=mk(ids[2],2,W/2-1100);X.hidden=true;
+  const H=mk('kai',0,W/2-300),R=mk(ids[0],1,W/2+300),X=mk(ids[1],2,W/2-1100);X.hidden=true;
   CINE.kind=best==='legend'?'comeback':best==='epic'?(Math.random()<0.5?'win':'help'):(Math.random()<0.5?'lose':'win');
-  Object.assign(CINE,{on:true,actors:[H,R,X],t:0,done,flash:0,beats:cineScript(CINE.kind)});
+  Object.assign(CINE,{on:true,actors:[H,R,X],t:0,done,flash:0,qte:null,fin:null,beats:cineScript(CINE.kind)});
   G.fx=[];G.projs=[];G.shake=0;G.zoomPunch=0;camS.ph=null;camS.x=0;camS.dist=1000;$('#cineSkip').hidden=false;sfx('bell');
 }
 function cineScript(kind){
@@ -5359,14 +5431,20 @@ function cineScript(kind){
     for(let k=0;k<6;k++)hit(456+k*8,0,1,k%2?'cross':'light','hit',2);
     b(0,508,'uppercut',{d:26,jump:-10});b(1,511,'launch',{jump:-16,vx:6,dec:0.99,d:60});fx(511,1,'hit',{heavy:1,col:'#c58bff'});b(1,571,'down',{d:200});fx(571,1,'land');
     b(0,545,'win',{d:200});fx(548,0,'ring',{col:'#b07cff'});}
-  for(const a of A)a.sort((x,y)=>x.t-y.t);F.sort((x,y)=>x.t-y.t);return {A,F};
+  const qteT={win:296,lose:296,help:440,comeback:500}[kind];
+  if(kind==='help'){b(1,428,'getup',{d:12});}
+  for(let i=0;i<3;i++)A[i]=A[i].filter(B=>B.t<qteT);
+  for(const a of A)a.sort((x,y)=>x.t-y.t);F.sort((x,y)=>x.t-y.t);return {A,F:F.filter(e=>e.t<qteT),qteT};
 }
 function cinePose(f,pose){const id=f.def.id;
   switch(pose){case 'idle':return idlePose(id,G.frame+(f.team.side||0)*97);case 'win':return winPose(id,G.frame);
     case 'heavy':return cp((HEAVY_VAR[id]||KICK)[1]);case 'hitH':return cp(P.hitHeavy);case 'airkick':return cp(P.airKickCh);
     case 'getup':return cp(P.getup1);case 'dash':return cp(P.dashF||P.dash);default:return cp(P[pose]||P.idle);}}
 function cineStep(){
-  if(!CINE.on)return;const t=++CINE.t,S=CINE.beats;
+  if(!CINE.on)return;
+  if(CINE.qte||CINE.fin){qteStep();for(const f of CINE.actors){f.t++;if(f.flash>0)f.flash--;updatePose(f);}if(CINE.flash>0)CINE.flash--;return;}
+  const t=++CINE.t,S=CINE.beats;
+  if(t>=S.qteT){startQte();return;}
   CINE.actors.forEach((f,i)=>{
     let cur=null;for(const B of S.A[i]){if(B.t<=t)cur=B;else break;}
     if(cur&&cur.t===t){if(cur.jump){f.vy=cur.jump;f.onGround=false;}f.kvx=cur.vx||0;f.dec=cur.dec||1;
@@ -5381,7 +5459,53 @@ function cineStep(){
   });
   for(const e of S.F)if(e.t===t)cineFx(e);
   if(CINE.flash>0)CINE.flash--;
-  if(t>=CINE_LEN)endCine();
+}
+/* timing button: a marker sweeps the bar; press while it is over the green to land the ultimate */
+const QTE_AIM=300,QTE_RES=210,QTE_FIN=120;
+function startQte(){
+  const [Hh,R,X]=CINE.actors,z=0.16+Math.random()*0.5;
+  CINE.qte={t:0,ph:'aim',m:0,v:0.016+Math.random()*0.004,zone:[z,z+0.2],ok:null,from:[Hh.x,R.x,X.x],down:[R.cpose,Hh.cpose]};
+  for(const f of CINE.actors){f.fly=null;f.kvx=0;f.vy=0;f.y=FLOOR;f.onGround=true;}
+  const b=$('#qteBtn');b.hidden=false;setTimeout(()=>{if(CINE.qte&&CINE.qte.ph==='aim')b.focus({preventScroll:true});},60);
+  sfx('bell');G.zoomPunch=0.06;
+}
+function qtePress(){const Q=CINE.qte;if(!Q||Q.ph!=='aim'||Q.t<20)return;
+  const ok=Q.m>=Q.zone[0]&&Q.m<=Q.zone[1];qteResolve(ok);}
+function qteResolve(ok){const Q=CINE.qte;Q.ph='res';Q.ok=ok;Q.t=0;$('#qteBtn').hidden=true;
+  const [Hh,R]=CINE.actors,a=ok?Hh:R;CINE.flash=24;CINE.flashCol=a.def.fx;sfx(ok?'super':'heavy');sfx('bell');G.shake=10;}
+function qteStep(){
+  const [Hh,R,X]=CINE.actors;
+  if(CINE.fin){const F=CINE.fin;F.t++;if(F.t>=QTE_FIN)endCine();return;}
+  const Q=CINE.qte;Q.t++;const t=Q.t;
+  if(Q.ph==='aim'){
+    const k=Math.min(1,t/24),e=k*k*(3-2*k),hx=W/2-170,rx=W/2+170;
+    Hh.x=Q.from[0]+(hx-Q.from[0])*e;R.x=Q.from[1]+(rx-Q.from[1])*e;Hh.face=1;R.face=-1;
+    if(!X.hidden){X.x=Q.from[2]+(hx-130-Q.from[2])*e;X.face=1;X.cpose=cinePose(X,'idle');}
+    const st=cp(P.windup);st.drop+=6;st.fa=[60+Math.sin(t*0.3)*4,140];Hh.cpose=st;
+    R.cpose=cinePose(R,'idle');
+    if(t>=20){Q.m+=Q.v;if(Q.m>=1){Q.m=1;Q.v=-Math.abs(Q.v);}if(Q.m<=0){Q.m=0;Q.v=Math.abs(Q.v);}}
+    if(t%12===0)G.fx.push({k:'ring',x:Hh.x,y:FLOOR-6,r:14,life:20,max:20,color:Hh.def.fx,flat:true});
+    if(t>=QTE_AIM)qteResolve(false);
+    return;
+  }
+  // the ultimate: dash in, six hits, a launcher, the slam
+  const ok=Q.ok,a=ok?Hh:R,v=ok?R:Hh,dir=v.x>=a.x?1:-1,fxc=a.def.fx;
+  a.face=dir;v.face=-dir;
+  if(t<22){const q=cp(P.windup);q.lean=-8;a.cpose=q;v.cpose=cinePose(v,'idle');if(t%5===0)G.fx.push({k:'ring',x:a.x,y:FLOOR-6,r:18,life:22,max:22,color:fxc,flat:true});}
+  else if(t<40){if(t===22){Q.ax=a.x;Q.tx=v.x-dir*72;sfx('whoosh');}const k=(t-22)/18;a.x=Q.ax+(Q.tx-Q.ax)*k*k;a.cpose=cinePose(a,'dash');
+    if(t%2===0)G.fx.push({k:'line',x:a.x-dir*26,y:FLOOR-60-Math.random()*80,vx:-dir*6,vy:0,life:10,max:10,color:fxc});}
+  else if(t<100){const i=Math.floor((t-40)/10),lt=(t-40)%10,pose=['light','cross','heavy','light','cross','heavy'][i];
+    a.cpose=cinePose(a,lt<3?'windup':pose);v.cpose=cinePose(v,i%2?'hitH':'hit');
+    if(lt===3){const x=v.x,y=v.y-110*v.def.scale;sparks(x,y,fxc,10);G.fx.push({k:'imp',x:x-dir*10,y,r:24,life:8,max:8,color:fxc,rot:Math.random()*TAU});sfx(i%3===2?'heavy':'light');G.shake=i%3===2?9:5;G.zoomPunch=0.05;v.x+=dir*6;a.x+=dir*6;}}
+  else if(t<110){a.cpose=cinePose(a,'uppercut');if(t===100){v.vy=-17;v.onGround=false;v.kvx=dir*5;const y=v.y-110*v.def.scale;sparks(v.x,y,fxc,22);G.fx.push({k:'imp',x:v.x,y,r:40,life:10,max:10,color:fxc,rot:0});
+      sfx('heavy');G.shake=14;G.zoomPunch=0.1;CINE.flash=14;CINE.flashCol=fxc;}}
+  else if(t<160){a.cpose=cinePose(a,'idle');}
+  else a.cpose=cinePose(a,'win');
+  if(t>=100){if(!v.onGround){v.y+=v.vy;v.vy+=0.75;v.x+=v.kvx;v.cpose=Object.assign(cinePose(v,'launch'),{rot:-30-(t-100)*6});
+      if(v.y>=FLOOR&&t>110){v.y=FLOOR;v.onGround=true;v.vy=0;dust(v.x);sfx('land');G.shake=10;for(let k=0;k<3;k++)G.fx.push({k:'ring',x:v.x,y:FLOOR-4,r:20+k*16,life:24+k*6,max:30,color:fxc,flat:true});}}
+    else v.cpose=cinePose(v,'down');}
+  if(!X.hidden){X.cpose=cinePose(X,ok?(t>160?'win':'idle'):'idle');}
+  if(t>=QTE_RES){CINE.qte=null;CINE.fin={t:0,ok};}
 }
 function cineFx(e){const f=CINE.actors[e.i],x=f.x,y=f.y-110*f.def.scale;
   switch(e.k){
@@ -5394,10 +5518,15 @@ function cineFx(e){const f=CINE.actors[e.i],x=f.x,y=f.y-110*f.def.scale;
       sfx('super');G.shake=12;CINE.flash=22;CINE.flashCol='#c58bff';f.flash=30;break;
   }}
 function cineCam(){const [H,R,X]=CINE.actors,t=CINE.t,k=CINE.kind;let tx=(H.x+R.x)/2-W/2,dist=t<110?980:t<390?760:640,ty=6;
-  const endT=k==='comeback'?545:k==='help'?462:410;
-  if(k==='help'&&t>=330&&t<endT){tx=(R.x+(X.hidden?R.x:X.x))/2-W/2;dist=820;}
-  if(t>=endT){if(k==='help'){tx=(H.x+X.x)/2-W/2;dist=640;}else{tx=(k==='lose'?R:H).x-W/2;dist=520;}}
+  if(k==='help'&&t>=330){tx=(R.x+(X.hidden?R.x:X.x))/2-W/2;dist=820;}
+  if(CINE.qte&&CINE.qte.ph==='res'){const Q=CINE.qte,a=Q.ok?H:R,v=Q.ok?R:H;tx=(a.x+v.x)/2-W/2;dist=Q.t<40?700:Q.t<100?560:Q.t<160?720:600;ty=Q.t>=100&&Q.t<160?60:6;}
+  if(CINE.fin){const w=CINE.fin.ok?H:R;tx=w.x-W/2;dist=520;}
   return [clamp(tx,-500,500),dist,ty];}
+/* close-up that faces Kai from the rival's side while the timing bar runs */
+function qteCamera(){const H=CINE.actors[0],s=H.def.scale,x=H.x-W/2,hy=150*s,k=Math.min(1,CINE.qte.t/24),e=k*k*(3-2*k);
+  const px=x+lerp(60,150,e),pz=lerp(560,150,e),py=lerp(110,hy+6,e);
+  let sx=0,sy=0;if(G.shake>0.6&&!RM){sx=(Math.random()-.5)*G.shake;sy=(Math.random()-.5)*G.shake;}
+  cam.position.set(px+sx,py+sy,pz);cam.lookAt(x+12,lerp(96,hy-8,e),0);camK=2.2;camS.x=x;camS.dist=520;camS.y=0;}
 function drawCine(c){
   const t=CINE.t,[HH,R,X]=CINE.actors,k=CINE.kind,bar=Math.round(H_BAR());
   c.fillStyle='#000';c.fillRect(-OX,-OY,W+2*OX,bar+OY);c.fillRect(-OX,H-bar,W+2*OX,bar+OY);
@@ -5408,19 +5537,34 @@ function drawCine(c){
     c.textAlign='left';otext(c,R.def.name.toUpperCase(),W/2+40,H/2-120,26,R.def.fx,OUT,6);c.restore();}
   if(k==='help'&&t>=334&&t<400)say(X.def.name.split(' ')[0].toUpperCase()+' JUMPS IN!',X.def.fx,clamp((t-334)/8,0,1)*clamp((400-t)/10,0,1));
   if(k==='comeback'&&t>=396&&t<450)say('NOT DONE YET!','#c58bff',clamp((t-396)/8,0,1)*clamp((450-t)/10,0,1));
-  const endT=k==='comeback'?548:k==='help'?466:412,endTxt={win:'VICTORY!',lose:'DEFEAT…',help:'TEAMWORK!',comeback:'LEGENDARY COMEBACK!'}[k];
-  if(t>=endT)say(endTxt,k==='lose'?'#ff6b4a':k==='comeback'?'#c58bff':'#ffc94d',clamp((t-endT)/10,0,1));
+  const Q=CINE.qte,FN=CINE.fin;
+  if(Q&&Q.ph==='aim'){const a=clamp(Q.t/12,0,1),bw=460,bh=24,bx=W/2-bw/2,by=H-bar-104;c.save();c.globalAlpha=a;
+    c.textAlign='center';c.textBaseline='middle';otext(c,'FINISH IT!',W/2,bar+46,40,'#ffc94d',OUT,8);
+    otext(c,'Press when the marker is on the green',W/2,by-22,15,'#f6efe4',OUT,4);
+    c.fillStyle='rgba(16,10,30,.85)';c.fillRect(bx-4,by-4,bw+8,bh+8);c.fillStyle='#3a2a5c';c.fillRect(bx,by,bw,bh);
+    c.fillStyle='#ff6b4a';c.fillRect(bx,by,bw*Q.zone[0],bh);c.fillRect(bx+bw*Q.zone[1],by,bw*(1-Q.zone[1]),bh);
+    c.fillStyle='#5fe08a';c.fillRect(bx+bw*Q.zone[0],by,bw*(Q.zone[1]-Q.zone[0]),bh);
+    const mx=bx+bw*Q.m;c.fillStyle='#ffffff';c.fillRect(mx-3,by-10,6,bh+20);c.fillStyle='#160f2a';c.fillRect(mx-1,by-8,2,bh+16);
+    const left=Math.max(0,Math.ceil((QTE_AIM-Q.t)/60));otext(c,String(left),bx+bw+30,by+bh/2,22,left<=1?'#ff6b4a':'#f6efe4',OUT,5);c.restore();}
+  if(Q&&Q.ph==='res'&&Q.t<70){const a=Q.ok?HH:R,al=clamp(Q.t/8,0,1)*clamp((70-Q.t)/10,0,1);c.save();c.globalAlpha=al;c.textAlign='center';c.textBaseline='middle';
+    otext(c,a.def.ultName.toUpperCase(),W/2,H/2-130,44,a.def.fx,OUT,8);otext(c,(Q.ok?'PERFECT TIMING!':'MISSED! '+R.def.name.split(' ')[0].toUpperCase()+' STRIKES BACK'),W/2,H/2-88,16,Q.ok?'#5fe08a':'#ff6b4a',OUT,4);c.restore();}
+  if(FN){const txt=FN.ok?{win:'VICTORY!',lose:'CLUTCH VICTORY!',help:'TEAMWORK!',comeback:'LEGENDARY COMEBACK!'}[k]:'DEFEAT…';
+    say(txt,FN.ok?(k==='comeback'?'#c58bff':'#ffc94d'):'#ff6b4a',clamp(FN.t/10,0,1));}
   if(CINE.flash>0){c.save();c.globalAlpha=CINE.flash/30;c.fillStyle=CINE.flashCol;c.fillRect(-OX,-OY,W+2*OX,H+2*OY);c.restore();}
-  if(t>CINE_LEN-24){c.save();c.globalAlpha=(t-(CINE_LEN-24))/24;c.fillStyle='#ffffff';c.fillRect(-OX,-OY,W+2*OX,H+2*OY);c.restore();}
+  if(FN&&FN.t>QTE_FIN-24){c.save();c.globalAlpha=(FN.t-(QTE_FIN-24))/24;c.fillStyle='#ffffff';c.fillRect(-OX,-OY,W+2*OX,H+2*OY);c.restore();}
 }
 const H_BAR=()=>H*0.085;
 function endCine(){
-  if(!CINE.on)return;CINE.on=false;$('#cineSkip').hidden=true;
+  if(!CINE.on)return;CINE.on=false;CINE.qte=null;CINE.fin=null;$('#cineSkip').hidden=true;$('#qteBtn').hidden=true;
   for(const f of CINE.actors)if(f.rig){disposeRig(f.rig);const k=rigs.indexOf(f.rig);if(k>=0)rigs.splice(k,1);f.rig=null;}
   CINE.actors=[];G.fx=[];const d=CINE.done;CINE.done=null;enterTown();sfx('bell');if(d)d();
 }
 $('#cineSkip').addEventListener('click',()=>{sfx('ui');endCine();});
-addEventListener('keydown',e=>{if(G.mode==='cine'&&CINE.on&&(e.key==='Escape'||e.key==='Enter'||e.key===' ')){e.preventDefault();endCine();}});
+addEventListener('keydown',e=>{if(G.mode!=='cine'||!CINE.on)return;
+  if(CINE.qte&&CINE.qte.ph==='aim'&&(e.key==='Enter'||e.key===' '||e.code===SAVE.binds.kb.light||e.code==='KeyJ')){e.preventDefault();qtePress();return;}
+  if(e.key==='Escape'||((e.key==='Enter'||e.key===' ')&&!CINE.qte)){e.preventDefault();endCine();}});
+$('#qteBtn').addEventListener('click',e=>{e.stopPropagation();qtePress();});
+$('#qteBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();qtePress();});
 
 const SCREEN_EL=()=>SCREEN_EL.c||(SCREEN_EL.c=SCREENS.map(s=>$(s)));
 const townBusy=()=>SCREEN_EL().some(e=>!e.hidden);
