@@ -271,7 +271,7 @@ body.land .sres{grid-template-columns:repeat(10,minmax(0,1fr))}
 .rcard .nm{font-weight:700;font-size:13px;text-align:center;line-height:1.15}
 .rcard .rk{font-size:11px;color:var(--muted);text-align:center;line-height:1.2}
 .rcard .tag{position:absolute;top:6px;right:6px;font-family:var(--display);font-size:10px;padding:2px 6px;background:var(--rc);color:var(--night)}
-.rcard.legend{box-shadow:0 0 22px 2px rgba(255,201,77,.55)}
+.rcard.legend{box-shadow:0 0 22px 2px rgba(176,124,255,.6)}.rcard.epic{box-shadow:0 0 14px 1px rgba(90,168,255,.4)}
 @keyframes rpop{from{opacity:0;transform:translateY(14px) scale(.8)}}
 @media (prefers-reduced-motion:reduce){.rcard{animation:none}}
 .coins.tok{color:#7fe3ff}
@@ -700,7 +700,7 @@ body.fighting #townFade{display:none}
     <section id="summon" class="overlay" hidden>
       <div class="screen">
         <header class="bar"><button class="back" type="button" id="sumBack">‹ Back</button><div class="ttl"><p class="eyebrow">Summon</p><h2>Banners</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
-        <p class="sub">Scroll through every banner. A ×10 summon always includes at least one Epic or Legend. Duplicates add a star, up to 14★. Each star adds 4% health and power; past 14★ a duplicate turns into 50 coins.</p>
+        <p class="sub">Scroll through every banner. A ×10 summon always includes at least one Improved or Vision fighter. Duplicates add a star, up to 14★. Each star adds 4% health and power; past 14★ a duplicate turns into 50 coins.</p>
         <div class="blist" id="blist"></div>
       </div>
     </section>
@@ -817,10 +817,33 @@ const ROSTER=[
  {id:'junho',cls:'Hapkido',name:'Jun-ho Seo',title:'Pressure Point',bio:'Hapkido instructor who turns a punch into a joint lock before the crowd sees what happened.',hp:100,speed:4.4,power:1.03,jump:1.0,scale:1.0,reach:1.02,build:'m',
   gear:{open:1,under:'#f2f2f2',lapel:'#1a1a2a',haori:60,pattern:'stars',obi:'#1a1a2a',tabi:'#f2f2f2',hakama:56},
   col:{skin:'#f0d0b8',main:'#f4f4f6',alt:'#1f2f6a',pants:'#1a1a2a',trim:'#3a6ad8',hair:'#1a1418'},hair:'undercut',face:{eye:'cool',iris:'#3a2a1a',brow:6,mouth:'calm'},special:'kunai',spName:'Pressure Needles',sup:'rush',supName:'Joint Lock Chain',ultName:'Hundred Points',fx:'#7fd0ff'},
+ {id:'ren',cls:'Kenjutsu',name:'Ren Kurobane',title:'Ashen Blade',bio:'Wandering swordsman who drags a blade nearly as tall as he is and never says where he found it.',hp:108,speed:4.1,power:1.12,jump:0.98,scale:1.04,reach:1.04,build:'m',
+  weapon:{kind:'sword',col:'#d8dee8',hilt:'#1a1a22',accent:'#9fd3ff'},
+  gear:{open:1,under:'#1a1a22',lapel:'#3a3a48',haori:78,pattern:'clouds',obi:'#9fd3ff',tabi:'#141418',hakama:58},
+  col:{skin:'#e8c8b0',main:'#2a2a36',alt:'#6a1f2a',pants:'#1a1a22',trim:'#9fd3ff',hair:'#e8e8f0'},hair:'swept',face:{eye:'sharp',iris:'#5ab0ff',brow:14,mouth:'flat',scar:1},special:'wave',spName:'Ground Splitter',sup:'rush',supName:'Ashfall Cuts',ultName:'Grave of Swords',fx:'#9fd3ff'},
+ {id:'saya',cls:'Scythe Arts',name:'Saya Tsukimori',title:'Moon Reaper',bio:'Shrine keeper who sweeps the old graveyard with a scythe, and sweeps her opponents the same way.',hp:94,speed:4.7,power:1.06,jump:1.1,scale:0.96,reach:1.05,build:'f',
+  weapon:{kind:'scythe',col:'#d0c4f0',hilt:'#2a1a2a',accent:'#c58bff'},
+  gear:{acc:['scarf:#6a2a8a'],under:'#f2eef8',haori:70,pattern:'stars',obi:'#6a2a8a',tabi:'#1a1418',hakama:62,longhair:1},
+  col:{skin:'#f6e2d6',main:'#1e1a2a',alt:'#6a2a8a',pants:'#2a2238',trim:'#c58bff',hair:'#e8e0ff'},hair:'hime',face:{eye:'narrow',iris:'#b07cff',brow:4,mouth:'smirk'},special:'spike',spName:'Crescent Harvest',sup:'beam',supName:'Moonfall',ultName:'Last Lantern',fx:'#c58bff'},
+ {id:'gunnar',cls:'Greatsword',name:'Gunnar Vale',title:'Iron Tide',bio:'Shipyard foreman who swings a greatsword forged from hull steel like a sledgehammer.',hp:124,speed:3.3,power:1.24,jump:0.9,scale:1.14,reach:1.04,build:'h',
+  weapon:{kind:'sword',col:'#b8bcc4',hilt:'#5a3a22',accent:'#ffb070',big:1.2},
+  gear:{sleeveless:1,acc:['fur','cuffs'],under:'#3a2a1a',haori:60,pattern:'crest',obi:'#8a5a2a',tabi:'#2a1a12'},
+  col:{skin:'#f0c8a8',main:'#4a3a2a',alt:'#2a4a5a',pants:'#2a2420',trim:'#ffb070',hair:'#c8642a'},hair:'crop',face:{eye:'small',iris:'#4a7a9a',brow:16,browThick:8,mouth:'grin',stubble:1},special:'slam',spName:'Mountain Cleaver',sup:'rush',supName:'Shipbreaker',ultName:'Iron Tide Crash',fx:'#ffb070'},
+ {id:'noor',cls:'Scythe Dance',name:'Noor Haddad',title:'Desert Wraith',bio:'Caravan dancer who turned a harvest scythe into a whirling art form.',hp:92,speed:4.9,power:1.0,jump:1.08,scale:0.97,reach:1.04,build:'f',
+  weapon:{kind:'scythe',col:'#ffd27a',hilt:'#3a2414',accent:'#c0392b'},
+  gear:{acc:['scarf:#e8a83a','cuffs'],under:'#f2e2c0',haori:56,pattern:'sun',obi:'#c0392b',tabi:'#3a2414'},
+  col:{skin:'#9a6a44',main:'#e8a83a',alt:'#1f6a7a',pants:'#2a2a3a',trim:'#ffd27a',hair:'#1a1210'},hair:'braid',face:{eye:'soft',iris:'#2a1a12',brow:6,mouth:'calm'},special:'sonic',spName:'Sandreaper Arc',sup:'beam',supName:'Mirage Storm',ultName:'Dune Requiem',fx:'#ffd27a'},
+ {id:'kaito',cls:'Iaijutsu',name:'Kaito Ibuki',title:'Rain Blade',bio:'Rooftop courier who carries a long, slim blade through the rain and has never once been late.',hp:98,speed:4.8,power:1.04,jump:1.04,scale:1.0,reach:1.03,build:'m',
+  weapon:{kind:'sword',col:'#e8f2ff',hilt:'#1f3a5a',accent:'#7fe3ff',slim:1},
+  gear:{acc:['scarf:#1f6aa8'],under:'#f2f2f2',haori:66,pattern:'waves',obi:'#1f3a5a',tabi:'#1a1a22'},
+  col:{skin:'#d8a882',main:'#1f3a5a',alt:'#7a1f2a',pants:'#1a1a22',trim:'#7fe3ff',hair:'#1a1418'},hair:'pony',face:{eye:'cool',iris:'#3a6a9a',brow:8,mouth:'flat'},special:'dash',spName:'Rain Cut',sup:'rush',supName:'Downpour',ultName:'Thousand Raindrops',fx:'#7fe3ff'},
+ {id:'amara',cls:'Dambe',name:'Amara Okoye',title:'River Fist',bio:'Dambe boxer who wraps her lead fist like a spearhead and hits like a river in flood.',hp:104,speed:4.4,power:1.1,jump:1.0,scale:1.0,reach:1.0,build:'f',
+  gear:{sleeveless:1,acc:['armguard'],gloves:'#e8dcc4',under:'#c0392b',haori:40,pattern:'chevron',obi:'#ffd23a',tabi:'#2a1a12'},
+  col:{skin:'#4a2a18',main:'#c0392b',alt:'#1f6a3a',pants:'#2a2a33',trim:'#ffd23a',hair:'#120c0a'},hair:'locs',face:{eye:'sharp',iris:'#3a2a1a',brow:12,mouth:'grin'},special:'uppercut',spName:'River Hammer',sup:'rush',supName:'Flood Strikes',ultName:'Champion of the Ring',fx:'#ffd23a'},
 ];
 const RIDX=id=>ROSTER.findIndex(d=>d.id===id);
-const RAR={rare:{name:'Rare',col:'#7fb0ff'},epic:{name:'Epic',col:'#c58bff'},legend:{name:'Legend',col:'#ffc94d'}};
-{const R={ozzy:'epic',lena:'epic',sora:'epic',taro:'epic',nadia:'epic',bruno:'epic',dex:'legend',mei:'legend',warden:'legend',tavi:'epic',bayu:'epic',devi:'legend',ines:'rare',junho:'rare'};ROSTER.forEach(d=>{d.rarity=R[d.id]||'rare';});}
+const RAR={rare:{name:'Fresh',col:'#5fe08a'},epic:{name:'Improved',col:'#5aa8ff'},legend:{name:'Vision',col:'#b07cff'}};
+{const R={ozzy:'epic',lena:'epic',sora:'epic',taro:'epic',nadia:'epic',bruno:'epic',dex:'legend',mei:'legend',warden:'legend',tavi:'epic',bayu:'epic',devi:'legend',ines:'rare',junho:'rare',ren:'legend',saya:'legend',gunnar:'epic',noor:'epic',kaito:'rare',amara:'rare'};ROSTER.forEach(d=>{d.rarity=R[d.id]||'rare';});}
 const SPDESC={fireball:'throws a fireball across the screen.',dash:'electric dash that knocks down.',slam:'leaping ground pound with a shockwave.',kunai:'fans out three fast blades.',orb:'slow, heavy orb that knocks down.',wave:'ground wave you have to jump.',sonic:'a clap shockwave that flies across the arena.',spike:'ice erupts under your rival after a short delay.',uppercut:'rising uppercut that beats jump-ins.'};
 const SUPDESC={beam:'full-screen beam.',rush:'dash in, then a 7-hit combo.'};
 const ULTDESC='unblockable dash into a 10-hit finisher. Needs all three bars.';
@@ -896,7 +919,7 @@ function dayStart(d){const x=new Date(d);x.setHours(0,0,0,0);return x;}
 const EVENTS=[
  {id:'dxp',name:'Double XP Weekend',days:[5,6,0],desc:'Every fight pays double XP. Great time to push fighters toward Lv 60.',col:'#9dff7a'},
  {id:'coin',name:'Coin Rush',days:[1,2],desc:'All coin rewards are 50% higher.',col:'#ffc94d'},
- {id:'fest',name:'Legend Festival',days:[3,4],desc:'Legend summon rate rises from 5% to 8% on every banner.',col:'#c58bff'},
+ {id:'fest',name:'Vision Festival',days:[3,4],desc:'Vision summon rate rises from 5% to 8% on every banner.',col:'#c58bff'},
 ];
 function eventState(e,now){now=now||new Date();const on=e.days.includes(now.getDay());let t=dayStart(now).getTime();
   for(let k=1;k<=8;k++){t+=DAY;const d=new Date(t);if(e.days.includes(d.getDay())!==on)break;}return {on,ms:t-now.getTime()};}
@@ -1079,6 +1102,12 @@ Object.assign(IDLE,{
  devi:{lean:10,drop:22,rot:0,ba:[60,120],fa:[80,110],bl:[-34,-12],fl:[40,16]},
  bayu:{lean:8,drop:18,rot:0,ba:[40,110],fa:[75,130],bl:[-28,-10],fl:[34,12]},
  junho:{lean:2,drop:8,rot:0,ba:[35,120],fa:[60,100],bl:[-16,-6],fl:[20,6]},
+ ren:{lean:6,drop:12,rot:0,ba:[30,100],fa:[60,140],bl:[-26,-10],fl:[30,10]},
+ saya:{lean:2,drop:10,rot:0,ba:[40,120],fa:[70,125],bl:[-20,-8],fl:[26,8]},
+ gunnar:{lean:8,drop:16,rot:0,ba:[40,110],fa:[80,150],bl:[-28,-10],fl:[32,12]},
+ noor:{lean:0,drop:8,rot:0,ba:[100,160],fa:[60,115],bl:[-18,-6],fl:[22,6]},
+ kaito:{lean:12,drop:14,rot:0,ba:[50,100],fa:[40,80],bl:[-30,-12],fl:[36,12]},
+ amara:{lean:8,drop:10,rot:0,ba:[30,160],fa:[70,100],bl:[-20,-8],fl:[26,8]},
 });
 Object.assign(FEEL,{
  tavi:(p,t)=>{const g=Math.sin(t*0.08);p.hx=(p.hx||0)+g*8;p.fl[0]+=g*14;p.bl[0]+=g*14;p.fa[0]-=g*20;p.ba[0]+=g*20;p.tw=(p.tw||0)+g*10;p.drop+=Math.abs(g)*4;},
@@ -1086,6 +1115,12 @@ Object.assign(FEEL,{
  devi:(p,t)=>{const b=Math.sin(t*0.05);p.drop+=b*3;p.fa[0]+=Math.sin(t*0.07)*8;p.ba[0]+=Math.sin(t*0.07+1)*8;},
  bayu:(p,t)=>{const b=Math.sin(t*0.06);p.lean+=b*2;p.fa[0]+=Math.sin(t*0.1)*12;p.fa[1]+=Math.cos(t*0.1)*14;p.drop+=b*2;},
  junho:(p,t)=>{p.fa[0]+=Math.sin(t*0.05)*5;p.ba[0]+=Math.sin(t*0.05+2)*5;},
+ ren:(p,t)=>{const b=Math.sin(t*0.05);p.drop+=b*2;p.fa[0]+=b*4;const e=envl(t,260,0.2);p.fa[0]+=e*60;p.fa[1]+=e*30;},
+ saya:(p,t)=>{const b=Math.sin(t*0.06);p.lean+=b*2;p.fa[0]+=Math.sin(t*0.08)*8;p.tw=(p.tw||0)+b*6;},
+ gunnar:(p,t)=>{const b=Math.sin(t*0.04);p.lean+=b*3;p.drop+=b*2;const e=envl(t,300,0.25);p.fa[0]+=e*50;p.fa[1]-=e*60;},
+ noor:(p,t)=>{const b=Math.sin(t*0.09);p.tw=(p.tw||0)+b*10;p.hx=(p.hx||0)+b*4;p.ba[0]+=b*10;},
+ kaito:(p,t)=>{const b=Math.sin(t*0.05);p.drop+=b*1.5;const e=envl(t,240,0.15);p.fa[0]+=e*50;p.fa[1]+=e*40;p.lean-=e*10;},
+ amara:(p,t)=>{const b=Math.sin(t*0.14);p.drop+=Math.abs(b)*4;p.lean+=b*3;p.fa[0]+=Math.sin(t*0.1)*6;},
 });
 Object.assign(WIN,{
  tavi:{lean:-6,drop:10,ba:[150,170],fa:[30,40],bl:[-20,-8],fl:[30,12]},
@@ -1093,6 +1128,12 @@ Object.assign(WIN,{
  devi:{lean:6,drop:14,ba:[100,170],fa:[100,170],bl:[-24,-10],fl:[28,10]},
  bayu:{lean:4,drop:14,ba:[60,130],fa:[90,160],bl:[-24,-10],fl:[30,12]},
  junho:{lean:-2,drop:2,ba:[20,60],fa:[30,60],bl:[-10,-4],fl:[12,4]},
+ ren:{lean:-4,drop:2,ba:[20,60],fa:[170,178],bl:[-12,-4],fl:[14,4]},
+ saya:{lean:-6,drop:4,ba:[30,60],fa:[150,176],bl:[-12,-4],fl:[14,4]},
+ gunnar:{lean:-6,drop:6,ba:[60,150],fa:[150,60],bl:[-16,-6],fl:[18,6]},
+ noor:{lean:-4,drop:4,ba:[160,176],fa:[60,100],bl:[-12,-4],fl:[16,4]},
+ kaito:{lean:4,drop:8,ba:[40,70],fa:[60,20],bl:[-14,-6],fl:[16,4]},
+ amara:{lean:-4,drop:2,ba:[40,140],fa:[172,178],bl:[-14,-6],fl:[16,4]},
 });
 Object.assign(HEAVY_VAR,{bruno:HEAVY_VAR.bastion,mei:HEAVY_VAR.doc,nadia:HEAVY_VAR.juno,taro:[P.crossCh,P.cross,P.crossRec,'hand']});
 Object.assign(WIN,{
@@ -1593,8 +1634,23 @@ function makeRig(f,sc,keep){
   const shadow=new THREE.Mesh(PLANE,new THREE.MeshBasicMaterial({map:SHADOW_TEX,color:'#0a0514',transparent:true,depthWrite:false}));
   shadow.rotation.x=-Math.PI/2;
   sc.add(root);sc.add(shadow);
+  /* weapons: greatsword or scythe, grip at the group's origin and the blade along +y */
+  let rWeapon=null;
+  if(d.weapon){const wg=new THREE.Group();body.add(wg);const wd=d.weapon,sc=wd.big||1,bl=T(wd.col||'#d8dee8',{rim:'#ffffff',rimS:0.6}),hl=T(wd.hilt||'#2a1a12'),ac=T(wd.accent||'#e8c26a');
+    if(wd.kind==='scythe'){const sh=new THREE.CylinderGeometry(2.3,2.3,180*sc,8);sh.translate(0,48*sc,0);part(sh,hl,wg,{});
+      const cs=new THREE.Shape();cs.moveTo(0,5);cs.quadraticCurveTo(52,22,94,-38);cs.quadraticCurveTo(44,-4,0,-7);cs.closePath();
+      const bg=new THREE.ExtrudeGeometry(cs,{depth:2.4,bevelEnabled:false,curveSegments:10});bg.translate(0,0,-1.2);bg.scale(sc,sc,1);bg.translate(0,136*sc,0);part(bg,bl,wg,{});
+      const cl=new THREE.TorusGeometry(3.6,1.4,6,12);cl.rotateX(Math.PI/2);cl.translate(0,133*sc,0);part(cl,ac,wg,{ol:false});wg.userData={len:150*sc,kind:'scythe'};}
+    else{const L=(wd.slim?132:122)*sc,Wd=(wd.slim?7:13)*sc;part(new THREE.CylinderGeometry(2.6,2.6,24,8),hl,wg,{});
+      const pm=new THREE.SphereGeometry(4.2,8,6);pm.translate(0,-14,0);part(pm,ac,wg,{});
+      const gd=new THREE.BoxGeometry(wd.slim?14:30*sc,5,9);gd.translate(0,13,0);part(gd,ac,wg,{});
+      const bd=new THREE.BoxGeometry(Wd,L,2.6);bd.translate(0,15+L/2,0);part(bd,bl,wg,{});
+      if(!wd.slim){const fu=new THREE.BoxGeometry(Wd*0.26,L*0.82,2.8);fu.translate(0,15+L*0.45,0);part(fu,T(wd.accent||'#9fd3ff'),wg,{ol:false});}
+      const tp=new THREE.ConeGeometry(Wd*0.71,Wd*1.3,4);tp.rotateY(Math.PI/4);tp.scale(1,1,0.26);tp.translate(0,15+L+Wd*0.65,0);part(tp,bl,wg,{});
+      wg.userData={len:15+L+Wd*1.3,kind:'sword'};}
+    rWeapon=wg;}
   const r={root,body,head,S,B,tails,btails,pauld:null,cape,weapons:[],shadow,cloth,face:faceMesh,expr:'neutral',blinkOff:Math.floor(Math.random()*230),
-    toon,all,emKey:-1,alpha:1,transp:false,beam:null,keep:!!keep};
+    toon,all,emKey:-1,alpha:1,transp:false,beam:null,keep:!!keep,weapon:rWeapon};
   if(isMain)rigs.push(r);
   return r;
 }
@@ -1648,6 +1704,13 @@ function updateRig(f){
   place(S.bUp,shB,be,-zS);place(S.bFore,be,bh,-zS);hand(S.bFist,be,bh,-zS);
   place(S.fUp,shF,fe,zS);place(S.fFore,fe,fh,zS);hand(S.fFist,fe,fh,zS);
   if(r.propK!==(f.prop||null)){if(r.prop)r.body.remove(r.prop);r.prop=f.prop?makeProp(f.prop,f):null;if(r.prop)r.body.add(r.prop);r.propK=f.prop||null;}
+  if(r.weapon){const wg=r.weapon,len=wg.userData.len*0.97,walk=f.state==='walk'&&!f.tpose;
+    const mode=f.town?(walk?'drag':(f.act||f.prop||f.tpose)?'back':'rest'):(walk?'drag':'align');
+    let px=fh[0],py=-fh[1],pz=zS+4,dx,dy;
+    if(mode==='align'){dx=fh[0]-fe[0];dy=-(fh[1]-fe[1]);}
+    else if(mode==='back'){const ap=at(TORSO*0.55);px=ap[0]-15;py=-ap[1]-18;pz=0;dx=-0.28;dy=1;}
+    else{const hh=Math.max(4,hipH+py),sn2=clamp(hh/len,0.06,0.98),cs2=Math.sqrt(1-sn2*sn2);dx=mode==='drag'?-cs2:cs2;dy=-sn2;}
+    wg.position.set(px,py,pz);wg.quaternion.setFromUnitVectors(UP,TV.set(dx,dy,0).normalize());}
   if(r.prop){if(f.prop==='book'){r.prop.position.set((fh[0]+bh[0])/2+5,-(fh[1]+bh[1])/2+3,0);r.prop.rotation.set(0,0,0.9);}
     else{r.prop.position.set(fh[0]+3,-fh[1]+12,zS);r.prop.rotation.set(0,0,0.15);}}
   place(S.torso,[0,0],neck,0);S.torso.quaternion.multiply(QT.setFromAxisAngle(UP,TW));
@@ -2630,6 +2693,12 @@ const STYLE={
  devi:[mv('Palm',SP.palmF,'f',{reach:84}),mv('Elbow',SP.elbow,'f',{reach:68,dmg:8}),mv('High Kick',SP.high,'foot',{...KICKH,...HIGHH,dmg:9}),mv('Lion Claw',SP.upper,'f',{...LAUNCH,h:[-150,-40],reach:90})],
  bayu:[mv('Palm',SP.palmF,'f',{reach:82,s:3}),mv('Palm',SP.palmB,'b',{reach:82,s:3}),mv('Knee',SP.knee,'foot',{reach:70,h:[-120,-50],dmg:8}),mv('Tiger Takedown',SP.grab,'f',THROW)],
  junho:[mv('Jab',SP.jab,'f'),mv('Palm',SP.palmF,'f',{reach:84}),mv('Front Kick',SP.teep,'foot',KICKH),mv('Wrist Lock',SP.grab,'f',THROW)],
+ ren:[mv('Slash',SP.chop,'f',{reach:116,dmg:8,s:6,r:12}),mv('Rising Cut',SP.upper,'f',{reach:112,dmg:8}),mv('Heavy Cleave',SP.chop,'f',{...KNOCK,reach:120,dmg:13})],
+ saya:[mv('Reap',SP.lariat,'f',{reach:122,dmg:7,lunge:4}),mv('Reap',SP.chop,'f',{reach:118,dmg:7}),mv('Moon Hook',SP.upper,'f',{...LAUNCH,reach:120})],
+ gunnar:[mv('Cleave',SP.chop,'f',{reach:118,dmg:10,s:8,r:14,heavy:true}),mv('Shoulder',SP.tackle,'f',{reach:80,dmg:9}),mv('Overhead',SP.chop,'f',{...KNOCK,reach:124,dmg:15,s:10})],
+ noor:[mv('Sweep',SP.lariat,'f',{reach:120,dmg:6}),mv('Spin Reap',SP.spin,'foot',{...KICKH,reach:110,dmg:8}),mv('Whirl',SP.lariat,'f',{...KNOCK,reach:126,dmg:11,lunge:6})],
+ kaito:[mv('Draw Cut',SP.hook,'f',{reach:112,dmg:7,s:3}),mv('Return Cut',SP.chop,'f',{reach:112,dmg:7}),mv('Rain Thrust',SP.jab,'f',{reach:118,dmg:8}),mv('Rising Rain',SP.upper,'f',{...LAUNCH,reach:112})],
+ amara:[mv('Jab',SP.jab,'f'),mv('Spear Hand',SP.cross,'b',{dmg:8,reach:84}),mv('Hook',SP.hook,'f',{dmg:8}),mv('River Hammer',SP.upper,'f',{...LAUNCH,h:[-150,-40],reach:90})],
  warden:[mv('Jab',SP.jab,'f',{dmg:7}),mv('Elbow',SP.elbow,'f',{reach:68,dmg:8}),mv('Spin Kick',SP.spin,'foot',{...KICKH,reach:104,dmg:10}),mv('Verdict Palm',SP.palmF,'f',{...LAUNCH,reach:92,dmg:14})],
 };
 const listOf=f=>f.str==='low'?STR.low:(STYLE[f.def.id]||STR.std);
@@ -2697,6 +2766,7 @@ function townActPose(f){
   return P0;
 }
 function townBasePose(f){const b=Math.sin((G.frame+(f.wx||0)*0.37)*0.045);
+  if(f.def.weapon)return {lean:2,drop:1.5+b*0.8,rot:0,tw:0,hx:0,lb:0,lf:0,fa:[26+b*2,42],ba:[7-b*2,22-b*2],fl:[6,3],bl:[-5,-6]};
   return {lean:1,drop:1.5+b*0.8,rot:0,tw:0,hx:0,lb:0,lf:0,fa:[9+b*2,24+b*2],ba:[7-b*2,22-b*2],fl:[6,3],bl:[-5,-6]};}
 function townIdlePose(f){if(f.act)return townActPose(f);return townBasePose(f);}
 function townIdlePoseOld(f){const b=Math.sin((G.frame+(f.wx||0)*0.37)*0.045);
@@ -2724,6 +2794,12 @@ const SHOW={
  devi:{L:240,k:[[0,{}],[30,{drop:50,bl:[-50,-20],fl:[56,24],fa:[100,120],ba:[100,120],lean:16}],[100,{drop:50,bl:[-50,-20],fl:[56,24],fa:[102,122],ba:[100,120],lean:16}],[130,{drop:30,lean:-10,fa:[150,120],ba:[150,120]}],[190,{drop:30,lean:-10,fa:[152,122],ba:[150,120]}],[240,{}]]},
  bayu:{L:240,k:[[0,{}],[30,{drop:30,fa:[110,150],ba:[40,90],tw:14}],[60,{drop:30,ba:[110,150],fa:[40,90],tw:-14}],[90,{drop:30,fa:[110,150],ba:[40,90],tw:14}],[120,{drop:34,fa:[100,140],ba:[100,140],lean:14}],[190,{drop:34,fa:[102,142],ba:[100,140],lean:14}],[240,{}]]},
  junho:{L:240,k:[[0,{}],[30,{lean:44,drop:4,fa:[8,10],ba:[8,10]}],[90,{lean:44,drop:4,fa:[8,10],ba:[8,10]}],[120,{lean:0}],[140,{fa:[80,40],ba:[80,130],tw:16}],[160,{fa:[80,130],ba:[80,40],tw:-16}],[180,{fa:[80,40],ba:[80,130],tw:16}],[240,{}]]},
+ ren:{L:240,k:[[0,{}],[40,{fa:[170,176],lean:-6}],[100,{fa:[172,178],lean:-6}],[130,{fa:[40,20],lean:24,drop:20}],[200,{fa:[40,20],lean:24,drop:20}],[240,{}]]},
+ saya:{L:240,k:[[0,{}],[40,{fa:[120,170],ba:[60,100],tw:20}],[80,{fa:[60,20],ba:[90,90],tw:-20,lean:10}],[120,{fa:[120,170],ba:[60,100],tw:20}],[160,{fa:[150,178],lean:-8}],[240,{}]]},
+ gunnar:{L:240,k:[[0,{}],[40,{fa:[160,60],ba:[90,170],lean:-6}],[120,{fa:[160,62],ba:[90,172],lean:-6}],[150,{fa:[70,20],lean:20,drop:24}],[190,{fa:[70,20],lean:20,drop:24}],[240,{}]]},
+ noor:{L:240,k:[[0,{}],[30,{tw:30,fa:[100,150],ba:[140,170]}],[60,{tw:-30,fa:[100,40],ba:[40,90]}],[90,{tw:30,fa:[100,150],ba:[140,170]}],[120,{tw:-30,fa:[100,40],ba:[40,90]}],[160,{fa:[160,178],ba:[20,60],lean:-6}],[240,{}]]},
+ kaito:{L:240,k:[[0,{}],[60,{lean:20,drop:22,fa:[30,60],ba:[40,70]}],[110,{lean:20,drop:22,fa:[30,60],ba:[40,70]}],[122,{lean:0,drop:10,fa:[100,100],tw:30}],[180,{lean:0,drop:10,fa:[100,100],tw:30}],[240,{}]]},
+ amara:{L:240,k:[[0,{}],[30,{fa:[92,92],lean:12}],[45,{}],[60,{fa:[92,92],lean:12}],[75,{}],[110,{fa:[170,178],ba:[170,178],lean:-8}],[200,{fa:[170,178],ba:[170,178],lean:-8}],[240,{}]]},
  def:{L:240,k:[[0,{}],[40,{fa:[92,92],tw:20}],[60,{}],[120,{fa:[170,178]}],[200,{fa:[170,178]}],[240,{}]]},
 };
 const ssm=x=>x*x*(3-2*x);
@@ -2740,10 +2816,10 @@ function targetPose(f){
   const t=f.t,id=f.def.id;
   switch(f.state){
     case 'idle':{if(f.town&&f.tpose)return f.tpose;if(f.town)return townIdlePose(f);const p=idlePose(id,G.frame+(f.team&&f.team.side?97:0));if(f.landT>0)p.drop+=f.landT*2.2;return p;}
-    case 'walk':{if(f.town&&f.tpose)return f.tpose;if(f.town)return townWalkPose(f);const fwd=Math.sign(f.vx||0)===f.face,ph=f.walkT*0.24,s=Math.sin(ph),c=Math.cos(ph),b=IDLE[id]||P.idle,p=cp(b),st=fwd?20:13;
+    case 'walk':{if(f.town&&f.tpose)return f.tpose;if(f.town){const q=townWalkPose(f);if(f.def.weapon){q.fa=[-18,-12];}return q;}const fwd=Math.sign(f.vx||0)===f.face,ph=f.walkT*0.24,s=Math.sin(ph),c=Math.cos(ph),b=IDLE[id]||P.idle,p=cp(b),st=fwd?20:13;
       p.bl=[-14+s*st,-6+s*st*0.6];p.fl=[20-s*st,6-s*st*0.6];p.lb=Math.max(0,c)*9;p.lf=Math.max(0,-c)*9;
       p.drop=Math.max(3,b.drop*0.6)+Math.abs(c)*3;p.lean+=fwd?4:-3;p.tw=s*(fwd?9:4);p.hx=(fwd?2:-2)+c*1.5;
-      p.fa[0]+=s*(fwd?10:4);p.ba[0]-=s*(fwd?10:4);if(f.landT>0)p.drop+=f.landT*2;return p;}
+      p.fa[0]+=s*(fwd?10:4);p.ba[0]-=s*(fwd?10:4);if(f.landT>0)p.drop+=f.landT*2;if(f.def.weapon){p.fa=[-14,-8];p.tw=0;}return p;}
     case 'crouch':return crouchPose(id);
     case 'guard':{const p=cp(P.block);p.drop+=Math.sin(G.frame*0.1)*1.2;p.hx=-2;return p;}
     case 'dash':{const fwd=f.dashDir===f.face,p=cp(fwd?P.dashF:P.dashB);if(fwd){const s=Math.sin(f.t*0.9);p.bl=[-30+s*30,-20+s*10];p.fl=[40-s*30,10-s*8];p.lb=Math.max(0,-s)*8;p.lf=Math.max(0,s)*8;}return p;}
@@ -3505,11 +3581,12 @@ const BANNERS=[
  {id:'shadow',name:'Shadow Clan',sub:'Mira Quill and Nadia Volkov strike from the dark.',feat:['mira','nadia'],col:'#ff7aa8'},
  {id:'fest',name:'Summer Festival',sub:'Sora Kiriyama, Ozzy Brass and Juno Tide at the night festival.',feat:['sora','ozzy','juno'],col:'#ffb070'},
  {id:'warden',name:'The Warden\u2019s Trial',sub:'Akio Kurogane, founder of the Triad, has boosted rates.',feat:['warden'],col:'#b07cff'},
+ {id:'blades',name:'Blades at Dusk',sub:'Ren Kurobane and Saya Tsukimori lead a crew that fights with steel. Gunnar, Noor and Kaito join them.',feat:['ren','saya'],col:'#9fd3ff'},
  {id:'world',name:'World Tour',sub:'Five new fighters arrive in Harbor City. Devi Raman, Tavi Ronda and Bayu Santoso have boosted rates.',feat:['devi','tavi','bayu'],col:'#5fe08a'},
 ];
 let curBanner=0,lastPull=1;
 function openSummon(){toHub();renderBannerList();show('#summon');const c=$('#bcard-'+curBanner);if(c&&curBanner)setTimeout(()=>c.scrollIntoView({block:'start'}),30);}
-function bannerRates(b){return (evOn('fest')?'Legend 8% (festival) · Epic 25% · Rare 67%':'Legend 5% · Epic 25% · Rare 70%')+(b.feat.length?' · featured fighters take half of their tier':'')+(COS_POOL[b.id]?` · Bonus: ${Math.round(COS_RATE*100)}% per pull for a profile icon or banner (${cosLeft(b).length} left here)`:'');}
+function bannerRates(b){return (evOn('fest')?'Vision 8% (festival) · Improved 25% · Fresh 67%':'Vision 5% · Improved 25% · Fresh 70%')+(b.feat.length?' · featured fighters take half of their tier':'')+(COS_POOL[b.id]?` · Bonus: ${Math.round(COS_RATE*100)}% per pull for a profile icon or banner (${cosLeft(b).length} left here)`:'');}
 function renderBannerList(){
   const L=$('#blist');L.innerHTML='';
   BANNERS.forEach((b,i)=>{const card=document.createElement('article');card.className='bcard';card.id='bcard-'+i;card.style.setProperty('--bc',b.col);
@@ -3528,7 +3605,7 @@ function selectBanner(i){
   $('#bannerHero').style.setProperty('--bc',b.col);
   $('#bEyebrow').textContent=b.feat.length?`Banner ${i+1} of ${BANNERS.length} · featured`:`Banner ${i+1} of ${BANNERS.length} · standard`;
   $('#bName').textContent=b.name;$('#bSub').textContent=b.sub;
-  $('#bRates').textContent=(evOn('fest')?'Legend 8% (festival) · Epic 25% · Rare 67%':'Legend 5% · Epic 25% · Rare 70%')+(b.feat.length?' · featured fighters take half of their tier':'')+(COS_POOL[b.id]?` · Bonus: ${Math.round(COS_RATE*100)}% per pull for a profile icon or banner (one guaranteed per ×10 while any are left, ${cosLeft(b).length} left here)`:'');
+  $('#bRates').textContent=(evOn('fest')?'Vision 8% (festival) · Improved 25% · Fresh 67%':'Vision 5% · Improved 25% · Fresh 70%')+(b.feat.length?' · featured fighters take half of their tier':'')+(COS_POOL[b.id]?` · Bonus: ${Math.round(COS_RATE*100)}% per pull for a profile icon or banner (one guaranteed per ×10 while any are left, ${cosLeft(b).length} left here)`:'');
   paintBanner(b);$('#pull1').disabled=SAVE.coins<100;$('#pull10').disabled=SAVE.coins<900;$('#pull10t').disabled=SAVE.tokens<300;refreshCoins();
 }
 function paintBanner(b,cv){
@@ -3545,18 +3622,20 @@ function paintBanner(b,cv){
 const EMB={rv:{name:'ReVision',col:'#ffc94d',bg:'#3a2466'},bolt:{name:'Rooftop Bolt',col:'#7fe3ff',bg:'#12203a'},star:{name:'Gold Star',col:'#ffc94d',bg:'#3a2a10'},
   fist:{name:'Iron Fist',col:'#ffcf4a',bg:'#3a2418'},flame:{name:'Ember',col:'#ff6b4a',bg:'#3a1010'},snow:{name:'Frost',col:'#bfe8ff',bg:'#10263a'},
   jade:{name:'Jade Dragon',col:'#7fe3b0',bg:'#0f2a20'},moon:{name:'Shadow Moon',col:'#ff7aa8',bg:'#1e1028'},lantern:{name:'Festival Lantern',col:'#ffb070',bg:'#3a1a10'},
-  crown:{name:'Warden Crown',col:'#b07cff',bg:'#1a1030'},globe:{name:'World Tour',col:'#5fe08a',bg:'#0f2a1e'}};
+  crown:{name:'Warden Crown',col:'#b07cff',bg:'#1a1030'},sword:{name:'Greatsword',col:'#cfe0ff',bg:'#1a2030'},scythe:{name:'Reaper',col:'#c58bff',bg:'#1e1028'},globe:{name:'World Tour',col:'#5fe08a',bg:'#0f2a1e'}};
 const PBAN={night:{name:'Harbor Night',a:'#160f2a',b:'#3a2466',acc:'#ffc94d',pat:'stars'},
   rooftop:{name:'Rooftop Dusk',a:'#2a1030',b:'#ff6b4a',acc:'#ffd27a',pat:'skyline'},neon:{name:'Neon Alley',a:'#0a1030',b:'#7a2a9a',acc:'#7fe3ff',pat:'grid'},
-  dojo:{name:'Champion Dojo',a:'#3a0a0a',b:'#c0392b',acc:'#ffe0b0',pat:'sun'},gold:{name:'Legend Gold',a:'#2a1a04',b:'#e8a830',acc:'#fff2c0',pat:'rays'},
+  dojo:{name:'Champion Dojo',a:'#3a0a0a',b:'#c0392b',acc:'#ffe0b0',pat:'sun'},gold:{name:'Vision Gold',a:'#2a1a04',b:'#e8a830',acc:'#fff2c0',pat:'rays'},
   frost:{name:'Frost & Flame',a:'#0f2a4a',b:'#ff6b4a',acc:'#bfe8ff',pat:'split'},iron:{name:'Iron Works',a:'#241e16',b:'#a8823a',acc:'#ffcf4a',pat:'plates'},
   jade:{name:'Jade Waves',a:'#08241c',b:'#2a8a6a',acc:'#bfffe0',pat:'waves'},shadow:{name:'Shadow Clan',a:'#12081a',b:'#6a1a4a',acc:'#ff7aa8',pat:'slashes'},
   fest:{name:'Summer Festival',a:'#2a0a24',b:'#ff8a3a',acc:'#ffe07a',pat:'lanterns'},sakura:{name:'Blossom Path',a:'#3a1430',b:'#ff9cc0',acc:'#fff0f6',pat:'petals'},
   warden:{name:'The Warden',a:'#0a0614',b:'#4a2a8a',acc:'#b07cff',pat:'rays'},
+  dusk:{name:'Blades at Dusk',a:'#140f24',b:'#6a3a5a',acc:'#9fd3ff',pat:'slashes'},
   tour:{name:'World Tour',a:'#0a2a20',b:'#ff9a5a',acc:'#ffe07a',pat:'waves'}};
 const COS_POOL={std:{i:['h:kai','h:vela','h:bastion','h:doc','e:bolt','e:star'],b:['rooftop','neon']},champ:{i:['h:dex','e:fist'],b:['dojo','gold']},
   frost:{i:['h:lena','h:kai','e:snow','e:flame'],b:['frost']},iron:{i:['h:taro','h:bruno','e:fist'],b:['iron']},dragon:{i:['h:mei','e:jade'],b:['jade']},
   shadow:{i:['h:mira','h:nadia','e:moon'],b:['shadow']},fest:{i:['h:sora','h:ozzy','h:juno','e:lantern'],b:['fest','sakura']},warden:{i:['h:warden','e:crown'],b:['warden','gold']},
+  blades:{i:['h:ren','h:saya','h:gunnar','h:noor','h:kaito','h:amara','e:sword','e:scythe'],b:['dusk']},
   world:{i:['h:devi','h:tavi','h:bayu','h:ines','h:junho','e:globe'],b:['tour']}};
 const COS_RATE=0.15;
 const ALL_ICONS=['e:rv',...new Set(Object.values(COS_POOL).flatMap(p=>p.i))],ALL_BANS=Object.keys(PBAN);
@@ -3587,6 +3666,8 @@ function drawEmblem(x,key,cx,cy,s){
     case 'moon':x.arc(cx,cy,s*0.56,0,TAU);x.fill();x.fillStyle=e.bg;x.beginPath();x.arc(cx+s*0.26,cy-s*0.14,s*0.48,0,TAU);x.fill();break;
     case 'lantern':x.ellipse(cx,cy+s*0.04,s*0.42,s*0.5,0,0,TAU);x.fill();x.fillRect(cx-s*0.2,cy-s*0.64,s*0.4,s*0.16);x.fillRect(cx-s*0.2,cy+s*0.5,s*0.4,s*0.14);
       x.strokeStyle=e.bg;x.lineWidth=s*0.05;x.beginPath();for(const yy of [-0.22,0.04,0.3]){x.moveTo(cx-s*0.38,cy+s*yy);x.lineTo(cx+s*0.38,cy+s*yy);}x.stroke();break;
+    case 'sword':x.fillRect(cx-s*0.08,cy-s*0.62,s*0.16,s*0.86);x.fillRect(cx-s*0.3,cy+s*0.2,s*0.6,s*0.1);x.fillRect(cx-s*0.06,cy+s*0.3,s*0.12,s*0.26);x.beginPath();x.moveTo(cx-s*0.08,cy-s*0.62);x.lineTo(cx,cy-s*0.76);x.lineTo(cx+s*0.08,cy-s*0.62);x.fill();break;
+    case 'scythe':x.lineWidth=s*0.09;x.moveTo(cx+s*0.3,cy-s*0.56);x.lineTo(cx-s*0.3,cy+s*0.62);x.stroke();x.beginPath();x.moveTo(cx+s*0.3,cy-s*0.56);x.quadraticCurveTo(cx-s*0.3,cy-s*0.7,cx-s*0.62,cy-s*0.18);x.quadraticCurveTo(cx-s*0.2,cy-s*0.48,cx+s*0.26,cy-s*0.44);x.closePath();x.fill();break;
     case 'globe':x.lineWidth=s*0.09;x.arc(cx,cy,s*0.56,0,TAU);x.stroke();x.beginPath();x.ellipse(cx,cy,s*0.24,s*0.56,0,0,TAU);x.stroke();x.beginPath();x.moveTo(cx-s*0.56,cy);x.lineTo(cx+s*0.56,cy);x.moveTo(cx-s*0.48,cy-s*0.28);x.lineTo(cx+s*0.48,cy-s*0.28);x.moveTo(cx-s*0.48,cy+s*0.28);x.lineTo(cx+s*0.48,cy+s*0.28);x.stroke();break;
     case 'crown':x.moveTo(cx-s*0.56,cy+s*0.4);x.lineTo(cx-s*0.56,cy-s*0.3);x.lineTo(cx-s*0.28,cy);x.lineTo(cx,cy-s*0.52);x.lineTo(cx+s*0.28,cy);x.lineTo(cx+s*0.56,cy-s*0.3);x.lineTo(cx+s*0.56,cy+s*0.4);x.closePath();x.fill();break;
     default:x.font=`${Math.round(s*0.66)}px ${FONT_D}`;x.textAlign='center';x.textBaseline='middle';x.fillText('RV',cx,cy+s*0.05);
@@ -3666,7 +3747,7 @@ function doSummon(n,tok){
 }
 function showSummonResults(res,cos){
   const best=res.some(r=>r.d.rarity==='legend')?'legend':res.some(r=>r.d.rarity==='epic')?'epic':'rare';
-  $('#srTitle').textContent=best==='legend'?'Legend summoned!':best==='epic'?'Epic pull!':'Summon complete';
+  $('#srTitle').textContent=best==='legend'?'Vision summoned!':best==='epic'?'Improved pull!':'Summon complete';
   const g=$('#sres');g.className='sres'+(res.length===1?' one':'');g.innerHTML='';
   res.forEach((r,i)=>{const R=RAR[r.d.rarity],e=document.createElement('div');e.className='rcard '+r.d.rarity;e.style.setProperty('--rc',R.col);e.style.setProperty('--i',i);
     e.innerHTML=`<span class="tag">${r.kind==='new'?'NEW':r.kind==='star'?r.st+'\u2605':'+50 ◆'}</span><canvas width="320" height="400" aria-hidden="true"></canvas><span class="rr">${R.name.toUpperCase()}</span><span class="nm">${r.d.name}</span><span class="rk">${r.kind==='new'?'Joined your roster':r.kind==='star'?'Star up!':'Max stars: +50 coins'}</span>`;
@@ -4051,7 +4132,7 @@ const NPCS=[
   say:()=>SAVE.cleared>=STORY.length?'You finished every chapter. Old stories are still worth replaying, and they still pay XP.':`Ah, you made it. ${PARTS[STORY[SAVE.cleared].part]} is where your crew stands. Next up is Chapter ${SAVE.cleared+1}, ${STORY[SAVE.cleared].name}.`,
   mark:()=>SAVE.cleared<STORY.length},
  {key:'summon',who:'mei',role:'Summon',place:'Summon Shrine',act:'Open the banners',go:()=>openSummon(),
-  say:()=>`The shrine has ${BANNERS.length} banners open tonight.${evOn('fest')?' The Legend Festival is on, so Legends answer more often.':''} You have ${SAVE.coins.toLocaleString()} coins and ${(SAVE.tokens||0).toLocaleString()} tokens.`,
+  say:()=>`The shrine has ${BANNERS.length} banners open tonight.${evOn('fest')?' The Vision Festival is on, so Vision fighters answer more often.':''} You have ${SAVE.coins.toLocaleString()} coins and ${(SAVE.tokens||0).toLocaleString()} tokens.`,
   mark:()=>SAVE.coins>=900||(SAVE.tokens||0)>=300},
  {key:'events',who:'ozzy',role:'Events',place:'Event Hall',act:'See the events',go:()=>openEvents(),
   say:()=>{const l=liveEvents();return `Listen up, Harbor City! ${l.length?l.map(e=>e.name).join(' and ')+' is live right now!':'No bonus event today, but Double XP comes back on Friday.'} This week’s raid boss is ${raidBoss().name}. Think your crew can take it?`;},
@@ -4961,8 +5042,8 @@ function showVsLoading(m,role,done){
 
 /* ---------------- summon cinematic ----------------
    Two random fighters from the roster clash for about ten seconds before the results.
-   How it ends hints at your best pull: a comeback win means a Legend; a clean win or a teammate jumping in
-   means Epic or better (or a lucky Rare); a loss means Rares only. */
+   How it ends hints at your best pull: a comeback win means a Vision; a clean win or a teammate jumping in
+   means Improved or better (or a lucky Fresh); a loss means Fresh only. */
 const CINE={on:false,actors:[],t:0,kind:'win',beats:null,done:null,flash:0,flashCol:'#ffffff'};
 const CINE_LEN=600;
 function playSummonCine(best,done){
@@ -4997,8 +5078,8 @@ function cineScript(kind){
     b(1,340,'win',{d:60});b(0,392,'getup',{d:22});fx(404,0,'aura');b(0,414,'special',{d:24});
     b(0,440,'dash',{vx:10,d:14});
     for(let k=0;k<6;k++)hit(456+k*8,0,1,k%2?'cross':'light','hit',2);
-    b(0,508,'uppercut',{d:26,jump:-10});b(1,511,'launch',{jump:-16,vx:6,dec:0.99,d:60});fx(511,1,'hit',{heavy:1,col:'#ffc94d'});b(1,571,'down',{d:200});fx(571,1,'land');
-    b(0,545,'win',{d:200});fx(548,0,'ring',{col:'#ffc94d'});}
+    b(0,508,'uppercut',{d:26,jump:-10});b(1,511,'launch',{jump:-16,vx:6,dec:0.99,d:60});fx(511,1,'hit',{heavy:1,col:'#c58bff'});b(1,571,'down',{d:200});fx(571,1,'land');
+    b(0,545,'win',{d:200});fx(548,0,'ring',{col:'#b07cff'});}
   for(const a of A)a.sort((x,y)=>x.t-y.t);F.sort((x,y)=>x.t-y.t);return {A,F};
 }
 function cinePose(f,pose){const id=f.def.id;
@@ -5030,8 +5111,8 @@ function cineFx(e){const f=CINE.actors[e.i],x=f.x,y=f.y-110*f.def.scale;
     case 'land':dust(f.x);sfx('land');G.shake=7;break;
     case 'ring':G.fx.push({k:'ring',x:f.x,y:FLOOR-6,r:20,life:26,max:26,color:e.col||f.def.fx,flat:true});sfx('bell');break;
     case 'call':sfx('tag');break;
-    case 'aura':for(let k=0;k<3;k++)G.fx.push({k:'ring',x:f.x,y:FLOOR-6,r:16+k*14,life:30+k*6,max:36,color:'#ffc94d',flat:true});sparks(x,y,'#ffc94d',24);
-      sfx('super');G.shake=12;CINE.flash=22;CINE.flashCol='#ffc94d';f.flash=30;break;
+    case 'aura':for(let k=0;k<3;k++)G.fx.push({k:'ring',x:f.x,y:FLOOR-6,r:16+k*14,life:30+k*6,max:36,color:'#b07cff',flat:true});sparks(x,y,'#c58bff',24);
+      sfx('super');G.shake=12;CINE.flash=22;CINE.flashCol='#c58bff';f.flash=30;break;
   }}
 function cineCam(){const [H,R,X]=CINE.actors,t=CINE.t,k=CINE.kind;let tx=(H.x+R.x)/2-W/2,dist=t<110?980:t<390?760:640,ty=6;
   const endT=k==='comeback'?545:k==='help'?462:410;
@@ -5047,9 +5128,9 @@ function drawCine(c){
     c.textAlign='right';otext(c,HH.def.name.toUpperCase(),W/2-40,H/2-120,26,HH.def.fx,OUT,6);c.textAlign='center';otext(c,'VS',W/2,H/2-120,36,'#ffc94d',OUT,7);
     c.textAlign='left';otext(c,R.def.name.toUpperCase(),W/2+40,H/2-120,26,R.def.fx,OUT,6);c.restore();}
   if(k==='help'&&t>=334&&t<400)say(X.def.name.split(' ')[0].toUpperCase()+' JUMPS IN!',X.def.fx,clamp((t-334)/8,0,1)*clamp((400-t)/10,0,1));
-  if(k==='comeback'&&t>=396&&t<450)say('NOT DONE YET!','#ffc94d',clamp((t-396)/8,0,1)*clamp((450-t)/10,0,1));
+  if(k==='comeback'&&t>=396&&t<450)say('NOT DONE YET!','#c58bff',clamp((t-396)/8,0,1)*clamp((450-t)/10,0,1));
   const endT=k==='comeback'?548:k==='help'?466:412,endTxt={win:'VICTORY!',lose:'DEFEAT…',help:'TEAMWORK!',comeback:'LEGENDARY COMEBACK!'}[k];
-  if(t>=endT)say(endTxt,k==='lose'?'#ff6b4a':'#ffc94d',clamp((t-endT)/10,0,1));
+  if(t>=endT)say(endTxt,k==='lose'?'#ff6b4a':k==='comeback'?'#c58bff':'#ffc94d',clamp((t-endT)/10,0,1));
   if(CINE.flash>0){c.save();c.globalAlpha=CINE.flash/30;c.fillStyle=CINE.flashCol;c.fillRect(0,0,W,H);c.restore();}
   if(t>CINE_LEN-24){c.save();c.globalAlpha=(t-(CINE_LEN-24))/24;c.fillStyle='#ffffff';c.fillRect(0,0,W,H);c.restore();}
 }
