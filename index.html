@@ -466,8 +466,8 @@ body.fighting #townFade{display:none}
         <div class="st-step" id="stStart"><button class="btn startbtn" id="startBtn" type="button">Start</button><p class="st-hint" id="startHint">Harbor City is waiting</p></div>
         <form class="st-step st-name" id="stName" hidden autocomplete="off">
           <label class="eyebrow" for="stNameIn">Choose your fighter name</label>
-          <div class="st-row"><input id="stNameIn" maxlength="16" spellcheck="false" autocapitalize="off" placeholder="Your name"><button class="btn" type="submit">Continue</button></div>
-          <p class="st-hint" id="stNameMsg">2 to 16 letters or numbers. Other players see this online.</p>
+          <div class="st-row"><input id="stNameIn" maxlength="20" spellcheck="false" autocapitalize="off" placeholder="Your name"><button class="btn" type="submit">Continue</button></div>
+          <p class="st-hint" id="stNameMsg">2 to 20 letters or numbers. Other players see this online.</p>
         </form>
         <div class="st-step" id="stMode" hidden>
           <p class="eyebrow st-hi">Welcome, <b id="stHi"></b> <button class="st-link" id="stRename" type="button">Change name</button></p>
@@ -3350,10 +3350,10 @@ async function loadProfile(){
   if(SAVE.netName!==p.name||!SAVE.name){SAVE.netName=p.name;SAVE.name=SAVE.name||p.name;persist();}
   NET.profile=p;
 }
-const cleanName=n=>String(n||'').replace(/[^\w \-.]/g,'').replace(/\s+/g,' ').trim().slice(0,16);
+const cleanName=n=>String(n||'').replace(/[^\w \-.]/g,'').replace(/\s+/g,' ').trim().slice(0,20);
 async function saveNetName(n){
   n=cleanName(n);
-  if(n.length<2){toast('Names need 2 to 16 letters or numbers.');return;}
+  if(n.length<2){toast('Names need 2 to 20 letters or numbers.');return;}
   try{await NET.db.ref('players/'+NET.uid+'/name').set(n);NET.profile.name=n;SAVE.netName=n;SAVE.name=n;persist();if(TP.last)TP.last.n=null;toast('Name saved.');}catch(e){toast('Couldn’t save your name. Try again.');}
   renderOnline();
 }
@@ -3388,7 +3388,7 @@ function renderOnline(){
   const board=NET.board.map((r,i)=>{const tt=tierOf(r.rating);return `<li class="${r.uid===NET.uid?'me':''}"><span class="rk">${i+1}</span><span class="nm">${esc(r.name)}</span><span class="tr" style="color:${tt.col}">${tt.name}</span><span class="rt">${r.rating|0}</span></li>`;}).join('')||'<li class="empty">No ranked players yet. Be the first.</li>';
   el.innerHTML=`<div class="onprof oncard" style="--ec:${t.col}">
       <div class="badge" style="--ec:${t.col}"><span>${t.name}</span><b>${p.rating|0}</b></div>
-      <div class="pinfo"><label for="onName" class="eyebrow">Fighter name</label><div class="row"><input id="onName" maxlength="16" value="${esc(p.name)}" autocomplete="off"><button type="button" class="btn alt" id="onSaveName">Save</button></div>
+      <div class="pinfo"><label for="onName" class="eyebrow">Fighter name</label><div class="row"><input id="onName" maxlength="20" value="${esc(p.name)}" autocomplete="off"><button type="button" class="btn alt" id="onSaveName">Save</button></div>
       <p class="evd">Ranked ${p.w|0} W · ${p.l|0} L${p.d?` · ${p.d} D`:''} · Casual ${p.cw|0} W · ${p.cl|0} L</p></div></div>
     <div class="ongrid">
       <div class="oncard mode" style="--ec:#7fe3ff"><p class="eyebrow">Casual</p><h3>Quick match</h3><p class="evd">Fight anyone online with your fighters’ own levels and stars. No rating on the line. Win 60 coins and 50 XP.</p><button type="button" class="btn" id="onCasual">Find match</button></div>
@@ -4097,7 +4097,7 @@ function tpGot(uid,v){
   let o=TP.others[uid];
   if(!o)o=TP.others[uid]={uid,actor:null};
   if(o.actor&&(o.f!==fid||o.c!==c))tpDispose(o);
-  Object.assign(o,{n:String(v.n||'Player').slice(0,16),f:fid,c,tx:v.x,tz:v.z,th:tpNum(v.h)?v.h:0,w:!!v.w,r:tpNum(v.r)?v.r:1000,seen:Date.now()});
+  Object.assign(o,{n:String(v.n||'Player').slice(0,20),f:fid,c,tx:v.x,tz:v.z,th:tpNum(v.h)?v.h:0,w:!!v.w,r:tpNum(v.r)?v.r:1000,seen:Date.now()});
 }
 function tpDispose(o){const f=o.actor;if(f&&f.rig){disposeRig(f.rig);const k=rigs.indexOf(f.rig);if(k>=0)rigs.splice(k,1);}o.actor=null;}
 function tpDrop(uid){const o=TP.others[uid];if(!o)return;tpDispose(o);delete TP.others[uid];}
@@ -4149,14 +4149,14 @@ G.title=true;buildTitle();setStage('shrine');show('#start');
 /* title: Start → (first time) pick a name → Offline / Online */
 let titleStep='start';
 function titleTo(step){titleStep=step;for(const [id,k] of [['#stStart','start'],['#stName','name'],['#stMode','mode']])$(id).hidden=k!==step;
-  if(step==='name'){const i=$('#stNameIn');i.value=SAVE.name||SAVE.netName||'';$('#stNameMsg').textContent='2 to 16 letters or numbers. Other players see this online.';setTimeout(()=>i.focus(),30);}
+  if(step==='name'){const i=$('#stNameIn');i.value=SAVE.name||SAVE.netName||'';$('#stNameMsg').textContent='2 to 20 letters or numbers. Other players see this online.';setTimeout(()=>i.focus(),30);}
   if(step==='mode'){$('#stHi').textContent=SAVE.name;$('#stMsg').textContent='';$('#stOn').disabled=$('#stOff').disabled=false;setTimeout(()=>$(SAVE.lastNet===0?'#stOff':'#stOn').focus(),30);}}
 function leaveTitle(){if(!G.title||titleStep!=='start')return;unlock();sfx('bell');titleTo(SAVE.name?'mode':'name');}
 $('#startBtn').addEventListener('click',leaveTitle);
 addEventListener('keydown',e=>{if(G.title&&titleStep==='start'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();leaveTitle();}});
 $('#stNameIn').addEventListener('keydown',e=>e.stopPropagation());
 $('#stName').addEventListener('submit',e=>{e.preventDefault();const n=cleanName($('#stNameIn').value);
-  if(n.length<2){$('#stNameMsg').textContent='Names need 2 to 16 letters or numbers.';sfx('ui');return;}
+  if(n.length<2){$('#stNameMsg').textContent='Names need 2 to 20 letters or numbers.';sfx('ui');return;}
   SAVE.name=n;SAVE.netName=n;persist();sfx('ui');$('#stNameIn').blur();
   if(NET.ready&&NET.profile&&NET.profile.name!==n)saveNetName(n);titleTo('mode');});
 $('#stRename').addEventListener('click',()=>{sfx('ui');titleTo('name');});
