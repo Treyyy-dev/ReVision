@@ -1,0 +1,25 @@
+name: Firebase rules
+
+# Publishes firebase/database.rules.json to the live database whenever it changes.
+# Needs the FIREBASE_SERVICE_ACCOUNT repository secret; skips quietly without it.
+on:
+  push:
+    branches: [main]
+    paths: ['firebase/database.rules.json', 'scripts/deploy_rules.py', '.github/workflows/firebase-rules.yml']
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Deploy database rules
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA" ]; then echo "::warning::FIREBASE_SERVICE_ACCOUNT secret is not set, so the rules were not published."; exit 0; fi
+          pip install -q google-auth requests
+          python scripts/deploy_rules.py
