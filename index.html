@@ -281,6 +281,21 @@ body.pvp .mbtn .mn{display:none}
 .btab:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .banner{position:relative;overflow:hidden;border:2px solid var(--bc,var(--gold));background:var(--panel)}
 .banner canvas{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:12/5}
+.binfo-btn{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;display:grid;place-items:center;font:italic 700 20px Georgia,serif;color:#fff;background:rgba(22,15,42,.82);border:2px solid #fff;cursor:pointer;padding:0}
+.binfo-btn:hover,.binfo-btn:focus-visible{background:var(--bc,var(--gold));color:#160f2a;outline:none}
+.bi-grid{list-style:none;margin:6px 0 16px;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.bi-card{display:flex;gap:10px;align-items:center;padding:8px;background:var(--panel);border:1px solid var(--line);border-left:4px solid #5fe08a}
+.bi-card.r-epic{border-left-color:#5aa8ff}.bi-card.r-legend{border-left-color:#b07cff}
+.bi-card.feat{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.bi-card img{width:64px;height:64px;flex:none;background:#f8f7f3;object-fit:cover}
+.bi-grid.big .bi-card img{width:96px;height:96px}
+.bi-card div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bi-card b{font-family:var(--display);font-size:15px;letter-spacing:.02em}
+.bi-card span{font-size:12px;color:var(--muted)}
+.bi-card .bi-rate{color:var(--ink);font-weight:700}
+.bi-cos{list-style:none;margin:6px 0 16px;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.bi-cos li{padding:6px 10px;background:var(--panel);border:1px solid var(--line);font-size:13px}
+.bi-cos small{color:var(--muted);margin-left:4px}
 .bcopy{position:absolute;left:0;top:0;bottom:0;width:min(55%,440px);padding:14px 16px;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;background:linear-gradient(90deg,rgba(22,15,42,.94),rgba(22,15,42,0))}
 .bcopy h3{font-family:var(--display);font-weight:400;font-size:clamp(20px,3.4vw,32px);margin:0;line-height:1.05;text-wrap:balance}
 .bcopy p{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
@@ -779,6 +794,13 @@ body.fighting #townFade{display:none}
         <header class="bar"><button class="back" type="button" id="sumBack">‹ Back</button><div class="ttl"><p class="eyebrow">Summon</p><h2>Banners</h2></div><p class="coins" data-coins>0</p></header>
         <p class="sub">Scroll through every banner. A ×10 summon always includes at least one Improved or Vision fighter. Duplicates add a star, up to 14★. Each star adds 4% health and power; past 14★ a duplicate turns into 50 Rebucks.</p>
         <div class="blist" id="blist"></div>
+      </div>
+    </section>
+
+    <section id="binfo" class="overlay" hidden>
+      <div class="screen">
+        <header class="bar"><button class="back" type="button" id="binfoBack">‹ Back</button><div class="ttl"><p class="eyebrow">Everything on this banner</p><h2 id="binfoTtl"></h2></div><p class="coins" data-coins>0</p></header>
+        <div id="binfoBody"></div>
       </div>
     </section>
 
@@ -3362,7 +3384,7 @@ function updateFx(){
 }
 
 function tick(){
-  G.frame++;pollPads();tpTick();musicTick();
+  G.frame++;pollPads();tpTick();musicTick();bannerTick();
   if(G.mode==='menu'){for(const f of menuF())updatePose(f);updateFx();return;}
   if(G.mode==='cine'){cineStep();updateFx();G.shake*=0.86;return;}
   if(G.mode==='town'){townStep();updateFx();return;}
@@ -3800,7 +3822,7 @@ function drawPortrait(target,id,c){const x=target.getContext('2d');x.clearRect(0
 function drawFullBody(target,id,c){const x=target.getContext('2d');x.clearRect(0,0,target.width,target.height);x.drawImage(portrait(id,c),0,0,target.width,target.height);}
 
 /* ---------------- menus ---------------- */
-const SCREENS=['#start','#menu','#vsload','#story','#storyIntro','#select','#shop','#collection','#pause','#result','#summon','#sreveal','#summonRes','#events','#missions','#online'];
+const SCREENS=['#start','#menu','#vsload','#story','#storyIntro','#select','#shop','#collection','#pause','#result','#summon','#binfo','#sreveal','#summonRes','#events','#missions','#online'];
 function show(id){for(const s of SCREENS)$(s).hidden=s!==id;refreshCoins();const el=id&&$(id);if(el)el.scrollTop=0;}
 function refreshCoins(){document.querySelectorAll('[data-coins]').forEach(e=>{e.textContent=SAVE.coins;e.setAttribute('aria-label',SAVE.coins+' Rebucks');});
   document.querySelectorAll('[data-tokens]').forEach(e=>{e.textContent=SAVE.tokens||0;e.setAttribute('aria-label',(SAVE.tokens||0)+' tokens');});
@@ -4175,29 +4197,122 @@ $('#collBack').addEventListener('click',()=>{if(charReturn){const k=charReturn;c
 
 /* summon */
 const BANNERS=[
- {id:'std',name:'Rooftop Standard',sub:'Every fighter in the league at standard rates.',feat:[],show:['kai','vela','bastion'],col:'#ff6b4a'},
- {id:'champ',name:'Champion\u2019s Return',sub:'Dex Grafton, the undefeated karate champion, has boosted rates.',feat:['dex'],col:'#ff6b4a'},
+ {id:'std',name:'Rooftop Standard',sub:'Every fighter in the league at standard rates. Starring Kai Ember and Vela Volt.',feat:[],show:['kai','vela'],col:'#ff6b4a'},
+ {id:'champ',name:'Champion’s Return',sub:'Dex Grafton, the undefeated karate champion, and his rival Jun-ho Seo have boosted rates.',feat:['dex','junho'],col:'#ff6b4a'},
  {id:'frost',name:'Frost & Flame',sub:'Lena Frost and Kai Ember have boosted rates.',feat:['lena','kai'],col:'#9fd3ff'},
  {id:'iron',name:'Iron Fists',sub:'Taro Kuroda and Bruno Saito, the heavy hitters of the underground.',feat:['taro','bruno'],col:'#ffcf4a'},
- {id:'dragon',name:'Dragon Hands',sub:'Mei Lan, master of the centerline, has boosted rates.',feat:['mei'],col:'#7fe3b0'},
+ {id:'dragon',name:'Dragon Hands',sub:'Mei Lan, master of the centerline, and Inès Moreau have boosted rates.',feat:['mei','ines'],col:'#7fe3b0'},
  {id:'shadow',name:'Shadow Clan',sub:'Mira Quill and Nadia Volkov strike from the dark.',feat:['mira','nadia'],col:'#ff7aa8'},
- {id:'fest',name:'Summer Festival',sub:'Sora Kiriyama, Ozzy Brass and Juno Tide at the night festival.',feat:['sora','ozzy','juno'],col:'#ffb070'},
- {id:'warden',name:'The Warden\u2019s Trial',sub:'Akio Kurogane, founder of the Triad, has boosted rates.',feat:['warden'],col:'#b07cff'},
- {id:'blades',name:'Blades at Dusk',sub:'Ren Kurobane and Saya Tsukimori lead a crew that fights with steel. Gunnar, Noor and Kaito join them.',feat:['ren','saya'],col:'#9fd3ff'},
- {id:'world',name:'World Tour',sub:'Five new fighters arrive in Harbor City. Devi Raman, Tavi Ronda and Bayu Santoso have boosted rates.',feat:['devi','tavi','bayu'],col:'#5fe08a'},
+ {id:'fest',name:'Summer Festival',sub:'Sora Kiriyama and Juno Tide at the night festival.',feat:['sora','juno'],col:'#ffb070'},
+ {id:'warden',name:'The Warden’s Trial',sub:'Akio Kurogane, founder of the Triad, and Doc Halcyon have boosted rates.',feat:['warden','doc'],col:'#b07cff'},
+ {id:'blades',name:'Blades at Dusk',sub:'Ren Kurobane and Saya Tsukimori lead a crew that fights with steel.',feat:['ren','saya'],col:'#9fd3ff'},
+ {id:'world',name:'World Tour',sub:'New in Harbor City: Devi Raman and Tavi Ronda have boosted rates.',feat:['devi','tavi'],col:'#5fe08a'},
 ];
+/* one featured banner a day (it changes at the same time as the raid bosses), plus the standard banner */
+const bannerDay=()=>Math.floor(Date.now()/DAY);
+const FEAT_BANNERS=BANNERS.filter(b=>b.feat.length);
+const todayBanner=()=>FEAT_BANNERS[bannerDay()%FEAT_BANNERS.length];
+const openBanners=()=>[todayBanner(),BANNERS[0]];
+function untilNextBanner(){const ms=DAY-(Date.now()%DAY),h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);return h?`${h}h ${m}m`:`${m}m ${Math.floor(ms%60000/1000)}s`;}
+
 let curBanner=0,lastPull=1;
-function openSummon(){toHub();renderBannerList();show('#summon');const c=$('#bcard-'+curBanner);if(c&&curBanner)setTimeout(()=>c.scrollIntoView({block:'start'}),30);}
+function openSummon(){toHub();if(!openBanners().includes(BANNERS[curBanner]))curBanner=BANNERS.indexOf(todayBanner());renderBannerList();show('#summon');}
 function bannerRates(b){return (evOn('fest')?'Vision 8% (festival) · Improved 25% · Fresh 67%':'Vision 5% · Improved 25% · Fresh 70%')+(b.feat.length?' · featured fighters take half of their tier':'')+(COS_POOL[b.id]?` · Bonus: ${Math.round(COS_RATE*100)}% per pull for a profile icon or banner (${cosLeft(b).length} left here)`:'');}
 function renderBannerList(){
-  const L=$('#blist');L.innerHTML='';
-  BANNERS.forEach((b,i)=>{const card=document.createElement('article');card.className='bcard';card.id='bcard-'+i;card.style.setProperty('--bc',b.col);
-    card.innerHTML=`<div class="banner"><canvas width="960" height="400" aria-hidden="true"></canvas><div class="bcopy"><p class="eyebrow">Banner ${i+1} of ${BANNERS.length} · ${b.feat.length?'featured':'standard'}</p><h3>${esc(b.name)}</h3><p>${esc(b.sub)}</p><p class="rates">${bannerRates(b)}</p></div></div>
+  const L=$('#blist');L.innerHTML='';BSHOW.cards=[];BSHOW.day=bannerDay();
+  openBanners().forEach(b=>{const i=BANNERS.indexOf(b),daily=!!b.feat.length;const card=document.createElement('article');card.className='bcard';card.id='bcard-'+i;card.style.setProperty('--bc',b.col);
+    card.innerHTML=`<div class="banner"><canvas width="960" height="400" aria-hidden="true"></canvas><button type="button" class="binfo-btn" aria-label="Everything you can pull on ${esc(b.name)}">i</button><div class="bcopy"><p class="eyebrow">${daily?'Today’s banner · <span class="bnext">new one in '+untilNextBanner()+'</span>':'Always open · standard'}</p><h3>${esc(b.name)}</h3><p>${esc(b.sub)}</p><p class="rates">${bannerRates(b)}</p></div></div>
       <div class="row sumrow"><button class="btn alt" type="button" data-n="1" ${SAVE.coins<100?'disabled':''}>Summon ×1 · 100 Rebucks</button><button class="btn" type="button" data-n="10" ${SAVE.coins<1000?'disabled':''}>Summon ×10 · 1,000 Rebucks</button></div>`;
-    paintBanner(b,card.querySelector('canvas'));
+    const cv=card.querySelector('canvas');paintBanner(b,cv);
+    BSHOW.cards.push({b,cv,ids:(b.feat.length?b.feat:b.show).slice(0,2),cur:0,t:0,bg:null});
+    card.querySelector('.binfo-btn').addEventListener('click',()=>{sfx('ui');openBannerInfo(b);});
     card.querySelectorAll('[data-n]').forEach(x=>x.addEventListener('click',()=>{curBanner=i;doSummon(+x.dataset.n,!!x.dataset.tok);}));
     L.appendChild(card);});
 }
+/* ---- live banner showcase: one featured fighter poses for 5 seconds, then performs their ultimate,
+   then the other fighter takes over, on a loop. Drawn with the small portrait renderer. ---- */
+const BSHOW={cards:[],rigs:{},cam:null,day:0},BS_SHOW=300,BS_ULT=250;
+function bsFighter(id){
+  if(BSHOW.rigs[id])return BSHOW.rigs[id];
+  const d=ROSTER[RIDX(id)],f={def:d,costume:0,pose:cp(IDLE[id]||P.idle),x:W/2,y:FLOOR,z:0,face:1,flash:0,state:'showoff',t:0,portrait:true,walkT:0};
+  f.rig=makeRig(f,ps,true);f.rig.root.visible=false;f.rig.shadow.visible=false;return BSHOW.rigs[id]=f;}
+function bsUltPose(f,u){const id=f.def.id;
+  if(u<30)return Object.assign(cp(P.windup),{drop:14+Math.sin(u*0.6)*2});
+  if(u<150){const k=Math.floor((u-30)/9)%4;return cp([P.light,P.cross,(HEAVY_VAR[id]||KICK)[1],P.dashF][k]);}
+  if(u<180)return Object.assign(cp(P.windup),{drop:18});
+  if(u<212)return cp(P.uppercut);
+  return winPose(id,G.frame);}
+function bsBg(C){const o=document.createElement('canvas');o.width=960;o.height=400;const x=o.getContext('2d'),b=C.b;
+  const g=x.createLinearGradient(0,0,960,400);g.addColorStop(0,'#160f2a');g.addColorStop(0.45,'#2a1846');g.addColorStop(1,b.col);x.fillStyle=g;x.fillRect(0,0,960,400);
+  x.save();x.globalAlpha=0.16;x.fillStyle='#ffffff';for(let i=0;i<9;i++){x.save();x.translate(960*0.72,400*1.1);x.rotate(-1.2+i*0.3);x.fillRect(-10,-900,20,900);x.restore();}x.restore();return C.bg=o;}
+function bsDraw(C){
+  const x=C.cv.getContext('2d'),id=C.ids[C.cur],f=bsFighter(id),d=f.def,t=C.t,ult=t>=BS_SHOW,u=t-BS_SHOW;
+  /* pose */
+  f.t=t;f.y=FLOOR;
+  if(!ult){f.state='showoff';f.town=false;f.tpose=null;}
+  else{f.state='idle';f.town=true;f.tpose=bsUltPose(f,u);if(u>=180&&u<212)f.y=FLOOR-Math.sin((u-180)/32*Math.PI)*70;}
+  updatePose(f);updateRig(f);f.rig.shadow.visible=false;
+  /* camera: slow orbit while posing; in the ultimate it charges in, spins 360, drops low, then pulls back */
+  const cam=BSHOW.cam||(BSHOW.cam=new THREE.PerspectiveCamera(30,320/400,10,4000)),s=d.scale;
+  let ang=0.75+Math.sin(t*0.012)*0.35,dist=560,hy=120,ly=100;
+  if(ult){if(u<30){dist=lerp(560,430,u/30);ly=110;}
+    else if(u<150){ang=0.75+(u-30)/120*TAU;dist=470;}
+    else if(u<180){dist=390;hy=40;ly=120;}
+    else{dist=lerp(430,600,Math.min(1,(u-180)/50));hy=150;}}
+  const sh=ult&&u>=30&&u<150&&u%9<3?(Math.random()-0.5)*8:0;
+  cam.position.set(Math.sin(ang)*dist+sh,hy*s,Math.cos(ang)*dist);cam.lookAt(0,ly*s,0);
+  pr.render(ps,cam);f.rig.root.visible=false;
+  /* 2D layers */
+  x.drawImage(C.bg||bsBg(C),0,0);
+  const fx=d.fx,X=600,cx=X+160;
+  if(ult&&u>=150&&u<180){x.fillStyle='rgba(0,0,0,'+(0.45*(u-150)/30)+')';x.fillRect(0,0,960,400);}
+  const glow=ult?(u<30?u/30:1):0.55,gr=x.createRadialGradient(cx,230,10,cx,230,230);gr.addColorStop(0,fx+(ult?'cc':'77'));gr.addColorStop(1,fx+'00');
+  x.globalAlpha=glow;x.fillStyle=gr;x.fillRect(X-120,0,560,400);x.globalAlpha=1;
+  if(ult&&u<150){x.save();x.strokeStyle=fx;x.globalAlpha=0.55;x.lineWidth=3;for(let i=0;i<14;i++){const yy=(i*61+u*23)%400,ll=60+(i*37)%120;x.beginPath();x.moveTo(X-40+((i*97+u*31)%380),yy);x.lineTo(X-40+((i*97+u*31)%380),yy-ll);x.stroke();}x.restore();}
+  x.drawImage(pr.domElement,X,0,320,400);
+  if(ult&&u>=30&&u<150){const k=(u-30)%9;if(k<5){const ix=cx+40+((u*53)%60)-30,iy=150+((u*29)%90),r=18+k*9;x.save();x.globalAlpha=1-k/5;x.fillStyle='#ffffff';x.strokeStyle=fx;x.lineWidth=4;x.beginPath();
+      for(let j=0;j<16;j++){const a=j/16*TAU,rr=j%2?r*0.42:r;x.lineTo(ix+Math.cos(a)*rr,iy+Math.sin(a)*rr);}x.closePath();x.fill();x.stroke();x.restore();}}
+  if(ult&&u>=180){const k=u-180;if(k<14){x.fillStyle='rgba(255,255,255,'+(1-k/14)+')';x.fillRect(0,0,960,400);}
+    x.save();x.strokeStyle=fx;x.lineWidth=Math.max(1,10-k*0.15);x.globalAlpha=Math.max(0,1-k/60);x.beginPath();x.arc(cx,240,k*9,0,TAU);x.stroke();x.restore();
+    const a=clamp((k-6)/10,0,1);x.save();x.globalAlpha=a;x.textAlign='right';x.lineJoin='round';
+    x.font=`20px ${FONT_D}`;x.lineWidth=6;x.strokeStyle='#160f2a';x.strokeText('ULTIMATE',940,60);x.fillStyle=fx;x.fillText('ULTIMATE',940,60);
+    x.font=`44px ${FONT_D}`;x.lineWidth=9;x.strokeText((d.ultName||'Ultimate').toUpperCase(),940,104);x.fillStyle='#ffffff';x.fillText((d.ultName||'Ultimate').toUpperCase(),940,104);x.restore();}
+  /* name and the next fighter */
+  const R=RAR[d.rarity];x.textAlign='right';x.lineJoin='round';x.font=`26px ${FONT_D}`;x.lineWidth=7;x.strokeStyle='#160f2a';x.strokeText(d.name.toUpperCase(),940,368);x.fillStyle='#fff';x.fillText(d.name.toUpperCase(),940,368);
+  x.font=`16px ${FONT_D}`;x.lineWidth=5;x.strokeText(R.name.toUpperCase()+(C.b.feat.length?' · FEATURED':''),940,390);x.fillStyle=R.col;x.fillText(R.name.toUpperCase()+(C.b.feat.length?' · FEATURED':''),940,390);
+  C.ids.forEach((oid,k)=>{const bx=X-70,by=250+k*66,on=k===C.cur;x.save();x.globalAlpha=on?1:0.6;x.fillStyle=on?fx:'#160f2a';x.fillRect(bx-3,by-3,62,62);x.drawImage(bustPortrait(oid,0),bx,by,56,56);x.restore();});
+  if(!ult){x.fillStyle='rgba(255,255,255,.75)';x.fillRect(X,396,320*(t/BS_SHOW),4);}
+}
+function bannerTick(){
+  if(!BSHOW.cards.length)return;const sc=$('#summon');if(!sc||sc.hidden)return;
+  if(BSHOW.day!==bannerDay()){renderBannerList();return;}
+  if(G.frame%60===0)document.querySelectorAll('#summon .bnext').forEach(e=>{e.textContent='new one in '+untilNextBanner();});
+  if(!ensurePR())return;
+  BSHOW.cards.forEach((C,k)=>{C.t++;if(C.t>=BS_SHOW+BS_ULT){C.t=0;C.cur=(C.cur+1)%C.ids.length;}
+    if((G.frame+k)%2)return;const r=C.cv.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)return;
+    try{bsDraw(C);}catch(e){}});
+}
+/* ---- the "i" box: everything you can pull on a banner, full screen ---- */
+function bannerOdds(b){const lr=evOn('fest')?0.08:0.05,T={legend:lr,epic:0.25,rare:1-lr-0.25},out={};
+  for(const tier of ['legend','epic','rare']){const pool=ROSTER.filter(d=>d.rarity===tier),fi=pool.filter(d=>b.feat.includes(d.id));
+    for(const d of pool)out[d.id]=fi.length?T[tier]*((b.feat.includes(d.id)?0.5/fi.length:0)+0.5/pool.length):T[tier]/pool.length;}
+  return out;}
+const pct=v=>(v*100<1?(v*100).toFixed(2):(v*100).toFixed(1))+'%';
+function openBannerInfo(b){
+  const O=bannerOdds(b),el=$('#binfoBody'),lr=evOn('fest')?0.08:0.05;
+  $('#binfoTtl').textContent=b.name;
+  const card=d=>{const own=owns(d.id),st=own?((SAVE.stars||{})[d.id]||1):0,feat=b.feat.includes(d.id);
+    return `<li class="bi-card r-${d.rarity}${feat?' feat':''}"><img alt="" src="${bustPortrait(d.id,0).toDataURL()}"><div><b>${esc(d.name)}</b><span>${RAR[d.rarity].name}${feat?' · Featured':''}</span><span class="bi-rate">${pct(O[d.id])} per pull</span><span class="bi-own">${own?st+'★ owned':'Not owned yet'}</span></div></li>`;};
+  const tiers=[['legend',lr],['epic',0.25],['rare',1-lr-0.25]];
+  const cos=COS_POOL[b.id];
+  el.innerHTML=`<p class="sub">${esc(b.sub)} ${b.feat.length?'This banner changes in '+untilNextBanner()+'.':'This banner is always open.'}</p>
+    <p class="hint">Rates per pull: ${tiers.map(([t,r])=>RAR[t].name+' '+pct(r)).join(' · ')}.${b.feat.length?' Featured fighters take half of their tier.':''} A ×10 summon always includes at least one Improved or Vision fighter.</p>
+    ${b.feat.length?`<h3 class="sec">Featured</h3><ul class="bi-grid big">${b.feat.map(id=>card(ROSTER[RIDX(id)])).join('')}</ul>`:''}
+    ${tiers.map(([t,r])=>`<h3 class="sec" style="color:${RAR[t].col}">${RAR[t].name} · ${pct(r)}</h3><ul class="bi-grid">${ROSTER.filter(d=>d.rarity===t&&!b.feat.includes(d.id)).map(card).join('')}</ul>`).join('')}
+    ${cos?`<h3 class="sec">Bonus drops</h3><p class="hint">Each pull has a ${Math.round(COS_RATE*100)}% chance to add one you don’t own yet.</p><ul class="bi-cos">${cos.i.map(k=>`<li>${esc(iconName(k))} <small>profile icon</small></li>`).join('')}${cos.b.map(k=>`<li>${esc((PBAN[k]||{}).name||k)} <small>profile banner</small></li>`).join('')}</ul>`:''}`;
+  show('#binfo');
+}
+$('#binfoBack').addEventListener('click',()=>{sfx('ui');openSummon();});
 function renderBannerTabs(){const t=$('#btabs');t.innerHTML='';
   BANNERS.forEach((b,i)=>{const e=document.createElement('button');e.type='button';e.className='btab';e.id='bt-'+b.id;e.setAttribute('role','tab');e.style.setProperty('--bc',b.col);e.textContent=b.name;
     e.addEventListener('click',()=>{sfx('ui');selectBanner(i);});t.appendChild(e);});}
@@ -4819,7 +4934,7 @@ const NPCS=[
   say:()=>SAVE.cleared>=STORY.length?'You finished every chapter. Old stories are still worth replaying, and they still pay XP.':`Ah, you made it. ${PARTS[STORY[SAVE.cleared].part]} is where your crew stands. Next up is Chapter ${SAVE.cleared+1}, ${STORY[SAVE.cleared].name}.`,
   mark:()=>SAVE.cleared<STORY.length},
  {key:'summon',who:'mei',role:'Summon',place:'Summon Shrine',act:'Open the banners',go:()=>openSummon(),
-  say:()=>`The shrine has ${BANNERS.length} banners open tonight.${evOn('fest')?' The Vision Festival is on, so Vision fighters answer more often.':''} You have ${SAVE.coins.toLocaleString()} Rebucks.`,
+  say:()=>`Today’s banner is ${todayBanner().name}, with ${todayBanner().feat.map(id=>ROSTER[RIDX(id)].name.split(' ')[0]).join(' and ')}. A new one arrives in ${untilNextBanner()}.${evOn('fest')?' The Vision Festival is on, so Vision fighters answer more often.':''} You have ${SAVE.coins.toLocaleString()} Rebucks.`,
   mark:()=>SAVE.coins>=100},
  {key:'events',who:'ozzy',role:'Events',place:'Event Hall',act:'See the events',go:()=>openEvents(),
   say:()=>{const l=liveEvents();return `Listen up, Harbor City! ${l.length?l.map(e=>e.name).join(' and ')+' is live right now!':'No bonus event today, but Double XP comes back on Friday.'} This week’s raid boss is ${raidBoss().name}. Think your crew can take it?`;},
