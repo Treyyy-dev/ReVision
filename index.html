@@ -3318,15 +3318,29 @@ async function netInit(){
         }
       }
       if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
-      const cred=await firebase.auth().signInAnonymously();
+      const within=(p,ms,tag)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(Object.assign(new Error(tag),{code:tag})),ms))]);
+      let cred;try{cred=await within(firebase.auth().signInAnonymously(),15000,'auth-timeout');}catch(e){e.stage='auth';throw e;}
       NET.uid=(cred&&cred.user&&cred.user.uid)||firebase.auth().currentUser.uid;
       NET.db=firebase.database();
       NET.db.ref('.info/serverTimeOffset').on('value',s=>{NET.offset=s.val()||0;});
-      await loadProfile();
-      NET.ready=true;NET.err='';return true;
-    }catch(e){console.warn('online',e);NET.err=(e&&e.message)==='sdk'?'sdk':'connect';return false;}
+      try{await within(loadProfile(),15000,'db-timeout');}catch(e){e.stage='db';throw e;}
+      NET.ready=true;NET.err='';NET.why='';return true;
+    }catch(e){console.warn('online',e);NET.err=(e&&e.message)==='sdk'?'sdk':'connect';NET.why=netWhy(e);return false;}
   })();
   const ok=await NET.busy;NET.busy=null;return ok;
+}
+/* turn a Firebase failure into something a player (or the game owner) can act on */
+function netWhy(e){
+  const c=String((e&&(e.code||e.message))||'').toLowerCase(),st=e&&e.stage;
+  if(c==='sdk')return 'The online library didn’t load. Check your internet and try again.';
+  if(/network-request-failed|offline/.test(c))return 'No internet connection reached the server. Check Wi-Fi or mobile data and try again. (auth/network)';
+  if(/operation-not-allowed|admin-restricted/.test(c))return 'Anonymous sign-in is turned off for this game. The owner needs to enable it in Firebase: Authentication → Sign-in method → Anonymous. (auth/disabled)';
+  if(/api-key|invalid-api|app-not-authorized|unauthorized-domain/.test(c))return 'The game’s Firebase key was rejected. The owner should check the API key settings in Google Cloud. (auth/key)';
+  if(/too-many-requests|quota/.test(c))return 'The server is busy. Wait a minute and try again. (auth/busy)';
+  if(c==='auth-timeout')return 'Signing in took too long. Check your connection and try again. (auth/timeout)';
+  if(/permission/.test(c))return 'The database blocked this player. The owner needs to paste the latest rules into Firebase: Realtime Database → Rules → Publish. (db/rules)';
+  if(c==='db-timeout')return 'The database didn’t answer. The owner should check that a Realtime Database exists and its URL matches the game. (db/timeout)';
+  return 'Couldn’t connect'+(st?` at the ${st==='auth'?'sign-in':'database'} step`:'')+'. Try again in a moment. ('+(c||'unknown').slice(0,40)+')';
 }
 const NET_NAMES=['Neon','Ronin','Comet','Blaze','Echo','Viper','Nova','Rook','Drift','Onyx','Kite','Ember'];
 async function loadProfile(){
@@ -3358,7 +3372,7 @@ function renderOnline(){
   const el=$('#onBody');if(!el)return;
   if(!FIREBASE_CONFIG){el.innerHTML=`<div class="oncard"><h3>The arena isn’t open yet</h3><p class="evd">Online battles need the game’s Firebase server. Once it’s connected, casual and ranked matches open here.</p></div>`;return;}
   if(!NET.ready){
-    el.innerHTML=NET.err&&!NET.busy?`<div class="oncard"><h3>Can’t reach the arena</h3><p class="evd">${NET.err==='sdk'?'The online library didn’t load.':'The server didn’t answer.'} Check your internet connection and try again.</p><div class="row"><button type="button" class="btn" id="onRetry">Try again</button></div></div>`
+    el.innerHTML=NET.err&&!NET.busy?`<div class="oncard"><h3>Can’t reach the arena</h3><p class="evd">${esc(NET.why||'The server didn’t answer. Check your internet connection and try again.')}</p><div class="row"><button type="button" class="btn" id="onRetry">Try again</button></div></div>`
       :`<div class="oncard"><h3>Connecting to the arena…</h3><p class="evd">Signing you in.</p></div>`;
     const r=$('#onRetry');if(r)r.addEventListener('click',()=>{NET.err='';renderOnline();netInit().then(ok=>{renderOnline();if(ok)loadBoard().then(renderOnline);});});
     return;
@@ -4124,7 +4138,7 @@ $('#townNet').addEventListener('click',async()=>{
   TP.busy=true;const b=$('#townNet');b.dataset.t='';b.textContent='Connecting…';
   const ok=await netInit();TP.busy=false;
   if(ok){tpStart();SAVE.lastNet=1;persist();toast('You’re online. Other players in this area show up around you.');}
-  else{tpLabel();toast('Couldn’t connect. Check your connection and try again.');}
+  else{tpLabel();toast(NET.why||'Couldn’t connect. Check your connection and try again.');}
 });
 addEventListener('pagehide',()=>{if(TP.me)TP.me.remove().catch(()=>{});});
 
@@ -4154,7 +4168,7 @@ $('#stOn').addEventListener('click',async()=>{
   const ok=await netInit();
   if(!G.title)return;
   if(ok){sfx('bell');finishTitle(true);}
-  else{$('#stOn').disabled=$('#stOff').disabled=false;$('#stMsg').textContent=NET.err==='sdk'?'Couldn’t load the online service. Check your connection, or play offline.':'Couldn’t connect. Check your connection and try again, or play offline.';}
+  else{$('#stOn').disabled=$('#stOff').disabled=false;$('#stMsg').textContent=(NET.why||'Couldn’t connect.')+' You can still play offline.';}
 });
 if(GIFT)setTimeout(()=>toast('Summon is open: 1,500 coins added for your first pulls.'),700);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>paintNeon());
