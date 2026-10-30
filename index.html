@@ -631,7 +631,7 @@ body.fighting #townFade{display:none}
       <div id="townFade" aria-hidden="true"></div>
       <div id="townHud" hidden>
         <div class="th-top"><p class="th-place" id="thPlace">Harbor City Plaza<small id="thSub">Walk into a building to visit</small></p><p class="coins" data-coins>0</p></div>
-        <button id="menuBtn" type="button" aria-label="Open menu">Menu</button><button id="townNet" type="button">Offline</button>
+        <button id="menuBtn" type="button" aria-label="Open menu">Menu</button>
         <div id="joy" aria-label="Move joystick"><div id="joyKnob"></div></div>
         <button id="sprintBtn" type="button" aria-pressed="false" aria-label="Sprint">RUN</button>
         <button id="grabBtn" type="button" aria-label="Grab, press again to throw">GRAB</button>
@@ -5478,8 +5478,8 @@ function drawTownTags(c){
     tagBox(c,x,y,n.def.name.split(' ')[0],n.npc.role.toUpperCase(),n.npc.locked?'#ff6b4a':n.def.fx,T.near===n?1:clamp(1.25-dist/1400,0.45,0.9),n.npc.mark());}
   for(const f of tpShown()){const o=f.remote,dist=Math.hypot(f.wx-p.wx,f.wz-p.wz);if(dist>1500)continue;
     const [x,y,z]=townToScreen(f.wx,222*f.def.scale,f.wz);if(z>1||x<-60||x>W+60||y<0)continue;const tr=tierOf(o.r);
-    tagBox(c,x,y,o.n,'PLAYER · '+tr.name.toUpperCase(),tr.col,clamp(1.2-dist/1300,0.4,0.9),false);}
-  if(TP.on&&p&&!T.gag&&!p.bz){const [x,y,z]=townToScreen(p.wx,222*p.def.scale+(p.hopY||0),p.wz);if(z<1&&y>40)tagBox(c,x,y,SAVE.name||'You','YOU · ONLINE','#ffc94d',0.78,false);}
+    tagBox(c,x,y,o.n,tr.name.toUpperCase(),tr.col,clamp(1.2-dist/1300,0.4,0.9),false);}
+  if(TP.on&&p&&!T.gag&&!p.bz){const [x,y,z]=townToScreen(p.wx,222*p.def.scale+(p.hopY||0),p.wz);if(z<1&&y>40){const tr=tierOf((NET.profile&&NET.profile.rating)||1000);tagBox(c,x,y,(NET.profile&&NET.profile.name)||SAVE.name||'You',tr.name.toUpperCase(),tr.col,0.8,false);}}
   if(T.bonk&&!area){const [x,y,z]=townToScreen(T.bonk.x,250,T.bonk.z);if(z<1){const k=T.bonk.t,a=clamp(1.4-k/50,0,1);c.globalAlpha=a;c.textAlign='center';c.textBaseline='middle';
     otext(c,'BONK!',x,y-k*0.8,26+Math.min(10,k),'#ffc94d',OUT,6);c.globalAlpha=1;}}
   if(!area)for(const N of NPCS){if(N.locked)continue;const B=BLD[N.key],dist=Math.hypot(B.doorX-p.wx,B.doorZ-p.wz);
@@ -5649,15 +5649,6 @@ function tpShown(){const out=[];for(const k in TP.others){const o=TP.others[k];i
 function tpLabel(){const b=$('#townNet');if(!b)return;const n=tpCount();
   const t=TP.on?(n?`Online · ${n} nearby`:'Online'):'Offline';
   if(b.dataset.t!==t){b.dataset.t=t;b.textContent=t;b.classList.toggle('on',TP.on);b.setAttribute('aria-label',TP.on?`Online, ${n} other players here. Tap to go offline.`:'Offline. Tap to go online.');}}
-$('#townNet').addEventListener('click',async()=>{
-  sfx('ui');if(TP.busy)return;
-  if(TP.on){tpStop();SAVE.lastNet=0;persist();toast('You’re offline. Other players are hidden.');return;}
-  if(!FIREBASE_CONFIG){toast('Online isn’t set up in this build yet.');return;}
-  TP.busy=true;const b=$('#townNet');b.dataset.t='';b.textContent='Connecting…';
-  const ok=await netInit();TP.busy=false;
-  if(ok){tpStart();SAVE.lastNet=1;persist();toast('You’re online. Other players in this area show up around you.');}
-  else{tpLabel();toast(NET.why||'Couldn’t connect. Check your connection and try again.');}
-});
 addEventListener('pagehide',()=>{if(TP.me)TP.me.remove().catch(()=>{});});
 
 /* ---------------- menu: Account · Settings · Binds ---------------- */
@@ -5717,7 +5708,10 @@ function renderSettings(){
   const el=$('#menuBody'),f=fpsCap();
   el.innerHTML=`<div class="set-row"><div><h3 class="acc-h">Frame rate</h3><p class="hint">Higher looks smoother and uses more battery. 90 and 120 need a screen that refreshes that fast; on a 60 Hz screen they run at 60.</p></div>
     <div class="seg" role="radiogroup" aria-label="Frame rate">${[30,60,90,120].map(v=>`<button type="button" role="radio" aria-checked="${v===f}" data-fps="${v}">${v}<small>FPS</small></button>`).join('')}</div></div>
-    <p class="hint" id="fpsNow" aria-live="polite"></p>`;
+    <p class="hint" id="fpsNow" aria-live="polite"></p>
+    <div class="set-row"><div><h3 class="acc-h">Start menu</h3><p class="hint">Go back to the start menu. That’s where you choose Online or Offline. You’re ${TP.on?'<b>online</b>':'<b>offline</b>'} right now.</p></div>
+    <button class="btn alt" type="button" id="toStart">Back to start menu</button></div>`;
+  $('#toStart').addEventListener('click',()=>{sfx('ui');backToStart();});
   el.querySelectorAll('[data-fps]').forEach(b=>b.addEventListener('click',()=>{sfx('ui');SAVE.set.fps=+b.dataset.fps;persist();renderSettings();}));
   const upd=()=>{const e=$('#fpsNow');if(e)e.textContent=`Running at about ${FPS_NOW} frames per second.`;};upd();fpsTimer=setInterval(upd,600);
 }
@@ -6020,6 +6014,10 @@ $('#stName').addEventListener('submit',e=>{e.preventDefault();const n=cleanName(
   SAVE.name=n;SAVE.netName=n;persist();sfx('ui');$('#stNameIn').blur();
   if(NET.ready&&NET.profile&&NET.profile.name!==n)saveNetName(n);titleTo('mode');});
 $('#stRename').addEventListener('click',()=>{sfx('ui');titleTo('name');});
+function backToStart(){
+  closeMenu();tpStop();if(NET.search&&!NET.search.done)cancelSearch();toMenu();
+  G.title=true;buildTitle();setStage('shrine');show('#start');titleTo('start');
+}
 function finishTitle(online){G.title=false;SAVE.lastNet=online?1:0;persist();goHome();if(online)tpStart();else tpStop();}
 $('#stOff').addEventListener('click',()=>{sfx('bell');finishTitle(false);});
 $('#stOn').addEventListener('click',async()=>{
