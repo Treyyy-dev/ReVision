@@ -31,6 +31,7 @@ jobs:
           # index.html has no document head of its own (the Claude page adds one), so add a phone-friendly one
           cat web/head.html index.html > site/index.html
           cp icon.png site/icon.png
+          cp web/manifest.webmanifest site/manifest.webmanifest
           touch site/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
