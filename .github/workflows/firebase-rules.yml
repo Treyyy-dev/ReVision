@@ -1,7 +1,7 @@
 name: Firebase rules
 
 # Publishes firebase/database.rules.json to the live database whenever it changes.
-# Needs the FIREBASE_SERVICE_ACCOUNT repository secret; skips quietly without it.
+# Needs the FIREBASE_SERVICE_ACCOUNT repository secret (added); skips quietly without it.
 on:
   push:
     branches: [main]
