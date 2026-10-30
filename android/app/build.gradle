@@ -14,12 +14,25 @@ android {
         versionName "1.0.${System.getenv('GITHUB_RUN_NUMBER') ?: '0'}"
     }
 
+    // One fixed key for every build, so each new APK installs over the last one.
+    // (CI's debug key is random per run, which made Android refuse updates.)
+    // Before a Play Store release, move this key out of the repo into a GitHub secret.
+    signingConfigs {
+        fixed {
+            storeFile file('revision.keystore')
+            storePassword 'revision123'
+            keyAlias 'revision'
+            keyPassword 'revision123'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            // Signed with the debug key so the APK installs by sideloading.
-            // Swap in a real release key before publishing to the Play Store.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.fixed
+        }
+        debug {
+            signingConfig signingConfigs.fixed
         }
     }
 

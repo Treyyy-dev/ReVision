@@ -48,6 +48,8 @@ public class MainActivity extends Activity {
         s.setUseWideViewPort(true);
         s.setSupportZoom(false);
         s.setBuiltInZoomControls(false);
+        s.setCacheMode(WebSettings.LOAD_NO_CACHE); // game files ship in the APK; never serve an old cached copy
+        web.clearCache(true);                      // clears cached files only, not your save
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
         final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
