@@ -154,7 +154,9 @@ kbd{font-family:var(--display);font-size:10px;color:var(--ink);background:var(--
 .touch .keys{display:none}
 
 .coins{display:inline-flex;align-items:center;gap:8px;font-family:var(--display);font-size:16px;color:var(--gold);background:rgba(36,26,68,.85);border:1px solid var(--line);padding:6px 12px;margin:0;font-variant-numeric:tabular-nums;white-space:nowrap}
-.coins::before{content:"";width:11px;height:11px;background:var(--gold);transform:rotate(45deg);box-shadow:inset -3px -3px 0 #c9902a}
+.coins::before{content:"R";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe8a0,var(--gold) 55%,#c9902a);color:#5a3a08;font:700 12px/1 var(--body);box-shadow:0 0 0 1px #8a5a12 inset}
+.coins::after{content:"Rebucks";font:600 11px var(--body);letter-spacing:.04em;color:var(--muted)}
+#townHud .coins::after{display:none}
 
 .home{max-width:1080px;display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:center}
 @media (min-width:760px){.home{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}}
@@ -596,7 +598,7 @@ body.fighting #townFade{display:none}
       </div>
       <div id="townFade" aria-hidden="true"></div>
       <div id="townHud" hidden>
-        <div class="th-top"><p class="th-place" id="thPlace">Harbor City Plaza<small id="thSub">Walk into a building to visit</small></p><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></div>
+        <div class="th-top"><p class="th-place" id="thPlace">Harbor City Plaza<small id="thSub">Walk into a building to visit</small></p><p class="coins" data-coins>0</p></div>
         <button id="menuBtn" type="button" aria-label="Open menu">Menu</button><button id="townNet" type="button">Offline</button>
         <div id="joy" aria-label="Move joystick"><div id="joyKnob"></div></div>
         <button id="talkBtn" type="button" hidden>Talk</button>
@@ -631,7 +633,7 @@ body.fighting #townFade{display:none}
 
     <section id="menu" class="overlay" hidden aria-label="Menu">
       <div class="screen">
-        <header class="bar"><button class="back" type="button" id="menuBack">‹ Back</button><div class="ttl"><p class="eyebrow">Menu</p><h2 id="menuTtl">Account</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
+        <header class="bar"><button class="back" type="button" id="menuBack">‹ Back</button><div class="ttl"><p class="eyebrow">Menu</p><h2 id="menuTtl">Account</h2></div><p class="coins" data-coins>0</p></header>
         <div class="mtabs" role="tablist" aria-label="Menu sections"><button type="button" role="tab" class="mtab" data-tab="account">Account</button><button type="button" role="tab" class="mtab" data-tab="settings">Settings</button><button type="button" role="tab" class="mtab" data-tab="binds">Binds</button></div>
         <div id="menuBody" role="tabpanel"></div>
       </div>
@@ -648,7 +650,7 @@ body.fighting #townFade{display:none}
 
     <section id="story" class="overlay" hidden>
       <div class="screen">
-        <header class="bar"><button class="back" type="button" id="storyBack">‹ Back</button><div class="ttl"><p class="eyebrow">Story</p><h2>Harbor City</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
+        <header class="bar"><button class="back" type="button" id="storyBack">‹ Back</button><div class="ttl"><p class="eyebrow">Story</p><h2>Harbor City</h2></div><p class="coins" data-coins>0</p></header>
         <p class="sub">Three parts, eighteen chapters. Win the rooftop league, follow the Warden’s wish underground, then climb Kurogane Tower. Every fight earns your crew XP; fighters level up to Lv 60 and grow stronger as they go.</p>
         <ol class="chapters" id="chapters"></ol>
       </div>
@@ -666,7 +668,7 @@ body.fighting #townFade{display:none}
 
     <section id="select" class="overlay" hidden>
       <div class="sel">
-        <header class="bar"><button class="back" type="button" id="selBack">‹ Back</button><div class="ttl"><p class="eyebrow" id="selEyebrow"></p><h2 id="selTitle"></h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
+        <header class="bar"><button class="back" type="button" id="selBack">‹ Back</button><div class="ttl"><p class="eyebrow" id="selEyebrow"></p><h2 id="selTitle"></h2></div><p class="coins" data-coins>0</p></header>
         <p class="sub" id="selSub"></p>
         <div class="row teamrow" id="savedTeams"></div>
         <div class="roster" id="roster"></div>
@@ -692,18 +694,18 @@ body.fighting #townFade{display:none}
 
     <section id="shop" class="overlay" hidden>
       <div class="screen">
-        <header class="bar"><button class="back" type="button" id="shopBack">‹ Back</button><div class="ttl"><p class="eyebrow">Shop</p><h2>Tokens</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
-        <p class="notice">Payments aren’t connected yet, so token packs can’t be bought. Tokens can still be earned from missions and raid bosses.</p>
-        <h3 class="sec">TOKEN PACKS</h3>
+        <header class="bar"><button class="back" type="button" id="shopBack">‹ Back</button><div class="ttl"><p class="eyebrow">Shop</p><h2>Rebucks</h2></div><p class="coins" data-coins>0</p></header>
+        <p class="notice">Payments aren’t connected yet, so Rebucks packs can’t be bought. Rebucks are earned from every fight, missions and raid bosses.</p>
+        <h3 class="sec">REBUCKS PACKS</h3>
         <div class="packs" id="packs"></div>
-        <h3 class="sec">SPEND TOKENS</h3>
+        <h3 class="sec">SPEND REBUCKS</h3>
         <div class="packs" id="exch"></div>
       </div>
     </section>
 
     <section id="collection" class="overlay" hidden>
       <div class="screen">
-        <header class="bar"><button class="back" type="button" id="collBack">‹ Back</button><div class="ttl"><p class="eyebrow">Characters</p><h2>Teams</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
+        <header class="bar"><button class="back" type="button" id="collBack">‹ Back</button><div class="ttl"><p class="eyebrow">Characters</p><h2>Teams</h2></div><p class="coins" data-coins>0</p></header>
         <div id="charTeams"></div>
       </div>
     </section>
@@ -717,21 +719,21 @@ body.fighting #townFade{display:none}
 
     <section id="events" class="overlay" hidden>
       <div class="screen">
-        <header class="bar"><button class="back" type="button" id="evBack">‹ Back</button><div class="ttl"><p class="eyebrow">Events</p><h2>This week</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
+        <header class="bar"><button class="back" type="button" id="evBack">‹ Back</button><div class="ttl"><p class="eyebrow">Events</p><h2>This week</h2></div><p class="coins" data-coins>0</p></header>
         <div class="evgrid" id="evList"></div>
       </div>
     </section>
 
     <section id="online" class="overlay" hidden>
       <div class="screen">
-        <header class="bar"><button class="back" type="button" id="onBack">‹ Back</button><div class="ttl"><p class="eyebrow">Arena</p><h2>Online</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
+        <header class="bar"><button class="back" type="button" id="onBack">‹ Back</button><div class="ttl"><p class="eyebrow">Arena</p><h2>Online</h2></div><p class="coins" data-coins>0</p></header>
         <div id="onBody" class="onbody"></div>
       </div>
     </section>
 
     <section id="missions" class="overlay" hidden>
       <div class="screen">
-        <header class="bar"><button class="back" type="button" id="misBack">‹ Back</button><div class="ttl"><p class="eyebrow">Missions</p><h2>Rewards</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
+        <header class="bar"><button class="back" type="button" id="misBack">‹ Back</button><div class="ttl"><p class="eyebrow">Missions</p><h2>Rewards</h2></div><p class="coins" data-coins>0</p></header>
         <div class="btabs" role="tablist" aria-label="Mission period"><button type="button" class="btab" id="mt-daily" data-p="daily" role="tab">Daily</button><button type="button" class="btab" id="mt-weekly" data-p="weekly" role="tab">Weekly</button><button type="button" class="btab" id="mt-monthly" data-p="monthly" role="tab">Monthly</button></div>
         <p class="sub" id="misReset"></p>
         <div class="mlist" id="misList"></div>
@@ -740,8 +742,8 @@ body.fighting #townFade{display:none}
 
     <section id="summon" class="overlay" hidden>
       <div class="screen">
-        <header class="bar"><button class="back" type="button" id="sumBack">‹ Back</button><div class="ttl"><p class="eyebrow">Summon</p><h2>Banners</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
-        <p class="sub">Scroll through every banner. A ×10 summon always includes at least one Improved or Vision fighter. Duplicates add a star, up to 14★. Each star adds 4% health and power; past 14★ a duplicate turns into 50 coins.</p>
+        <header class="bar"><button class="back" type="button" id="sumBack">‹ Back</button><div class="ttl"><p class="eyebrow">Summon</p><h2>Banners</h2></div><p class="coins" data-coins>0</p></header>
+        <p class="sub">Scroll through every banner. A ×10 summon always includes at least one Improved or Vision fighter. Duplicates add a star, up to 14★. Each star adds 4% health and power; past 14★ a duplicate turns into 50 Rebucks.</p>
         <div class="blist" id="blist"></div>
       </div>
     </section>
@@ -756,7 +758,7 @@ body.fighting #townFade{display:none}
 
     <section id="summonRes" class="overlay" hidden>
       <div class="screen">
-        <header class="bar"><div class="ttl"><p class="eyebrow">Summon results</p><h2 id="srTitle"></h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
+        <header class="bar"><div class="ttl"><p class="eyebrow">Summon results</p><h2 id="srTitle"></h2></div><p class="coins" data-coins>0</p></header>
         <div class="sres" id="sres"></div>
         <div class="row"><button class="btn" id="srAgain" type="button">Summon again</button><button class="btn alt" id="srDone" type="button">Done</button></div>
       </div>
@@ -967,7 +969,7 @@ const DAY=86400000;
 function dayStart(d){const x=new Date(d);x.setHours(0,0,0,0);return x;}
 const EVENTS=[
  {id:'dxp',name:'Double XP Weekend',days:[5,6,0],desc:'Every fight pays double XP. Great time to push fighters toward Lv 60.',col:'#9dff7a'},
- {id:'coin',name:'Coin Rush',days:[1,2],desc:'All coin rewards are 50% higher.',col:'#ffc94d'},
+ {id:'coin',name:'Rebucks Rush',days:[1,2],desc:'All Rebucks rewards are 50% higher.',col:'#ffc94d'},
  {id:'fest',name:'Vision Festival',days:[3,4],desc:'Vision summon rate rises from 5% to 8% on every banner.',col:'#c58bff'},
 ];
 function eventState(e,now){now=now||new Date();const on=e.days.includes(now.getDay());let t=dayStart(now).getTime();
@@ -980,9 +982,9 @@ const RAIDS=[
  {id:'lena',name:'Glacier Queen',stage:'snow',bio:'Lena Frost, grown huge in the blizzard, guarding the mountain temple.'},
 ];
 const RAID_TIERS=[
- {name:'Normal',lv:20,st:3,diff:'normal',coins:400,tokens:10,xp:600},
- {name:'Hard',lv:40,st:5,diff:'hard',coins:800,tokens:20,xp:1200},
- {name:'Extreme',lv:60,st:7,diff:'hard',coins:1500,tokens:40,xp:2000},
+ {name:'Normal',lv:20,st:3,diff:'normal',coins:430,tokens:0,xp:600},
+ {name:'Hard',lv:40,st:5,diff:'hard',coins:860,tokens:0,xp:1200},
+ {name:'Extreme',lv:60,st:7,diff:'hard',coins:1620,tokens:0,xp:2000},
 ];
 function weekStart(d){const x=dayStart(d||new Date());x.setDate(x.getDate()-(x.getDay()+6)%7);return x;}
 function weekEnd(d){const x=weekStart(d);x.setDate(x.getDate()+7);return x.getTime();}
@@ -990,9 +992,9 @@ const weekIndex=d=>Math.round(weekStart(d).getTime()/(7*DAY));
 const raidBoss=()=>RAIDS[weekIndex()%RAIDS.length];
 function raidDef(r){const b=ROSTER[RIDX(r.id)];return Object.assign({},b,{name:r.name+' \u00b7 '+b.name.split(' ')[0],hp:b.hp*7,power:b.power*1.25,scale:b.scale*1.32,speed:b.speed*0.95});}
 const MISSIONS={
- daily:[{id:'d1',text:'Win 3 fights',stat:'wins',n:3,r:{coins:150}},{id:'d2',text:'Use 5 specials',stat:'specials',n:5,r:{coins:100}},{id:'d3',text:'Land a 10-hit combo',stat:'combo10',n:1,r:{tokens:10}},{id:'d4',text:'Summon once',stat:'summons',n:1,r:{coins:100}},{id:'d5',text:'Counter 2 attacks',stat:'counters',n:2,r:{tokens:10}}],
- weekly:[{id:'w1',text:'Win 15 fights',stat:'wins',n:15,r:{tokens:50}},{id:'w2',text:'Beat a raid boss',stat:'raids',n:1,r:{tokens:40}},{id:'w3',text:'Use 5 ultimates',stat:'ults',n:5,r:{coins:600}},{id:'w4',text:'Summon 10 times',stat:'summons',n:10,r:{tokens:30}},{id:'w5',text:'Knock out 40 fighters',stat:'kos',n:40,r:{coins:800}}],
- monthly:[{id:'m1',text:'Win 60 fights',stat:'wins',n:60,r:{tokens:200}},{id:'m2',text:'Beat 4 raid bosses',stat:'raids',n:4,r:{tokens:150}},{id:'m3',text:'Summon 50 times',stat:'summons',n:50,r:{tokens:120}},{id:'m4',text:'Land 30 combos of 10+ hits',stat:'combo10',n:30,r:{coins:3000}},{id:'m5',text:'Clear 20 story chapters (replays count)',stat:'chapters',n:20,r:{tokens:100}}],
+ daily:[{id:'d1',text:'Win 3 fights',stat:'wins',n:3,r:{coins:150}},{id:'d2',text:'Use 5 specials',stat:'specials',n:5,r:{coins:100}},{id:'d3',text:'Land a 10-hit combo',stat:'combo10',n:1,r:{coins:30}},{id:'d4',text:'Summon once',stat:'summons',n:1,r:{coins:100}},{id:'d5',text:'Counter 2 attacks',stat:'counters',n:2,r:{coins:30}}],
+ weekly:[{id:'w1',text:'Win 15 fights',stat:'wins',n:15,r:{coins:150}},{id:'w2',text:'Beat a raid boss',stat:'raids',n:1,r:{coins:120}},{id:'w3',text:'Use 5 ultimates',stat:'ults',n:5,r:{coins:600}},{id:'w4',text:'Summon 10 times',stat:'summons',n:10,r:{coins:90}},{id:'w5',text:'Knock out 40 fighters',stat:'kos',n:40,r:{coins:800}}],
+ monthly:[{id:'m1',text:'Win 60 fights',stat:'wins',n:60,r:{coins:600}},{id:'m2',text:'Beat 4 raid bosses',stat:'raids',n:4,r:{coins:450}},{id:'m3',text:'Summon 50 times',stat:'summons',n:50,r:{coins:360}},{id:'m4',text:'Land 30 combos of 10+ hits',stat:'combo10',n:30,r:{coins:3000}},{id:'m5',text:'Clear 20 story chapters (replays count)',stat:'chapters',n:20,r:{coins:300}}],
 };
 function periodKey(p,d){d=d||new Date();const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
   if(p==='daily')return `${y}-${m}-${dd}`;if(p==='monthly')return `${y}-${m}`;return 'W'+weekIndex(d);}
@@ -1003,7 +1005,7 @@ function misOf(p){const k=periodKey(p);let v=SAVE.mis[p];if(!v||v.k!==k)v=SAVE.m
 function track(stat,n){n=n||1;for(const p of ['daily','weekly','monthly']){const v=misOf(p);v.p[stat]=(v.p[stat]||0)+n;}}
 function claimableMissions(){let c=0;for(const p in MISSIONS){const v=misOf(p);for(const m of MISSIONS[p])if(!v.c[m.id]&&(v.p[m.stat]||0)>=m.n)c++;}return c;}
 function fmtLeft(ms){const h=Math.max(0,Math.floor(ms/3600000)),d=Math.floor(h/24);return d>=1?`${d}d ${h%24}h`:`${h}h ${Math.max(1,Math.floor(ms/60000)%60)}m`;}
-const rewardText=r=>[r.coins?`${r.coins} ◆`:'',r.tokens?`${r.tokens} ✦`:''].filter(Boolean).join(' + ');
+const rewardText=r=>`${((r.coins||0)+(r.tokens||0)*3).toLocaleString()} Rebucks`;
 
 /* ---------------- save data (this browser only) ---------------- */
 const SAVE_KEY='triadclash.save.v1';
@@ -1020,7 +1022,7 @@ const DEF_KB={l:'KeyA',r:'KeyD',u:'KeyW',crh:'KeyS',light:'KeyJ',blk:'KeyK',sp1:
 const DEF_PAD={l:14,r:15,u:12,crh:13,light:0,blk:2,sp1:1,sp2:3,ult:5,tag:4,ast:11,dl:6,dr:7,act:0,pause:9};
 SAVE.binds={kb:Object.assign({},DEF_KB,(SAVE.binds&&SAVE.binds.kb)||{}),pad:Object.assign({},DEF_PAD,(SAVE.binds&&SAVE.binds.pad)||{})};
 SAVE.set=Object.assign({fps:60},SAVE.set||{});
-SAVE.stars=SAVE.stars||{};SAVE.lv=SAVE.lv||{};SAVE.plv=(SAVE.plv&&SAVE.plv.lv)?SAVE.plv:{lv:1,xp:0};SAVE.tokens=SAVE.tokens||0;SAVE.teams=SAVE.teams||[];while(SAVE.teams.length<8)SAVE.teams.push([]);SAVE.mis=SAVE.mis||{};
+if(SAVE.tokens>0){SAVE.coins=(SAVE.coins|0)+Math.round(SAVE.tokens*3);SAVE.tokens=0;}SAVE.stars=SAVE.stars||{};SAVE.lv=SAVE.lv||{};SAVE.plv=(SAVE.plv&&SAVE.plv.lv)?SAVE.plv:{lv:1,xp:0};SAVE.tokens=SAVE.tokens||0;SAVE.teams=SAVE.teams||[];while(SAVE.teams.length<8)SAVE.teams.push([]);SAVE.mis=SAVE.mis||{};
 let GIFT=false;if(!SAVE.summonGift){SAVE.summonGift=1;SAVE.coins+=1500;GIFT=true;try{localStorage.setItem(SAVE_KEY,JSON.stringify(SAVE));}catch(e){}}
 const starRow=st=>{let h='';for(let i=0;i<7;i++)h+=i<st-7?'<b class="st2">\u2605</b>':i<st?'\u2605':'\u2606';return h;};
 const MAX_LV=60,MAX_STARS=14,xpNeed=lv=>30+lv*14;
@@ -3612,7 +3614,7 @@ function drawPortrait(target,id,c){const x=target.getContext('2d');x.clearRect(0
 /* ---------------- menus ---------------- */
 const SCREENS=['#start','#menu','#vsload','#story','#storyIntro','#select','#shop','#collection','#pause','#result','#summon','#sreveal','#summonRes','#events','#missions','#online'];
 function show(id){for(const s of SCREENS)$(s).hidden=s!==id;refreshCoins();const el=id&&$(id);if(el)el.scrollTop=0;}
-function refreshCoins(){document.querySelectorAll('[data-coins]').forEach(e=>{e.textContent=SAVE.coins;e.setAttribute('aria-label',SAVE.coins+' coins');});
+function refreshCoins(){document.querySelectorAll('[data-coins]').forEach(e=>{e.textContent=SAVE.coins;e.setAttribute('aria-label',SAVE.coins+' Rebucks');});
   document.querySelectorAll('[data-tokens]').forEach(e=>{e.textContent=SAVE.tokens||0;e.setAttribute('aria-label',(SAVE.tokens||0)+' tokens');});
 }
 let toastT=0;
@@ -3651,7 +3653,7 @@ function openStory(){
     const done=i<SAVE.cleared,open=i<=SAVE.cleared;
     const li=document.createElement('li');
     const foes=ch.foes.map(id=>ROSTER[RIDX(id)].name.split(' ')[0]).join(', ');
-    li.innerHTML=`<button type="button" class="chap${done?' done':''}" id="chap-${i}" ${open?'':'disabled'}><span class="no">${i+1}</span><span class="cn">${ch.name}</span><span class="cp">${ch.place} · Lv ${ch.lvl} · ${ch.diff}</span><span class="cf">vs ${foes}</span><span class="cs">${done?'Cleared · replay for '+Math.round(ch.reward*0.3)+' coins':open?'Next · '+ch.reward+' coins · '+ch.xp+' XP':'Locked'}</span></button>`;
+    li.innerHTML=`<button type="button" class="chap${done?' done':''}" id="chap-${i}" ${open?'':'disabled'}><span class="no">${i+1}</span><span class="cn">${ch.name}</span><span class="cp">${ch.place} · Lv ${ch.lvl} · ${ch.diff}</span><span class="cf">vs ${foes}</span><span class="cs">${done?'Cleared · replay for '+Math.round(ch.reward*0.3)+' Rebucks':open?'Next · '+ch.reward+' Rebucks · '+ch.xp+' XP':'Locked'}</span></button>`;
     if(open)li.firstChild.addEventListener('click',()=>{sfx('ui');openStoryIntro(i);});
     list.appendChild(li);
   });
@@ -3845,7 +3847,7 @@ function showResult(){
     sub=reason||(win?'Rival crew knocked out':'Your crew was knocked out');
     if(k==='vs'){coins=win?{easy:60,normal:90,hard:130}[G.diff]:20;xpGain=win?{easy:40,normal:60,hard:90}[G.diff]:15;btns=[['Rematch',startMatch],['New team',()=>openDraft('vs')],['Town',goHome]];}
     if(k==='raid'){const T=G.raid.tier;
-      if(win){coins=T.coins;tokens=T.tokens;xpGain=T.xp;track('raids');text=`${G.raid.boss.name} is down. Your crew earned ${T.tokens} tokens.`;btns=[['Fight again',startMatch],['Events',openEvents]];}
+      if(win){coins=T.coins;tokens=T.tokens;xpGain=T.xp;track('raids');text=`${G.raid.boss.name} is down. Your crew earned ${T.coins} Rebucks.`;btns=[['Fight again',startMatch],['Events',openEvents]];}
       else{coins=40;xpGain=Math.round(T.xp*0.2);text='The boss is still standing. Level up, star up, or bring a different team.';btns=[['Retry',startMatch],['Change team',()=>openDraft('raid')],['Events',openEvents]];}}
     if(k==='story'){
       const ch=STORY[G.chapter];
@@ -3864,12 +3866,12 @@ function showResult(){
     const base=k==='pvp'?30:k==='online'?(G.net&&G.net.coop?70:G.net&&G.net.ranked?60:50):k==='story'?50:k==='raid'?60:({easy:30,normal:45,hard:60}[G.diff]||45);
     pxp=k==='pvp'?base:won?base:draw?Math.round(base*0.7):Math.round(base*0.45);if(evOn('dxp'))pxp*=2;}
   const pup=addPlayerXP(pxp);
-  SAVE.coins+=coins;SAVE.tokens=(SAVE.tokens||0)+tokens;persist();
+  coins+=Math.round(tokens*3);tokens=0;SAVE.coins+=coins;persist();
   $('#resSub').textContent=sub;
   line.hidden=!text;line.textContent=text;
   const standing=me.members.filter(m=>m.alive).length;
   $('#resStats').innerHTML=(k==='pvp'?`<dt>P1 longest combo</dt><dd>${me.maxCombo} hits</dd><dt>P2 longest combo</dt><dd>${G.teams[1].maxCombo} hits</dd>`
-    :`<dt>Longest combo</dt><dd>${me.maxCombo} hits</dd><dt>Damage dealt</dt><dd>${Math.round(me.dmg)}</dd><dt>Fighters standing</dt><dd>${standing} of ${me.members.length}</dd><dt>Coins earned</dt><dd>+${coins}${evOn('coin')?' (Coin Rush)':''}</dd>`+(tokens?`<dt>Tokens earned</dt><dd>+${tokens}</dd>`:'')+(evOn('dxp')&&xpGain?`<dt>Event</dt><dd>Double XP</dd>`:''))+(xpGain?`<dt>XP each</dt><dd>+${xpGain}</dd>`+ups.map(([d,r])=>`<dt>${d.name.split(' ')[0]}</dt><dd>${r.to>r.from?`Lv ${r.from} \u2192 ${r.to}`:`Lv ${r.to}`}</dd>`).join(''):'');
+    :`<dt>Longest combo</dt><dd>${me.maxCombo} hits</dd><dt>Damage dealt</dt><dd>${Math.round(me.dmg)}</dd><dt>Fighters standing</dt><dd>${standing} of ${me.members.length}</dd><dt>Rebucks earned</dt><dd>+${coins}${evOn('coin')?' (Rebucks Rush)':''}</dd>`+(evOn('dxp')&&xpGain?`<dt>Event</dt><dd>Double XP</dd>`:''))+(xpGain?`<dt>XP each</dt><dd>+${xpGain}</dd>`+ups.map(([d,r])=>`<dt>${d.name.split(' ')[0]}</dt><dd>${r.to>r.from?`Lv ${r.from} \u2192 ${r.to}`:`Lv ${r.to}`}</dd>`).join(''):'');
   {const v=SAVE.plv,pct=v.lv>=PLV_MAX?100:Math.round(v.xp/plvNeed(v.lv)*100);
    $('#resStats').insertAdjacentHTML('beforeend',`<dt>Player EXP</dt><dd>+${pup.amt} · Lv ${v.lv}${v.lv>=PLV_MAX?' (max)':` · ${pct}%`}</dd>`);
    if(pup.to>pup.from)setTimeout(()=>toast(`Player level up! You are now level ${pup.to}.`),400);}
@@ -3881,13 +3883,13 @@ function showResult(){
 /* shop */
 function itemEl(id,canvasFn,title,subtitle,price,ownedNow,onBuy){
   const el=document.createElement('div');el.className='item';
-  el.innerHTML=`<canvas width="128" height="160" aria-hidden="true"></canvas><div><p class="in">${title}</p><p class="is">${subtitle}</p>${ownedNow?'<span class="owned">Owned</span>':`<button type="button" class="buy" id="${id}" ${SAVE.coins<price?'disabled':''}>${price} ◆ Buy</button>`}</div>`;
+  el.innerHTML=`<canvas width="128" height="160" aria-hidden="true"></canvas><div><p class="in">${title}</p><p class="is">${subtitle}</p>${ownedNow?'<span class="owned">Owned</span>':`<button type="button" class="buy" id="${id}" ${SAVE.coins<price?'disabled':''}>${price} Rebucks</button>`}</div>`;
   canvasFn(el.querySelector('canvas'));
   const b=el.querySelector('.buy');if(b)b.addEventListener('click',onBuy);
   return el;
 }
 function buy(price,apply,msg){
-  if(SAVE.coins<price){toast('Not enough coins yet.');return;}
+  if(SAVE.coins<price){toast('Not enough Rebucks yet.');return;}
   SAVE.coins-=price;apply();persist();sfx('bell');toast(msg);renderShop();refreshCoins();
 }
 function openShop(){toHub();renderShop();show('#shop');}
@@ -3907,9 +3909,9 @@ function renderCollection(){
   const eq=equipped(d.id);
   el.innerHTML=infoHTML(d)+statsHTML(d)+`<p class="mv" style="margin-top:10px"><b>COSTUME</b></p><div class="chips">${COSTUMES.map((cs,c)=>{
     const have=ownsCostume(d.id,c);
-    return `<button type="button" class="chip" id="cos-${c}" data-c="${c}" aria-pressed="${c===eq}">${cs.name}${have?'':` · ${cs.price} ◆`}</button>`;}).join('')}</div>`;
+    return `<button type="button" class="chip" id="cos-${c}" data-c="${c}" aria-pressed="${c===eq}">${cs.name}${have?'':` · ${cs.price} Rebucks`}</button>`;}).join('')}</div>`;
   el.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{const c=+b.dataset.c;
-    if(!ownsCostume(d.id,c)){const pr=COSTUMES[c].price;if(SAVE.coins<pr){toast(`${COSTUMES[c].name} costs ${pr} coins. Win story chapters to earn more.`);return;}
+    if(!ownsCostume(d.id,c)){const pr=COSTUMES[c].price;if(SAVE.coins<pr){toast(`${COSTUMES[c].name} costs ${pr} Rebucks. Win story chapters to earn more.`);return;}
       SAVE.coins-=pr;(SAVE.costumes[d.id]=SAVE.costumes[d.id]||[]).push(c);sfx('bell');toast(`${COSTUMES[c].name} unlocked for ${d.name.split(' ')[0]}.`);}
     SAVE.equipped[d.id]=c;persist();sfx('ui');renderCollection();refreshCoins();}));paintHeads(el);
 }
@@ -3927,11 +3929,11 @@ let fdId=null;
 function openFighter(id){
   fdId=id;const d=ROSTER[RIDX(id)],own=owns(id),eq=own?equipped(id):0,el=$('#fdInfo');
   $('#fdetail').style.setProperty('--tint',d.fx);el.style.setProperty('--tint',d.fx);drawPortrait($('#fdArt canvas'),id,eq);
-  el.innerHTML=infoHTML(d)+statsHTML(d)+(own?`<p class="mv" style="margin-top:10px"><b>COSTUME</b></p><div class="chips">${COSTUMES.map((cs,c)=>`<button type="button" class="chip" id="cos-${c}" data-c="${c}" aria-pressed="${c===eq}">${cs.name}${ownsCostume(id,c)?'':` · ${cs.price} ◆`}</button>`).join('')}</div>`
+  el.innerHTML=infoHTML(d)+statsHTML(d)+(own?`<p class="mv" style="margin-top:10px"><b>COSTUME</b></p><div class="chips">${COSTUMES.map((cs,c)=>`<button type="button" class="chip" id="cos-${c}" data-c="${c}" aria-pressed="${c===eq}">${cs.name}${ownsCostume(id,c)?'':` · ${cs.price} Rebucks`}</button>`).join('')}</div>`
     :`<div class="row" style="margin-top:10px"><button type="button" class="btn" id="fdSummon">Find in Summon</button></div>`);
   paintHeads(el);
   el.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{const c=+b.dataset.c;
-    if(!ownsCostume(id,c)){const pr=COSTUMES[c].price;if(SAVE.coins<pr){toast(`${COSTUMES[c].name} costs ${pr} coins. Win story chapters to earn more.`);return;}
+    if(!ownsCostume(id,c)){const pr=COSTUMES[c].price;if(SAVE.coins<pr){toast(`${COSTUMES[c].name} costs ${pr} Rebucks. Win story chapters to earn more.`);return;}
       SAVE.coins-=pr;(SAVE.costumes[id]=SAVE.costumes[id]||[]).push(c);sfx('bell');toast(`${COSTUMES[c].name} unlocked for ${d.name.split(' ')[0]}.`);}
     SAVE.equipped[id]=c;persist();sfx('ui');openFighter(id);refreshCoins();if(!$('#collection').hidden)renderTeams();}));
   const sb=$('#fdSummon');if(sb)sb.addEventListener('click',()=>{closeFighter();sfx('ui');openSummon();});
@@ -3984,7 +3986,7 @@ function renderBannerList(){
   const L=$('#blist');L.innerHTML='';
   BANNERS.forEach((b,i)=>{const card=document.createElement('article');card.className='bcard';card.id='bcard-'+i;card.style.setProperty('--bc',b.col);
     card.innerHTML=`<div class="banner"><canvas width="960" height="400" aria-hidden="true"></canvas><div class="bcopy"><p class="eyebrow">Banner ${i+1} of ${BANNERS.length} · ${b.feat.length?'featured':'standard'}</p><h3>${esc(b.name)}</h3><p>${esc(b.sub)}</p><p class="rates">${bannerRates(b)}</p></div></div>
-      <div class="row sumrow"><button class="btn" type="button" data-n="10" ${SAVE.coins<900?'disabled':''}>Summon ×10 · 900 ◆</button><button class="btn alt" type="button" data-n="10" data-tok="1" ${SAVE.tokens<300?'disabled':''}>Summon ×10 · 300 ✦</button></div>`;
+      <div class="row sumrow"><button class="btn" type="button" data-n="10" ${SAVE.coins<900?'disabled':''}>Summon ×10 · 900 Rebucks</button></div>`;
     paintBanner(b,card.querySelector('canvas'));
     card.querySelectorAll('[data-n]').forEach(x=>x.addEventListener('click',()=>{curBanner=i;doSummon(+x.dataset.n,!!x.dataset.tok);}));
     L.appendChild(card);});
@@ -4126,7 +4128,7 @@ function rollOne(b,guar){
 }
 let lastTok=false;
 function doSummon(n,tok){
-  n=10;const cost=tok?300:n===10?900:100,have=tok?SAVE.tokens:SAVE.coins;if(have<cost){toast(tok?'Not enough tokens. Earn them from missions and raid bosses.':'Not enough coins yet. Win fights to earn more.');return;}
+  n=10;tok=false;const cost=tok?300:n===10?900:100,have=tok?SAVE.tokens:SAVE.coins;if(have<cost){toast('Not enough Rebucks yet. Win fights, clear missions and beat raid bosses to earn more.');return;}
   unlock();if(tok)SAVE.tokens-=cost;else SAVE.coins-=cost;lastPull=n;lastTok=!!tok;track('summons',n);const b=BANNERS[curBanner],res=[];
   for(let i=0;i<n;i++){
     const guar=n===10&&i===n-1&&!res.some(r=>r.d.rarity!=='rare'),d=rollOne(b,guar);let kind,st;
@@ -4159,8 +4161,8 @@ function revealNext(){
   if(it.r){const r=it.r,R=RAR[r.d.rarity];el.style.setProperty('--rc',R.col);el.classList.add(r.d.rarity);
     x.drawImage(portraitHi(r.d.id),0,0);
     $('#rvRar').textContent=R.name.toUpperCase()+' · '+r.d.cls.toUpperCase();$('#rvName').textContent=r.d.name;
-    $('#rvSub').textContent=r.kind==='new'?`${r.d.title}. Joined your roster!`:r.kind==='star'?`${r.d.title}. Star up to ${r.st}\u2605!`:'Max stars: +50 coins';
-    $('#rvTag').textContent=r.kind==='new'?'NEW!':r.kind==='star'?r.st+'\u2605':'+50 \u25c6';
+    $('#rvSub').textContent=r.kind==='new'?`${r.d.title}. Joined your roster!`:r.kind==='star'?`${r.d.title}. Star up to ${r.st}\u2605!`:'Max stars: +50 Rebucks';
+    $('#rvTag').textContent=r.kind==='new'?'NEW!':r.kind==='star'?r.st+'\u2605':'+50 Rebucks';
     sfx(r.d.rarity==='legend'?'super':r.d.rarity==='epic'?'special':'ui');if(r.d.rarity!=='rare')sfx('bell');}
   else{const c=it.c,nm=c.cos==='i'?iconName(c.id):PBAN[c.id].name;el.style.setProperty('--rc','#7fe3ff');el.classList.add('cos');
     if(c.cos==='i')drawPIcon(x,c.id,320,400,236,'#7fe3ff');else{x.save();x.translate(320,400);x.rotate(-0.14);drawPBanner(x,c.id,-300,-110,600,220);x.restore();}
@@ -4175,13 +4177,13 @@ function showSummonResults(res,cos){
   $('#srTitle').textContent=best==='legend'?'Vision summoned!':best==='epic'?'Improved pull!':'Summon complete';
   const g=$('#sres');g.className='sres'+(res.length===1?' one':'');g.innerHTML='';
   res.forEach((r,i)=>{const R=RAR[r.d.rarity],e=document.createElement('div');e.className='rcard '+r.d.rarity;e.style.setProperty('--rc',R.col);e.style.setProperty('--i',i);
-    e.innerHTML=`<span class="tag">${r.kind==='new'?'NEW':r.kind==='star'?r.st+'\u2605':'+50 ◆'}</span><canvas width="320" height="400" aria-hidden="true"></canvas><span class="rr">${R.name.toUpperCase()}</span><span class="nm">${r.d.name}</span><span class="rk">${r.kind==='new'?'Joined your roster':r.kind==='star'?'Star up!':'Max stars: +50 coins'}</span>`;
+    e.innerHTML=`<span class="tag">${r.kind==='new'?'NEW':r.kind==='star'?r.st+'\u2605':'+50 RB'}</span><canvas width="320" height="400" aria-hidden="true"></canvas><span class="rr">${R.name.toUpperCase()}</span><span class="nm">${r.d.name}</span><span class="rk">${r.kind==='new'?'Joined your roster':r.kind==='star'?'Star up!':'Max stars: +50 Rebucks'}</span>`;
     drawPortrait(e.querySelector('canvas'),r.d.id,0);g.appendChild(e);});
   (cos||[]).forEach((c,j)=>{const e=document.createElement('div'),nm=c.cos==='i'?iconName(c.id):PBAN[c.id].name;e.className='rcard cos';e.style.setProperty('--rc','#7fe3ff');e.style.setProperty('--i',res.length+j);
     e.innerHTML=`<span class="tag">NEW</span><canvas width="320" height="400" aria-hidden="true"></canvas><span class="rr">${c.cos==='i'?'PROFILE ICON':'PROFILE BANNER'}</span><span class="nm">${esc(nm)}</span><span class="rk">Equip it in Menu › Account</span>`;
     const x=e.querySelector('canvas').getContext('2d');if(c.cos==='i')drawPIcon(x,c.id,160,200,118,'#7fe3ff');else{x.save();x.translate(160,200);x.rotate(-0.14);drawPBanner(x,c.id,-170,-62,340,124);x.restore();}
     g.appendChild(e);});
-  const c=lastTok?300:lastPull===10?900:100;$('#srAgain').textContent=`Summon ×${lastPull} again · ${c} ${lastTok?'✦':'◆'}`;$('#srAgain').disabled=(lastTok?SAVE.tokens:SAVE.coins)<c;
+  const c=lastTok?300:lastPull===10?900:100;$('#srAgain').textContent=`Summon ×${lastPull} again · ${c} Rebucks`;$('#srAgain').disabled=(lastTok?SAVE.tokens:SAVE.coins)<c;
   sfx(best==='legend'?'super':'bell');show('#summonRes');
 }
 $('#srAgain').addEventListener('click',()=>doSummon(lastPull,lastTok));
@@ -4193,7 +4195,7 @@ function openEvents(){toHub();renderEvents();show('#events');}
 function renderEvents(){
   const r=raidBoss(),bd=ROSTER[RIDX(r.id)],now=Date.now(),left=weekEnd()-now;
   let h=`<article class="evcard raid" style="--ec:${bd.fx}"><div class="evhead"><canvas width="128" height="128" data-head="${r.id}" data-c="0"></canvas><div><p class="eyebrow">Raid boss \u00b7 rotates in ${fmtLeft(left)}</p><h3>${r.name}</h3><p class="evd">${r.bio} Fight it alone with your best three. Stage: ${STAGE_NAMES[r.stage]}.</p></div></div>
-    <div class="tiers">${RAID_TIERS.map((T,i)=>`<button type="button" class="tier" id="raid-${i}" data-i="${i}"><b>${T.name}</b><span>Boss Lv ${T.lv}</span><span>${T.coins} ◆ + ${T.tokens} ✦ + ${T.xp} XP</span></button>`).join('')}</div></article>`;
+    <div class="tiers">${RAID_TIERS.map((T,i)=>`<button type="button" class="tier" id="raid-${i}" data-i="${i}"><b>${T.name}</b><span>Boss Lv ${T.lv}</span><span>${T.coins} Rebucks + ${T.xp} XP</span></button>`).join('')}</div></article>`;
   for(const e of EVENTS){const st=eventState(e);h+=`<article class="evcard" style="--ec:${e.col}"><p class="eyebrow">${st.on?'Live now \u00b7 ends in '+fmtLeft(st.ms):'Starts in '+fmtLeft(st.ms)}</p><h3>${e.name}</h3><p class="evd">${e.desc}</p><p class="evs">${st.on?'<span class="live">LIVE</span>':'<span class="soon">UPCOMING</span>'}</p></article>`;}
   $('#evList').innerHTML=h;paintHeads($('#evList'));
   document.querySelectorAll('.tier').forEach(b=>b.addEventListener('click',()=>{sfx('ui');G.raid={boss:raidBoss(),tier:RAID_TIERS[+b.dataset.i]};openDraft('raid');}));
@@ -4209,7 +4211,7 @@ function renderMissions(){
   $('#misList').innerHTML=MISSIONS[misTab].map(m=>{const p=Math.min(m.n,v.p[m.stat]||0),done=p>=m.n,got=!!v.c[m.id];
     return `<div class="mrow${got?' got':''}"><div class="mtext"><p class="mt2">${m.text}</p><div class="mbar"><i style="width:${Math.round(p/m.n*100)}%"></i></div><p class="mp">${p} / ${m.n} \u00b7 ${rewardText(m.r)}</p></div>${got?'<span class="owned">Claimed</span>':`<button type="button" class="buy" id="claim-${m.id}" data-id="${m.id}" ${done?'':'disabled'}>${done?'Claim':'In progress'}</button>`}</div>`;}).join('');
   document.querySelectorAll('#misList .buy').forEach(b=>b.addEventListener('click',()=>{const m=MISSIONS[misTab].find(x=>x.id===b.dataset.id),vv=misOf(misTab);if(vv.c[m.id])return;
-    vv.c[m.id]=1;SAVE.coins+=m.r.coins||0;SAVE.tokens+=m.r.tokens||0;persist();sfx('bell');toast(`Claimed ${rewardText(m.r)}.`);renderMissions();refreshCoins();}));
+    vv.c[m.id]=1;SAVE.coins+=(m.r.coins||0)+(m.r.tokens||0)*3;persist();sfx('bell');toast(`Claimed ${rewardText(m.r)}.`);renderMissions();refreshCoins();}));
 }
 for(const p of ['daily','weekly','monthly'])$('#mt-'+p).addEventListener('click',()=>{misTab=p;sfx('ui');renderMissions();});
 $('#misBack').addEventListener('click',goHome);
@@ -4219,19 +4221,17 @@ const TOKEN_PACKS=[
  {id:'t2600',tokens:2600,price:'$19.99',bonus:'+30% bonus'},{id:'t6800',tokens:6800,price:'$49.99',bonus:'+36% bonus'},{id:'t14000',tokens:14000,price:'$99.99',bonus:'+40% bonus',tag:'Best value'},
 ];
 const PAYMENTS_READY=false;
-function grantTokens(n){SAVE.tokens=(SAVE.tokens||0)+n;persist();refreshCoins();}
+function grantTokens(n){SAVE.coins=(SAVE.coins|0)+n*3;persist();refreshCoins();}
 function purchaseTokens(pack){
   /* Connect a payment provider here. Only call grantTokens(pack.tokens) after the provider confirms the payment. */
-  if(!PAYMENTS_READY){toast('Payments aren\u2019t connected yet. Token packs will work once the store is set up.');return;}
+  if(!PAYMENTS_READY){toast('Payments aren\u2019t connected yet. Rebucks packs will work once the store is set up.');return;}
 }
 const EXCHANGE=[{id:'x1',tokens:50,coins:500},{id:'x2',tokens:200,coins:2200},{id:'x3',tokens:500,coins:6000}];
 function renderShop(){
-  $('#packs').innerHTML=TOKEN_PACKS.map(p=>`<div class="pack">${p.tag?`<span class="ptag">${p.tag}</span>`:''}<p class="pt">${p.tokens.toLocaleString()} ✦</p><p class="pb">${p.bonus||'Starter pack'}</p><button type="button" class="buy" id="pk-${p.id}" data-id="${p.id}">${p.price}</button></div>`).join('');
-  $('#exch').innerHTML=EXCHANGE.map(x=>`<div class="pack"><p class="pt">${x.coins.toLocaleString()} ◆</p><p class="pb">for ${x.tokens} tokens</p><button type="button" class="buy" id="ex-${x.id}" data-id="${x.id}" ${SAVE.tokens<x.tokens?'disabled':''}>${x.tokens} ✦</button></div>`).join('')
-    +`<div class="pack"><p class="pt">Summon ×10</p><p class="pb">on any banner</p><button type="button" class="buy" id="ex-sum">300 ✦</button></div>`;
+  $('#packs').innerHTML=TOKEN_PACKS.map(p=>`<div class="pack">${p.tag?`<span class="ptag">${p.tag}</span>`:''}<p class="pt">${(p.tokens*3).toLocaleString()} Rebucks</p><p class="pb">${p.bonus||'Starter pack'}</p><button type="button" class="buy" id="pk-${p.id}" data-id="${p.id}">${p.price}</button></div>`).join('');
+  $('#exch').innerHTML=`<div class="pack"><p class="pt">Summon ×10</p><p class="pb">on any banner</p><button type="button" class="buy" id="ex-sum">900 Rebucks</button></div>`;
   document.querySelectorAll('#packs .buy').forEach(b=>b.addEventListener('click',()=>purchaseTokens(TOKEN_PACKS.find(p=>p.id===b.dataset.id))));
-  document.querySelectorAll('#exch .buy[data-id]').forEach(b=>b.addEventListener('click',()=>{const x=EXCHANGE.find(e=>e.id===b.dataset.id);if(SAVE.tokens<x.tokens)return;
-    SAVE.tokens-=x.tokens;SAVE.coins+=x.coins;persist();sfx('bell');toast(`Traded ${x.tokens} tokens for ${x.coins.toLocaleString()} coins.`);renderShop();refreshCoins();}));
+
   $('#ex-sum').addEventListener('click',()=>{sfx('ui');openSummon();});
 }
 
@@ -4357,12 +4357,12 @@ function renderOnline(){
       <p class="evd">Ranked ${p.w|0} W · ${p.l|0} L${p.d?` · ${p.d} D`:''} · Casual ${p.cw|0} W · ${p.cl|0} L · Co-op raids ${p.ow|0} cleared</p></div></div>
     <h3 class="onsec">PvP <small>1 vs 1 · teams of three</small></h3>
     <div class="ongrid">
-      <div class="oncard mode" style="--ec:#7fe3ff"><p class="eyebrow">Casual</p><h3>Quick match</h3><p class="evd">Everyone fights at max power, Lv 60 and 14★, so it comes down to skill. No rating on the line. Win 60 coins and 50 XP.</p><button type="button" class="btn" id="onCasual">Find match</button></div>
-      <div class="oncard mode" style="--ec:${t.col}"><p class="eyebrow">Ranked</p><h3>${t.name} league</h3><p class="evd">Your fighters’ own levels and stars. Win to climb from Bronze to Master. Win 100 coins.</p><button type="button" class="btn" id="onRanked">Find ranked match</button></div>
+      <div class="oncard mode" style="--ec:#7fe3ff"><p class="eyebrow">Casual</p><h3>Quick match</h3><p class="evd">Everyone fights at max power, Lv 60 and 14★, so it comes down to skill. No rating on the line. Win 60 Rebucks and 50 XP.</p><button type="button" class="btn" id="onCasual">Find match</button></div>
+      <div class="oncard mode" style="--ec:${t.col}"><p class="eyebrow">Ranked</p><h3>${t.name} league</h3><p class="evd">Your fighters’ own levels and stars. Win to climb from Bronze to Master. Win 100 Rebucks.</p><button type="button" class="btn" id="onRanked">Find ranked match</button></div>
     </div>
     <h3 class="onsec">Co-op <small>2 players together · duos of two (Teams 7 and 8)</small></h3>
     <div class="ongrid">
-      ${coopBosses().map((r,k)=>`<div class="oncard mode" style="--ec:#ff6b4a"><p class="eyebrow">Raid boss ${k+1} · today</p><h3>${esc(r.name)}</h3><p class="evd">${esc(r.bio)} You and a teammate fight it on screen together. Lv ${COOP_BOSS.lv}. Win 700 coins and 20 tokens. Bosses change every day.</p><button type="button" class="btn" data-coop="raid_${r.id}">Find teammate</button></div>`).join('')}
+      ${coopBosses().map((r,k)=>`<div class="oncard mode" style="--ec:#ff6b4a"><p class="eyebrow">Raid boss ${k+1} · today</p><h3>${esc(r.name)}</h3><p class="evd">${esc(r.bio)} You and a teammate fight it on screen together. Lv ${COOP_BOSS.lv}. Win 760 Rebucks. Bosses change every day.</p><button type="button" class="btn" data-coop="raid_${r.id}">Find teammate</button></div>`).join('')}
       <div class="oncard mode" style="--ec:#7fe3b0"><p class="eyebrow">Survival</p><h3>Endless rounds</h3><p class="evd">Enemies come in rounds, stronger every time. See how long you and your teammate last.${p.sb?` Your best: round ${p.sb|0}.`:''}</p><button type="button" class="btn" data-coop="surv">Find teammate</button></div>
     </div>
     <div class="oncard"><p class="eyebrow">Ranked leaderboard</p><ol class="board">${board}</ol></div>`;
@@ -4590,8 +4590,8 @@ const NPCS=[
   say:()=>SAVE.cleared>=STORY.length?'You finished every chapter. Old stories are still worth replaying, and they still pay XP.':`Ah, you made it. ${PARTS[STORY[SAVE.cleared].part]} is where your crew stands. Next up is Chapter ${SAVE.cleared+1}, ${STORY[SAVE.cleared].name}.`,
   mark:()=>SAVE.cleared<STORY.length},
  {key:'summon',who:'mei',role:'Summon',place:'Summon Shrine',act:'Open the banners',go:()=>openSummon(),
-  say:()=>`The shrine has ${BANNERS.length} banners open tonight.${evOn('fest')?' The Vision Festival is on, so Vision fighters answer more often.':''} You have ${SAVE.coins.toLocaleString()} coins and ${(SAVE.tokens||0).toLocaleString()} tokens.`,
-  mark:()=>SAVE.coins>=900||(SAVE.tokens||0)>=300},
+  say:()=>`The shrine has ${BANNERS.length} banners open tonight.${evOn('fest')?' The Vision Festival is on, so Vision fighters answer more often.':''} You have ${SAVE.coins.toLocaleString()} Rebucks.`,
+  mark:()=>SAVE.coins>=900},
  {key:'events',who:'ozzy',role:'Events',place:'Event Hall',act:'See the events',go:()=>openEvents(),
   say:()=>{const l=liveEvents();return `Listen up, Harbor City! ${l.length?l.map(e=>e.name).join(' and ')+' is live right now!':'No bonus event today, but Double XP comes back on Friday.'} This week’s raid boss is ${raidBoss().name}. Think your crew can take it?`;},
   mark:()=>liveEvents().length>0},
@@ -4602,7 +4602,7 @@ const NPCS=[
   say:()=>{const n=claimableMissions();return `I pin new jobs to this board every day, week and month. ${n?`You have ${n} reward${n>1?'s':''} ready to claim!`:'Nothing to claim yet, so get out there and fight!'}`;},
   mark:()=>claimableMissions()>0},
  {key:'shop',who:'taro',role:'Shop',place:'Shop',act:'Open the shop',go:()=>openShop(),
-  say:()=>'Welcome to the shop. Token packs aren’t on sale yet, but you can trade tokens for coins any time.',mark:()=>false},
+  say:()=>'Welcome to the shop. Rebucks packs aren’t on sale yet. You earn Rebucks from every fight, missions and raid bosses.',mark:()=>false},
  {key:'training',who:'junho',role:'Training',place:'Training Hall',act:'Start training',go:()=>openDraft('training'),
   extra:[['Spar vs CPU',()=>openDraft('vs')],['2-player fight',()=>openDraft('pvp')]],
   say:()=>'Bring your team in and practice on my sparring partner. It won’t hit back unless you ask it to, and its health never drops, so drill your combos as long as you like.',mark:()=>false},
@@ -4915,7 +4915,7 @@ defStage('town','Harbor City Plaza',(g,upd,rnd)=>{
   townRoom(g,'events',{floor:'#3a3a4a',wall:'#2f4466',post:'#1a2238',low:'#1a2238',mat:'#c0392b',lamp:'#ffcf4a',ceil:'#1a1a2a',npcAt:[0,-180],build:(r,e)=>{
     box(r,700,40,200,TM('#5a2a2a'),0,20,-e.hd+100);const cur=TM('#a8222a');for(const sx of [-1,1])box(r,100,e.H-40,20,cur,sx*360,(e.H-40)/2+20,-e.hd+20);
     const big=sign('RAID BOSS',420,110,'#2a0a14','#ffffff','#ff3a5a');big.position.set(0,300,-e.hd+12);r.add(big);
-    const posters=[['DOUBLE XP','#ffcf4a'],['LEGEND FEST','#ff7ad8'],['COIN RUSH','#9dff7a'],['WEEKLY RAID','#7fe3ff']];
+    const posters=[['DOUBLE XP','#ffcf4a'],['LEGEND FEST','#ff7ad8'],['REBUCKS RUSH','#9dff7a'],['WEEKLY RAID','#7fe3ff']];
     posters.forEach(([t,c],i)=>{const s=sign(t,220,90,'#160f2a','#ffffff',c);const sx=i<2?-1:1;s.position.set(sx*(e.hw-14),200,-200+(i%2)*260);s.rotation.y=-sx*Math.PI/2;r.add(s);});
     const cols=['#ff5aa8','#ffcf4a','#7fe3ff','#9dff7a'];for(let row=0;row<3;row++)for(let i=0;i<12;i++){const f=new THREE.Mesh(new THREE.PlaneGeometry(30,40),bmat(cols[(i+row)%4],{side:THREE.DoubleSide}));f.rotation.x=Math.PI;f.position.set(-e.hw+60+i*(e.hw*2-120)/11,e.H-60-Math.sin(i/11*Math.PI)*30,-e.hd*0.6+row*e.hd*0.5);r.add(f);}
     for(const sx of [-1,1]){cyl(r,40,40,30,TM('#3a3a44'),sx*250,15,80,16);box(r,40,60,40,TM('#3a3a44'),sx*250,60,80);}
@@ -4941,7 +4941,7 @@ defStage('town','Harbor City Plaza',(g,upd,rnd)=>{
     for(let s=0;s<4;s++){box(r,760,10,70,TM('#5a3020'),0,60+s*80,-e.hd+40);for(let i=0;i<14;i++){const c=gc[(i+s)%6];if((i+s)%3===0)cyl(r,14,14,40,TM(c),-350+i*54,85+s*80,-e.hd+40,10);else box(r,32,36,32,TM(c),-350+i*54,83+s*80,-e.hd+40);}}
     for(const sx of [-1,1]){box(r,60,260,300,TM('#5a3020'),sx*(e.hw-40),130,40);for(let i=0;i<10;i++)box(r,30,30,30,TM(gc[i%6]),sx*(e.hw-74),40+Math.floor(i/5)*90+30,-80+(i%5)*55);}
     const tk=new THREE.Mesh(new THREE.OctahedronGeometry(26),bmat('#7fe3ff'));tk.position.set(140,150,-90);r.add(tk);upd.push(t=>{tk.rotation.y=t*0.04;});
-    const sg=sign('TOKENS',150,44,'#160f2a','#ffffff','#7fe3ff');sg.position.set(140,200,-88);r.add(sg);
+    const sg=sign('REBUCKS',150,44,'#160f2a','#ffffff','#7fe3ff');sg.position.set(140,200,-88);r.add(sg);
     robs('shop',0,-90,220,48);robs('shop',-e.hw+40,40,36,150);robs('shop',e.hw-40,40,36,150);}});
   const mats=canvasTex(256,256,x=>{const c=['#2f6a8a','#3a7a4a'];for(let i=0;i<4;i++)for(let j=0;j<4;j++){x.fillStyle=c[(i+j)%2];x.fillRect(i*64,j*64,64,64);x.strokeStyle='rgba(0,0,0,.25)';x.lineWidth=2;x.strokeRect(i*64+1,j*64+1,62,62);}},[5,4]);
   townRoom(g,'training',{floorTex:mats,wall:'#eef2e8',post:'#2a3a2a',low:'#3a4a3a',mat:'#2a4a3a',lamp:'#f0ffe0',ceil:'#2a3028',build:(r,e)=>{
@@ -5710,7 +5710,7 @@ $('#stOn').addEventListener('click',async()=>{
   if(ok){sfx('bell');finishTitle(true);}
   else{$('#stOn').disabled=$('#stOff').disabled=false;$('#stMsg').textContent=(NET.why||'Couldn’t connect.')+' You can still play offline.';}
 });
-if(GIFT)setTimeout(()=>toast('Summon is open: 1,500 coins added for your first pulls.'),700);
+if(GIFT)setTimeout(()=>toast('Summon is open: 1,500 Rebucks added for your first pulls.'),700);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>paintNeon());
 })();
 </script>
