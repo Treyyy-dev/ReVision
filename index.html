@@ -344,6 +344,38 @@ body.land.fighting #pad{position:absolute;z-index:4;left:max(16px,env(safe-area-
 body.rot.fighting #pad{left:16px;right:16px}
 body.land.fighting #pad .pbtn{pointer-events:auto;background:rgba(36,26,68,.6)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* online arena */
+.onbody{display:flex;flex-direction:column;gap:10px}
+.oncard{padding:14px 16px;background:rgba(36,26,68,.9);border:2px solid var(--line);border-top:4px solid var(--ec,#7fe3ff)}
+.oncard h3{font-family:var(--display);font-weight:400;font-size:20px;margin:2px 0 4px}
+.oncard .eyebrow{color:var(--ec,#7fe3ff);margin:0}
+.oncard .row{margin-top:10px}
+.ongrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.oncard.mode{display:flex;flex-direction:column;align-items:flex-start}
+.oncard.mode .evd{flex:1}
+.oncard.mode .btn{margin-top:12px}
+.onprof{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.badge{width:96px;height:104px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:linear-gradient(180deg,var(--ec),rgba(16,10,30,.9) 140%);clip-path:polygon(50% 0,100% 22%,100% 78%,50% 100%,0 78%,0 22%)}
+.badge span{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#160f2a}
+.badge b{font-family:var(--display);font-size:24px;color:#160f2a;font-weight:400}
+.pinfo{flex:1;min-width:220px}
+.pinfo .row{display:flex;gap:8px;margin-top:4px}
+.pinfo input{font:600 15px var(--body);color:var(--ink);background:var(--night);border:2px solid var(--line);padding:8px 10px;min-width:0;flex:1}
+.pinfo input:focus-visible{outline:2px solid var(--gold)}
+.board{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px}
+.board li{display:grid;grid-template-columns:30px minmax(0,1fr) auto 52px;gap:8px;align-items:center;padding:6px 8px;background:rgba(16,10,30,.5)}
+.board li.me{background:rgba(255,201,77,.14);outline:1px solid var(--gold)}
+.board .rk{font-family:var(--display);color:var(--muted)}
+.board .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .rt{text-align:right;font-family:var(--display)}
+.board .tr{font-size:12px;font-weight:700}
+.board .empty{display:block;color:var(--muted)}
+.onteam{display:flex;gap:8px;margin-top:10px}
+.onteam canvas{width:64px;height:64px;border:2px solid var(--line);background:var(--panel)}
+.searching .dots::after{content:'';animation:dots 1.2s steps(4) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+@media (prefers-reduced-motion:reduce){.searching .dots::after{animation:none;content:'...'}}
 /* town hub */
 #townHud{position:absolute;inset:0;z-index:4;pointer-events:none;font-family:var(--body)}
 body.fighting #townHud{display:none}
@@ -434,7 +466,7 @@ body.fighting #townFade{display:none}
           <button class="mode" type="button" id="m-missions" style="--mc:#9dff7a"><span class="mt">Missions <span class="badge" id="misBadge" hidden>0</span></span><span class="md">Daily, weekly and monthly rewards.</span></button>
           <button class="mode" type="button" id="m-coll" style="--mc:#ff7aa8"><span class="mt">Characters</span><span class="md">Stats, costumes and saved teams.</span></button>
           <button class="mode" type="button" id="m-shop" style="--mc:var(--gold)"><span class="mt">Shop</span><span class="md">Token packs.</span></button>
-          <button class="mode lead locked" type="button" id="m-online" aria-disabled="true" style="--mc:#8f9ab8"><span class="mt">Online <span class="lockb">LOCKED</span></span><span class="md">Ranked battles against other players. Coming soon.</span></button>
+          <button class="mode lead" type="button" id="m-online" style="--mc:#ff3a5a"><span class="mt">Online</span><span class="md">Casual and ranked battles against real players.</span></button>
         </nav>
       </div>
     </section>
@@ -512,6 +544,13 @@ body.fighting #townFade{display:none}
       <div class="screen">
         <header class="bar"><button class="back" type="button" id="evBack">‹ Back</button><div class="ttl"><p class="eyebrow">Events</p><h2>This week</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
         <div class="evgrid" id="evList"></div>
+      </div>
+    </section>
+
+    <section id="online" class="overlay" hidden>
+      <div class="screen">
+        <header class="bar"><button class="back" type="button" id="onBack">‹ Back</button><div class="ttl"><p class="eyebrow">Arena</p><h2>Online</h2></div><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p></header>
+        <div id="onBody" class="onbody"></div>
       </div>
     </section>
 
@@ -1790,6 +1829,7 @@ function noise(dur,vol,freq){
   s.connect(f).connect(g).connect(AC.destination); s.start(t); s.stop(t+dur+0.03);
 }
 function sfx(k){
+  if(G.kind==='online'&&G.net&&G.net.role==='host'&&G.mode==='fight')G.net.sfxQ.push(k);
   if(!AC||muted) return;
   try{ switch(k){
     case 'light': noise(.08,.35,1900); tone(220,.06,'square',.035,.5); break;
@@ -2461,6 +2501,7 @@ function tick(){
   if(G.mode==='town'){townStep();updateFx();return;}
   if(G.paused)return;
   if(G.mode==='result'){for(const tm of G.teams)updatePose(active(tm));updateFx();return;}
+  if(G.kind==='online'&&G.net&&G.mode==='fight'){if(G.net.role==='guest'){guestTick();return;}hostPre();}
   updateFx();
   if(G.banner){G.banner.t--;if(G.banner.t<=0)G.banner=null;}
   G.shake*=0.86;
@@ -2470,8 +2511,8 @@ function tick(){
   const [A,B]=G.teams;
   let ia=EMPTY,ib=EMPTY;
   gestureTick();
-  const p1=playerInput(1),p2=playerInput(2);
-  if(G.intro<=0&&!G.over){ia=p1;ib=G.kind==='pvp'?p2:G.kind==='training'?dummyInput(B,active(A)):aiInput(B,active(A));}
+  const p1=playerInput(1),p2=playerInput(2),pn=G.kind==='online'&&G.net?netGuestInput():null;
+  if(G.intro<=0&&!G.over){ia=p1;ib=G.kind==='pvp'?p2:pn?pn:G.kind==='training'?dummyInput(B,active(A)):aiInput(B,active(A));}
   stepTeam(A,ia,B);stepTeam(B,ib,A);
   if(G.intro<=0&&!G.over)for(const tm of G.teams)tm.meter=Math.min(METER_MAX,tm.meter+0.045);
   const fa=active(A),fb=active(B);
@@ -2550,7 +2591,7 @@ function drawHUD(c){
     const hpF=f.hp/f.maxHp;bar(hpF,hpF<.3?'#ff6b4a':'#ffc94d',x0,y0,bw,bh);
     bar(hpF,'rgba(255,255,255,.22)',x0,y0,bw,6);
     c.textBaseline='top';c.textAlign=side?'right':'left';
-    otext(c,(G.kind==='pvp'?`P${side+1} · `:G.kind==='training'&&side===1?'DUMMY · ':'')+f.def.name.toUpperCase()+(G.kind!=='pvp'?'  LV '+f.lv:''),side?x0+bw:x0,y0+bh+6,16,'#f6efe4',OUT,5);
+    otext(c,(G.kind==='pvp'?`P${side+1} · `:G.kind==='online'?(side===mySide()?'YOU · ':'RIVAL · '):G.kind==='training'&&side===1?'DUMMY · ':'')+f.def.name.toUpperCase()+(G.kind!=='pvp'?'  LV '+f.lv:''),side?x0+bw:x0,y0+bh+6,16,'#f6efe4',OUT,5);
     let k=0;
     for(let i=0;i<tm.members.length;i++){
       if(i===tm.active)continue;
@@ -2561,7 +2602,7 @@ function drawHUD(c){
       else if(tm.tagCd>0){c.fillStyle='rgba(16,10,30,.62)';c.fillRect(bx+2,by+2,42,42*tm.tagCd/150);}
       c.fillStyle='rgba(16,10,30,.9)';c.fillRect(bx,by+48,46,7);c.fillStyle='#2e2152';c.fillRect(bx+1,by+49,44,5);
       if(m.alive){c.fillStyle='#b8324a';c.fillRect(bx+1,by+49,44*m.rec/m.maxHp,5);c.fillStyle='#ffc94d';c.fillRect(bx+1,by+49,44*m.hp/m.maxHp,5);}
-      if(m.alive&&(side===0||G.kind==='pvp'))G.hudHit.push({p:side+1,idx:i,x:bx-8,y:by-8,w:62,h:72});
+      if(m.alive&&(side===mySide()||G.kind==='pvp'))G.hudHit.push({p:G.kind==='pvp'?side+1:1,idx:i,x:bx-8,y:by-8,w:62,h:72});
       k++;
     }
     if(tm.comboT>0&&tm.combo>=2){c.textAlign=side?'right':'left';c.textBaseline='top';const sz=26+Math.min(10,tm.combo);otext(c,`${tm.combo} HITS`,side?W-20:20,124,sz,'#ffc94d',OUT,6);}
@@ -2572,6 +2613,8 @@ function drawHUD(c){
   c.fillStyle='rgba(16,10,30,.9)';c.beginPath();c.moveTo(W/2-38,8);c.lineTo(W/2+38,8);c.lineTo(W/2+30,56);c.lineTo(W/2-30,56);c.closePath();c.fill();
   c.strokeStyle='#4b3b7c';c.lineWidth=2;c.stroke();
   c.textAlign='center';c.textBaseline='middle';c.font=`30px ${FONT_D}`;c.fillStyle=G.timer<=15&&G.kind!=='training'?'#ff6b4a':'#ffc94d';c.fillText(G.kind==='training'?'\u221e':String(Math.max(0,G.timer)),W/2,33);
+  if(G.kind==='online'&&G.net&&G.intro<=0&&!G.over){const f=active(G.teams[mySide()]),[x,y]=proj(f.x,f.y-232*f.def.scale);
+    c.fillStyle='#ffc94d';c.beginPath();c.moveTo(x-9,y-10);c.lineTo(x+9,y-10);c.lineTo(x,y);c.closePath();c.fill();c.textAlign='center';c.textBaseline='bottom';otext(c,'YOU',x,y-12,13,'#ffc94d',OUT,4);}
 }
 function drawBanner(c){
   if(G.freeze>0&&G.supBanner){
@@ -2660,7 +2703,7 @@ function syncMoveButtons(){
   if(!G.teams||G.mode!=='fight')return;
   for(const p of [1,2]){
     if(p===2&&G.kind!=='pvp')continue;
-    const grp=$('#mg'+p),tm=G.teams[p-1],f=active(tm);
+    const grp=$('#mg'+p),tm=G.teams[G.kind==='online'?mySide():p-1],f=active(tm);
     if(mbCache[p-1]!==f.def.id){mbCache[p-1]=f.def.id;
       grp.querySelector('[data-k="sp1"] .mn').textContent=f.def.spName;grp.querySelector('[data-k="sp2"] .mn').textContent=f.def.supName;grp.querySelector('[data-k="ult"] .mn').textContent=f.def.ultName;grp.style.setProperty('--fx',f.def.fx);}
     const m=tm.meter;
@@ -2671,7 +2714,7 @@ function syncMoveButtons(){
 }
 function strikeLimb(f){
   const S=f.rig&&f.rig.S;if(!S)return null;
-  if(f.state==='attack'){const m=f.atk;if(f.t<m.s||f.t>m.s+m.a+3)return null;const l=m.limb||limbOf(m.key,f.def.id);return l==='b'?S.bFist:l==='foot'?S.fShoe:S.fFist;}
+  if(f.state==='attack'){const m=f.atk;if(!m)return null;if(f.t<m.s||f.t>m.s+m.a+3)return null;const l=m.limb||limbOf(m.key,f.def.id);return l==='b'?S.bFist:l==='foot'?S.fShoe:S.fFist;}
   if(f.state==='grab'&&f.grabKind==='strike'){const t=f.t;if(t>=9&&t<=13)return S.fShoe;if(t>=21&&t<=25)return S.fFist;if(t>=33&&t<=37)return S.fShoe;return null;}
   if(f.state==='air'&&f.airAtk){const m=MOVES[f.airAtk];if(f.at<m.s||f.at>m.s+m.a)return null;return f.airAtk==='airheavy'?S.fShoe:S.fFist;}
   if(f.state==='special'&&(f.def.special==='dash'||f.def.special==='uppercut')&&f.t>4&&f.t<22)return S.fFist;
@@ -2765,7 +2808,7 @@ function paintHeads(root){root.querySelectorAll('canvas[data-head]').forEach(cv=
 function drawPortrait(target,id,c){const x=target.getContext('2d');x.clearRect(0,0,target.width,target.height);x.drawImage(portrait(id,c),0,0,target.width,target.height);}
 
 /* ---------------- menus ---------------- */
-const SCREENS=['#start','#home','#story','#storyIntro','#select','#shop','#collection','#pause','#result','#summon','#summonRes','#events','#missions'];
+const SCREENS=['#start','#home','#story','#storyIntro','#select','#shop','#collection','#pause','#result','#summon','#summonRes','#events','#missions','#online'];
 function show(id){for(const s of SCREENS)$(s).hidden=s!==id;refreshCoins();const el=id&&$(id);if(el)el.scrollTop=0;}
 function refreshCoins(){document.querySelectorAll('[data-coins]').forEach(e=>{e.textContent=SAVE.coins;e.setAttribute('aria-label',SAVE.coins+' coins');});
   document.querySelectorAll('[data-tokens]').forEach(e=>{e.textContent=SAVE.tokens||0;e.setAttribute('aria-label',(SAVE.tokens||0)+' tokens');});
@@ -2845,6 +2888,7 @@ function renderDraft(){
     story:[`Story · Chapter ${G.chapter+1}`,STORY[G.chapter]?STORY[G.chapter].name:'',`Choose one of your teams to face ${STORY[G.chapter]?STORY[G.chapter].foes.map(id=>ROSTER[RIDX(id)].name.split(' ')[0]).join(', '):''}.`],
     training:['Training','Pick a team to practice with','No timer and no knockouts. Health refills when nobody is attacking. Change the dummy below or from the pause menu.'],
     raid:['Raid boss',G.raid?`${G.raid.boss.name} \u00b7 ${G.raid.tier.name}`:'',G.raid?`Choose a team to face a giant boss at Lv ${G.raid.tier.lv}. It has seven times the health of a normal fighter and fights alone.`:''],
+    online:[`Online \u00b7 ${G.netMode==='ranked'?'Ranked':'Casual'}`,'Pick your team',G.netMode==='ranked'?'Ranked puts every fighter at Lv 40, 3\u2605, so the fight comes down to skill and team choice.':'Casual uses your fighters\u2019 own levels and stars.'],
     pvp:['PvP',`Player ${draft.step}: draft your team`,draft.step===1?'Player 1 picks first, then hands over. On keyboard, P1 uses WASD + J K L I U; P2 uses the arrows + , . / ; ’.':'Player 2, pick three. You can pick the same fighters as Player 1.']}[k];
   $('#selEyebrow').textContent=head[0];$('#selTitle').textContent=head[1];$('#selSub').textContent=head[2];
   $('#diff').hidden=k!=='vs';$('#dummy').hidden=k!=='training';
@@ -2879,7 +2923,7 @@ function updateSel(){
   $('#slots').innerHTML=L.map((l,k)=>{const d=list[k]==null?null:ROSTER[list[k]];return `<div class="slot">${d?`<canvas class="shd" width="64" height="64" data-head="${d.id}" data-c="${equipped(d.id)}"></canvas>`:'<span class="shd"></span>'}<span class="lbl">${l.toUpperCase()}</span><span class="who${d?'':' empty'}">${d?d.name:'Open slot'}</span></div>`;}).join('');
   paintHeads($('#slots'));
   const go=$('#goBtn');go.disabled=list.length<3;
-  go.textContent=list.length<3?'Choose a team':draft.kind==='pvp'&&draft.step===1?'Next: Player 2':draft.kind==='training'?'Start training':'Fight';
+  go.textContent=list.length<3?'Choose a team':draft.kind==='online'?'Find match':draft.kind==='pvp'&&draft.step===1?'Next: Player 2':draft.kind==='training'?'Start training':'Fight';
 }
 document.querySelectorAll('#diff button').forEach(b=>b.addEventListener('click',()=>{G.vsDiff=b.dataset.d;document.querySelectorAll('#diff button').forEach(x=>x.setAttribute('aria-pressed',x===b));sfx('ui');}));
 document.querySelectorAll('#dummy button').forEach(b=>b.addEventListener('click',()=>{G.train.dummy=b.dataset.m;document.querySelectorAll('#dummy button').forEach(x=>x.setAttribute('aria-pressed',x===b));sfx('ui');}));
@@ -2887,11 +2931,13 @@ $('#selBack').addEventListener('click',()=>{
   if(draft.kind==='pvp'&&draft.step===2){draft.step=1;renderDraft();return;}
   if(draft.kind==='story'){openStoryIntro(G.chapter);return;}
   if(draft.kind==='raid'){openEvents();return;}
+  if(draft.kind==='online'){openOnline();return;}
   goHome();
 });
 $('#goBtn').addEventListener('click',()=>{
   if(curPicks().length<3)return;
   sfx('ui');
+  if(draft.kind==='online'){startSearch(G.netMode||'casual');return;}
   if(draft.kind==='pvp'&&draft.step===1){draft.step=2;renderDraft();$('#select').scrollTop=0;return;}
   const pv=draft.kind==='pvp',mine=i=>{const id=ROSTER[i].id;return {i,c:equipped(id),lv:pv?1:lvOf(id),st:pv?1:starsOf(id)};};
   const P1=draft.p1.map(mine),avg=Math.max(1,Math.round(P1.reduce((a,m)=>a+m.lv,0)/3));
@@ -2908,11 +2954,11 @@ $('#goBtn').addEventListener('click',()=>{
 function startMatch(){
   unlock();clearMatchRigs();clearInputs();
   const {P1,P2}=G.lineup;
-  G.diff=G.kind==='story'?STORY[G.chapter].diff:G.kind==='raid'?G.raid.tier.diff:G.kind==='training'?'normal':G.vsDiff;
-  G.teams=[makeTeam(0,P1,false),makeTeam(1,P2,G.kind!=='pvp')];
+  G.diff=G.kind==='online'?'normal':G.kind==='story'?STORY[G.chapter].diff:G.kind==='raid'?G.raid.tier.diff:G.kind==='training'?'normal':G.vsDiff;
+  G.teams=[makeTeam(0,P1,false),makeTeam(1,P2,G.kind!=='pvp'&&G.kind!=='online')];
   for(const tm of G.teams)for(const m of tm.members){headPortrait(m.def.id,m.costume,'neutral');headPortrait(m.def.id,m.costume,'hurt');}
   mbCache=['',''];G.hudHit=[];
-  setStage(G.kind==='raid'?G.raid.boss.stage:G.kind==='story'&&STORY[G.chapter]?STORY[G.chapter].stage:'rooftop');
+  setStage(G.kind==='online'&&G.net?G.net.stage:G.kind==='raid'?G.raid.boss.stage:G.kind==='story'&&STORY[G.chapter]?STORY[G.chapter].stage:'rooftop');
   if(G.kind==='raid')G.timer=180;
   leaveTownView();introLayout();
   Object.assign(G,{mode:'fight',projs:[],fx:[],hitstop:0,freeze:0,freezeBy:null,shake:0,timer:150,tf:0,intro:INTRO_LEN,over:null,paused:false,banner:null,supBanner:null,guideT:300,trails:[]});
@@ -2929,30 +2975,47 @@ function syncPauseButtons(){
   $('#dummyBtn').textContent='Dummy: '+{stand:'Stand',block:'Block',cpu:'Fight'}[G.train.dummy];
   $('#meterBtn').textContent='Super: '+(G.train.meter?'Always full':'Normal');
   $('#soundBtn').textContent=muted?'Sound: Off':'Sound: On';
+  if(!$('#quitBtn').dataset.lbl)$('#quitBtn').dataset.lbl=$('#quitBtn').textContent;
+  $('#quitBtn').textContent=G.kind==='online'?'Forfeit match':$('#quitBtn').dataset.lbl;
+  $('#resumeBtn').textContent=G.kind==='online'?'Back to the fight':'Resume';
 }
 function togglePause(){
   if(G.mode!=='fight')return;
+  if(G.kind==='online'){const open=$('#pause').hidden;show(open?'#pause':null);clearInputs();if(open){syncPauseButtons();$('#resumeBtn').focus();}return;}
   G.paused=!G.paused;show(G.paused?'#pause':null);clearInputs();
   if(G.paused){syncPauseButtons();$('#resumeBtn').focus();}
 }
 $('#pauseBtn').addEventListener('click',()=>{unlock();togglePause();});
 $('#resumeBtn').addEventListener('click',togglePause);
-$('#quitBtn').addEventListener('click',goHome);
+$('#quitBtn').addEventListener('click',()=>{if(G.kind==='online'&&G.net&&!G.net.finished&&G.mode==='fight'){netForfeit();return;}goHome();});
 $('#soundBtn').addEventListener('click',()=>{muted=!muted;syncPauseButtons();});
 $('#dummyBtn').addEventListener('click',()=>{const o=['stand','block','cpu'];G.train.dummy=o[(o.indexOf(G.train.dummy)+1)%3];syncPauseButtons();});
 $('#meterBtn').addEventListener('click',()=>{G.train.meter=!G.train.meter;syncPauseButtons();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&G.mode==='fight'&&!G.paused)togglePause();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&G.mode==='fight'&&!G.paused&&G.kind!=='online')togglePause();});
 
 /* results */
 function showResult(){
   G.mode='result';document.body.classList.remove('fighting','pvp');
-  const w=G.over.w,me=G.teams[0],k=G.kind,t=$('#resTitle'),line=$('#resLine');
+  const w=G.over.w,k=G.kind,me=G.teams[k==='online'&&G.net?G.net.side:0],t=$('#resTitle'),line=$('#resLine');
   let coins=0,tokens=0,btns=[],sub='',text='',xpGain=0;
   const reason=G.over.reason==='time'?'Time ran out':'';
   if(k==='pvp'){
     t.textContent=w<0?'Draw':`Player ${w+1} wins`;t.className='win';sub=reason||'Whole crew knocked out';
     btns=[['Rematch',startMatch],['New teams',()=>openDraft('pvp')],['Town',goHome]];
+  } else if(k==='online'){
+    const n=G.net,win=w===n.side,draw=w<0;
+    t.textContent=win?'Victory':draw?'Draw':'Defeated';t.className=win?'win':draw?'':'lose';
+    sub=G.over.reason==='left'?(win?'Your opponent left the match':'You left the match'):(reason||(win?'Rival crew knocked out':draw?'Even fight':'Your crew was knocked out'));
+    coins=n.ranked?(win?100:draw?50:30):(win?60:draw?35:20);xpGain=n.ranked?0:(win?50:draw?30:15);
+    text=`${n.ranked?'Ranked':'Casual'} match vs ${n.opp.name||'a rival'}.`;
+    if(n.role==='host'&&!n.finished){n.ref.child('result').set({w,reason:G.over.reason||''}).catch(()=>{});setTimeout(()=>{n.ref.child('s').remove().catch(()=>{});n.ref.child('gi').remove().catch(()=>{});},4000);}
+    netCleanup(n);
+    if(win){for(const m of me.members)SAVE.wins[m.def.id]=(SAVE.wins[m.def.id]||0)+1;track('wins');}
+    netRecord(n,win,draw).then(r=>{if(G.mode!=='result')return;line.hidden=false;line.textContent=n.ranked?`${text} Rating ${r.before} \u2192 ${r.after} (${r.delta>=0?'+':''}${r.delta}) \u00b7 ${tierOf(r.after).name}`:text;}).catch(()=>{});
+    btns=[['Find another',()=>{G.netMode=n.mode;openDraft('online');}],['Arena',openOnline],['Town',goHome]];
+    if(evOn('dxp'))xpGain*=2;if(evOn('coin'))coins=Math.round(coins*1.5);
   } else {
+
     const win=w===0;t.textContent=win?'Victory':w===1?'Defeated':'Draw';t.className=win?'win':w===1?'lose':'';
     sub=reason||(win?'Rival crew knocked out':'Your crew was knocked out');
     if(k==='vs'){coins=win?{easy:60,normal:90,hard:130}[G.diff]:20;xpGain=win?{easy:40,normal:60,hard:90}[G.diff]:15;btns=[['Rematch',startMatch],['New team',()=>openDraft('vs')],['Town',goHome]];}
@@ -3182,11 +3245,300 @@ function renderShop(){
   $('#ex-sum').addEventListener('click',()=>{sfx('ui');openSummon();});
 }
 $('#m-shop').addEventListener('click',()=>{unlock();sfx('ui');openShop();});
-$('#m-online').addEventListener('click',()=>{sfx('ui');toast('Online battles are locked for now. They\u2019re coming in a future update.');});
+$('#m-online').addEventListener('click',()=>{unlock();sfx('ui');openOnline();});
 
 /* home */
 $('#m-story').addEventListener('click',()=>{unlock();sfx('ui');openStory();});
 $('#m-coll').addEventListener('click',()=>{unlock();sfx('ui');openCollection(null);});
+
+/* ================= online (Firebase Realtime Database) =================
+   Casual and ranked 3v3 matches between real players.
+   - Matchmaking: each searching player writes an entry under queue/<mode>/<uid>. Players scan the queue
+     and the higher uid claims the lower one with a transaction, so a pair is never matched twice.
+   - Battles are host-authoritative: the claimed player (host, left side) runs the fight and streams
+     snapshots 20 times a second; the other player (guest, right side) sends inputs and draws the snapshots.
+   - Ranked uses Elo (K 32) stored under players/<uid>; everyone fights at Lv 40, 3 stars. */
+const FIREBASE_CONFIG=null; // paste your Firebase web app config object here (see README, "Online setup")
+const FB_VER='10.12.2';
+const NET={ready:false,busy:null,db:null,uid:null,offset:0,profile:null,err:'',search:null,board:[],boardT:0};
+const netNow=()=>Date.now()+NET.offset;
+const TS=()=>firebase.database.ServerValue.TIMESTAMP;
+const TIERS=[[0,'Bronze','#d08a5a'],[1100,'Silver','#c8d0e0'],[1250,'Gold','#ffc94d'],[1400,'Platinum','#7fe3d0'],[1550,'Diamond','#7fb8ff'],[1700,'Master','#ff7ad8']];
+function tierOf(r){let t=TIERS[0];for(const x of TIERS)if((r||0)>=x[0])t=x;return {name:t[1],col:t[2]};}
+function mySide(){return G.kind==='online'&&G.net?G.net.side:0;}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.async=true;s.onload=()=>res();s.onerror=()=>{s.remove();rej(new Error('load'));};document.head.appendChild(s);});}
+async function netInit(){
+  if(NET.ready)return true;
+  if(!FIREBASE_CONFIG){NET.err='no_config';return false;}
+  if(NET.busy)return NET.busy;
+  NET.busy=(async()=>{
+    try{
+      if(!window.firebase||!window.firebase.database){
+        const bases=['fb/',`https://www.gstatic.com/firebasejs/${FB_VER}/`,`https://cdn.jsdelivr.net/npm/firebase@${FB_VER}/`];
+        for(const name of ['firebase-app-compat.js','firebase-auth-compat.js','firebase-database-compat.js']){
+          let ok=false;for(const b of bases){try{await loadScript(b+name);ok=true;break;}catch(e){}}
+          if(!ok)throw new Error('sdk');
+        }
+      }
+      if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+      const cred=await firebase.auth().signInAnonymously();
+      NET.uid=(cred&&cred.user&&cred.user.uid)||firebase.auth().currentUser.uid;
+      NET.db=firebase.database();
+      NET.db.ref('.info/serverTimeOffset').on('value',s=>{NET.offset=s.val()||0;});
+      await loadProfile();
+      NET.ready=true;NET.err='';return true;
+    }catch(e){console.warn('online',e);NET.err=(e&&e.message)==='sdk'?'sdk':'connect';return false;}
+  })();
+  const ok=await NET.busy;NET.busy=null;return ok;
+}
+const NET_NAMES=['Neon','Ronin','Comet','Blaze','Echo','Viper','Nova','Rook','Drift','Onyx','Kite','Ember'];
+async function loadProfile(){
+  const ref=NET.db.ref('players/'+NET.uid);let p=(await ref.once('value')).val();
+  if(!p||!p.name){p=Object.assign({rating:1000,w:0,l:0,d:0,cw:0,cl:0},p||{},{name:SAVE.netName||(NET_NAMES[Math.floor(Math.random()*NET_NAMES.length)]+Math.floor(100+Math.random()*900))});await ref.set(p);}
+  if(SAVE.netName!==p.name){SAVE.netName=p.name;persist();}
+  NET.profile=p;
+}
+async function saveNetName(n){
+  n=String(n||'').replace(/[^\w \-.]/g,'').replace(/\s+/g,' ').trim().slice(0,16);
+  if(n.length<2){toast('Names need 2 to 16 letters or numbers.');return;}
+  try{await NET.db.ref('players/'+NET.uid+'/name').set(n);NET.profile.name=n;SAVE.netName=n;persist();toast('Name saved.');}catch(e){toast('Couldn’t save your name. Try again.');}
+  renderOnline();
+}
+async function loadBoard(){
+  try{const s=await NET.db.ref('players').orderByChild('rating').limitToLast(20).once('value');const out=[];s.forEach(c=>{out.push(Object.assign({uid:c.key},c.val()));});NET.board=out.reverse();NET.boardT=Date.now();}catch(e){NET.board=[];}
+}
+
+/* ---- arena screen ---- */
+function openOnline(){
+  toHub();show('#online');renderOnline();
+  if(FIREBASE_CONFIG&&!NET.ready)netInit().then(ok=>{renderOnline();if(ok)loadBoard().then(renderOnline);});
+  else if(NET.ready&&Date.now()-NET.boardT>20000)loadBoard().then(renderOnline);
+}
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function renderOnline(){
+  const el=$('#onBody');if(!el)return;
+  if(!FIREBASE_CONFIG){el.innerHTML=`<div class="oncard"><h3>The arena isn’t open yet</h3><p class="evd">Online battles need the game’s Firebase server. Once it’s connected, casual and ranked matches open here.</p></div>`;return;}
+  if(!NET.ready){
+    el.innerHTML=NET.err&&!NET.busy?`<div class="oncard"><h3>Can’t reach the arena</h3><p class="evd">${NET.err==='sdk'?'The online library didn’t load.':'The server didn’t answer.'} Check your internet connection and try again.</p><div class="row"><button type="button" class="btn" id="onRetry">Try again</button></div></div>`
+      :`<div class="oncard"><h3>Connecting to the arena…</h3><p class="evd">Signing you in.</p></div>`;
+    const r=$('#onRetry');if(r)r.addEventListener('click',()=>{NET.err='';renderOnline();netInit().then(ok=>{renderOnline();if(ok)loadBoard().then(renderOnline);});});
+    return;
+  }
+  const p=NET.profile,t=tierOf(p.rating),S=NET.search;
+  if(S&&!S.done){
+    el.innerHTML=`<div class="oncard searching" style="--ec:${S.ranked?t.col:'#7fe3ff'}"><p class="eyebrow">${S.ranked?'Ranked':'Casual'} · searching</p><h3>Finding an opponent<span class="dots"></span></h3>
+      <p class="evd">Time waiting <b id="onTimer">0:00</b>${S.ranked?` · matching players near <b>${p.rating}</b>`:''}</p>
+      <div class="onteam">${S.team.map(m=>`<canvas width="96" height="96" data-head="${m.id}" data-c="${m.c||0}"></canvas>`).join('')}</div>
+      <div class="row"><button type="button" class="btn alt" id="onCancel">Cancel</button></div></div>`;
+    paintHeads(el);$('#onCancel').addEventListener('click',()=>{sfx('ui');cancelSearch();});tickSearchTimer();return;
+  }
+  const board=NET.board.map((r,i)=>{const tt=tierOf(r.rating);return `<li class="${r.uid===NET.uid?'me':''}"><span class="rk">${i+1}</span><span class="nm">${esc(r.name)}</span><span class="tr" style="color:${tt.col}">${tt.name}</span><span class="rt">${r.rating|0}</span></li>`;}).join('')||'<li class="empty">No ranked players yet. Be the first.</li>';
+  el.innerHTML=`<div class="onprof oncard" style="--ec:${t.col}">
+      <div class="badge" style="--ec:${t.col}"><span>${t.name}</span><b>${p.rating|0}</b></div>
+      <div class="pinfo"><label for="onName" class="eyebrow">Fighter name</label><div class="row"><input id="onName" maxlength="16" value="${esc(p.name)}" autocomplete="off"><button type="button" class="btn alt" id="onSaveName">Save</button></div>
+      <p class="evd">Ranked ${p.w|0} W · ${p.l|0} L${p.d?` · ${p.d} D`:''} · Casual ${p.cw|0} W · ${p.cl|0} L</p></div></div>
+    <div class="ongrid">
+      <div class="oncard mode" style="--ec:#7fe3ff"><p class="eyebrow">Casual</p><h3>Quick match</h3><p class="evd">Fight anyone online with your fighters’ own levels and stars. No rating on the line. Win 60 coins and 50 XP.</p><button type="button" class="btn" id="onCasual">Find match</button></div>
+      <div class="oncard mode" style="--ec:${t.col}"><p class="eyebrow">Ranked</p><h3>${t.name} league</h3><p class="evd">Everyone fights at Lv 40, 3★, so it comes down to skill. Win to climb from Bronze to Master. Win 100 coins.</p><button type="button" class="btn" id="onRanked">Find ranked match</button></div>
+    </div>
+    <div class="oncard"><p class="eyebrow">Ranked leaderboard</p><ol class="board">${board}</ol></div>`;
+  $('#onSaveName').addEventListener('click',()=>{sfx('ui');saveNetName($('#onName').value);});
+  $('#onName').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')saveNetName(e.target.value);});
+  $('#onCasual').addEventListener('click',()=>{sfx('ui');G.netMode='casual';openDraft('online');});
+  $('#onRanked').addEventListener('click',()=>{sfx('ui');G.netMode='ranked';openDraft('online');});
+}
+function tickSearchTimer(){const S=NET.search,el=$('#onTimer');if(!S||!el)return;const s=Math.floor((Date.now()-S.t0)/1000);el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
+$('#onBack').addEventListener('click',()=>{sfx('ui');if(NET.search&&!NET.search.done)cancelSearch();goHome();});
+
+/* ---- matchmaking ---- */
+function onlineTeam(ranked){return draft.p1.slice(0,3).map(i=>{const id=ROSTER[i].id;return {id,c:equipped(id),lv:ranked?40:lvOf(id),st:ranked?3:Math.max(1,starsOf(id))};});}
+async function startSearch(mode){
+  show('#online');
+  if(!NET.ready&&!(await netInit())){renderOnline();return;}
+  if(NET.search&&!NET.search.done)cancelSearch();
+  const ranked=mode==='ranked',team=onlineTeam(ranked),p=NET.profile;
+  const S=NET.search={mode,ranked,team,t0:Date.now(),done:false,claiming:false};
+  S.ref=NET.db.ref(`queue/${mode}/${NET.uid}`);
+  renderOnline();
+  try{
+    await S.ref.set({uid:NET.uid,name:p.name,rating:p.rating|0,team,ts:TS(),hb:TS()});
+    S.ref.onDisconnect().remove();
+  }catch(e){toast('Couldn’t join the queue. Check your connection.');S.done=true;NET.search=null;renderOnline();return;}
+  if(S.done)return;
+  S.onMatch=S.ref.child('match').on('value',snap=>{const v=snap.val();if(!v||S.done||typeof v!=='string'||v.startsWith('claim:'))return;joinFound(S,v,'host',null);});
+  S.k=0;S.timer=setInterval(()=>{tickSearchTimer();S.k++;if(S.k%2===0&&!S.claiming)searchTick(S);},1000);
+  S.hb=setInterval(()=>{if(!S.done)S.ref.child('hb').set(TS());},5000);
+  searchTick(S);
+}
+async function searchTick(S){
+  if(S.done||S.claiming||NET.search!==S)return;
+  S.claiming=true;
+  try{
+    const snap=await NET.db.ref('queue/'+S.mode).orderByChild('ts').limitToFirst(40).once('value');
+    const now=netNow(),wait=(Date.now()-S.t0)/1000,win=S.ranked?Math.min(700,120+wait*20):Infinity,myR=NET.profile.rating|0,c=[];
+    snap.forEach(ch=>{const v=ch.val();if(!v||ch.key===NET.uid||v.match||ch.key>NET.uid)return;
+      if(typeof v.hb==='number'&&now-v.hb>16000)return;if(Math.abs((v.rating|0)-myR)>win)return;c.push(Object.assign({},v,{uid:ch.key}));});
+    c.sort((a,b)=>Math.abs((a.rating|0)-myR)-Math.abs((b.rating|0)-myR));
+    for(const v of c){if(S.done)break;if(await tryClaim(S,v))break;}
+  }catch(e){console.warn('search',e);}
+  S.claiming=false;
+}
+async function tryClaim(S,c){
+  const mid=NET.db.ref('matches').push().key,tag='claim:'+mid;
+  const own=await S.ref.child('match').transaction(v=>v?undefined:tag);
+  if(!own.committed||S.done)return false;
+  const tRef=NET.db.ref(`queue/${S.mode}/${c.uid}`);
+  const release=()=>S.ref.child('match').transaction(v=>v===tag?null:undefined);
+  try{
+    await tRef.once('value');
+    const m={mode:S.mode,ranked:S.ranked,stage:HOME_STAGES[Math.floor(Math.random()*HOME_STAGES.length)],created:TS(),
+      a:{uid:c.uid,name:c.name||'Rival',rating:c.rating|0,team:c.team},b:{uid:NET.uid,name:NET.profile.name,rating:NET.profile.rating|0,team:S.team}};
+    await NET.db.ref('matches/'+mid).set(m);
+    const r=await tRef.transaction(v=>{if(!v||v.match)return;v.match=mid;return v;});
+    if(!r.committed){await NET.db.ref('matches/'+mid).remove();await release();return false;}
+    joinFound(S,mid,'guest',m);return true;
+  }catch(e){console.warn('claim',e);try{await release();}catch(_){}return false;}
+}
+function stopSearch(S,removeEntry){
+  if(!S)return;S.done=true;clearInterval(S.timer);clearInterval(S.hb);
+  if(S.onMatch){S.ref.child('match').off('value',S.onMatch);S.onMatch=null;}
+  try{S.ref.onDisconnect().cancel();}catch(e){}
+  if(removeEntry)S.ref.remove().catch(()=>{});
+  if(NET.search===S)NET.search=null;
+}
+function cancelSearch(){stopSearch(NET.search,true);renderOnline();}
+async function joinFound(S,mid,role,m){
+  if(S.done)return;stopSearch(S,true);
+  if(!m){try{m=(await NET.db.ref('matches/'+mid).once('value')).val();}catch(e){m=null;}}
+  if(!m){toast('That match fell through. Searching again…');startSearch(S.mode);return;}
+  beginOnlineMatch(mid,m,role);
+}
+
+/* ---- live match ---- */
+function beginOnlineMatch(mid,m,role){
+  const side=role==='host'?0:1,R=NET.db.ref('matches/'+mid);
+  G.net={id:mid,role,side,ranked:!!m.ranked,mode:m.mode,stage:STAGES[m.stage]?m.stage:'rooftop',me:side?m.b:m.a,opp:side?m.a:m.b,ref:R,
+    seq:0,lastN:0,cnt:{},jdir:0,tagIdx:null,lastMsg:'',sentAt:-99,held:[0,0,0,0],jdirIn:0,tagIn:null,pend:{},seen:{},sfxQ:[],
+    gotSnap:0,oppSeen:false,finished:false,startedAt:Date.now(),subs:[]};
+  const toLine=t=>(t||[]).map(o=>({i:Math.max(0,RIDX(o.id)),c:o.c||0,lv:o.lv||1,st:o.st||1}));
+  G.lineup={P1:toLine(m.a.team),P2:toLine(m.b.team)};
+  for(const x of G.lineup.P2)if(G.lineup.P1.some(o=>o.i===x.i&&o.c===x.c))x.c=(x.c+1)%3;
+  G.kind='online';
+  const n=G.net,myK=side?'b':'a',opK=side?'a':'b',sub=(path,fn)=>{const ref=R.child(path),cb=ref.on('value',s=>{if(G.net===n&&!n.finished)fn(s.val());});n.subs.push([ref,cb]);};
+  R.child('on/'+myK).set(true);R.child('on/'+myK).onDisconnect().remove();
+  sub('on/'+opK,v=>{if(v)n.oppSeen=true;else if(n.oppSeen)oppGone();});
+  if(role==='host')sub('gi',hostGotInput);
+  else{sub('s',v=>{if(v)guestApply(v);});sub('result',v=>{if(v)guestResult(v);});}
+  n.wd=setInterval(()=>{if(G.net!==n||n.finished){clearInterval(n.wd);return;}
+    if(!n.oppSeen&&Date.now()-n.startedAt>20000)oppGone();
+    if(role==='guest'&&n.gotSnap&&Date.now()-n.gotSnap>7000)oppGone();},1000);
+  toast(`Matched with ${m[opK].name||'a rival'}!`);
+  startMatch();
+}
+function netCleanup(n){
+  if(!n)return;n.finished=true;clearInterval(n.wd);
+  for(const [ref,cb] of n.subs)ref.off('value',cb);n.subs=[];
+  const myK=n.side?'b':'a';try{n.ref.child('on/'+myK).onDisconnect().cancel();n.ref.child('on/'+myK).remove();}catch(e){}
+}
+function oppGone(){
+  const n=G.net;if(!n||n.finished)return;
+  if(G.mode!=='fight'){netCleanup(n);return;}
+  toast('Your opponent left the match.');
+  if(n.role==='host'){if(!G.over)endMatch(n.side,'left');}
+  else{G.over={w:n.side,t:175,reason:'left'};showResult();}
+}
+function netForfeit(){
+  const n=G.net;if(!n||n.finished)return;
+  G.over={w:1-n.side,t:175,reason:'left'};show(null);showResult();
+}
+/* host: guest inputs arrive as held buttons plus running counters for one-shot actions */
+function hostGotInput(v){
+  const n=G.net;if(!v)return;n.oppSeen=true;n.held=v.h||[0,0,0,0];n.jdirIn=v.j||0;n.tagIn=v.ti==null?null:v.ti;
+  const c=v.c||[];PULSES.forEach((k,i)=>{const now=c[i]||0;if(now>(n.seen[k]||0)){n.pend[k]=1;n.seen[k]=now;}});
+}
+function netGuestInput(){
+  const n=G.net,h=n.held,out={l:!!h[0],r:!!h[1],blk:!!h[2],crh:!!h[3],jdir:0,tagIdx:null};
+  for(const k of PULSES)out[k]=!!n.pend[k];
+  out.jdir=out.u?n.jdirIn:((h[1]?1:0)-(h[0]?1:0));if(out.tag)out.tagIdx=n.tagIn;
+  n.pend={};return out;
+}
+const RN=v=>Math.round((v||0)*10)/10;
+function hostPre(){
+  const n=G.net;if(!n||n.finished||G.frame%3)return;
+  const T=G.teams.map(tm=>[tm.active,RN(tm.meter),tm.combo|0,tm.comboT|0,tm.maxCombo|0,tm.tagCd|0,tm.callT|0,tm.exiting?tm.members.indexOf(tm.exiting):-1,Math.round(tm.dmg||0),tm.members.map(m=>[RN(m.hp),RN(m.rec),m.alive?1:0])]);
+  const V=[];
+  G.teams.forEach((tm,s)=>tm.members.forEach((m,i)=>{
+    if(!(i===tm.active||m===tm.exiting||(G.intro>0&&!m.introGone)))return;const p=m.pose;
+    V.push([s,i,RN(m.x),RN(m.y),RN(m.z),m.face||1,m.state||'idle',m.t|0,m.onGround?1:0,RN(m.vx),RN(m.vy),m.flash|0,m.dying?1:0,RN(m.hj),m.airAtk||0,m.ult?1:0,
+      RN(p.lean),RN(p.drop),RN(p.rot),RN(p.tw),RN(p.lb),RN(p.lf),RN(p.hx),RN(p.ba[0]),RN(p.ba[1]),RN(p.fa[0]),RN(p.fa[1]),RN(p.bl[0]),RN(p.bl[1]),RN(p.fl[0]),RN(p.fl[1]),
+      m.state==='attack'&&m.atk?m.atk.s|0:0,m.state==='attack'&&m.atk?m.atk.a|0:0,m.state==='attack'&&m.atk?(m.atk.limb||limbOf(m.atk.key,m.def.id)||'f'):0,m.grabKind||0,m.lock?1:0,m.lockT|0]);}));
+  const P=G.projs.map(p=>[p.id|0,p.kind||'orb',RN(p.x),RN(p.y),RN(p.vx),p.ground?1:0,p.delay|0,p.act|0,p.life|0,p.team.side,Math.max(0,p.team.members.indexOf(p.owner))]);
+  const fx=[];for(const p of G.fx)if(!p._s){p._s=1;const q={};for(const k in p){const v=p[k];if(k==='_s')continue;if(typeof v==='number')q[k]=RN(v);else if(typeof v==='string'||typeof v==='boolean')q[k]=v;}fx.push(q);}
+  const fb=G.freezeBy?[G.freezeBy.team.side,G.freezeBy.team.members.indexOf(G.freezeBy)]:0;
+  const sb=G.freeze>0&&G.supBanner?JSON.parse(JSON.stringify(G.supBanner)):0;
+  const snap={n:++n.seq,T,V,P,g:[G.timer|0,G.intro|0,G.freeze|0,RN(G.shake),RN(G.zoomPunch),G.tf|0],fb,b:G.banner?[String(G.banner.text),G.banner.t|0,G.banner.color||'#ffc94d']:0,sb,
+    o:G.over?[G.over.w,G.over.t|0,G.over.reason||'']:0,fx,sf:n.sfxQ.splice(0,24)};
+  n.ref.child('s').set(snap).catch(()=>{});
+}
+/* guest: send inputs, draw the host's snapshots with smoothing */
+function guestSendInput(){
+  const n=G.net,inp=playerInput(1);
+  for(const k of PULSES)if(inp[k])n.cnt[k]=(n.cnt[k]||0)+1;
+  if(inp.u)n.jdir=inp.jdir||0;if(inp.tag&&inp.tagIdx!=null)n.tagIdx=inp.tagIdx;
+  const msg={h:[+inp.l,+inp.r,+inp.blk,+inp.crh],c:PULSES.map(k=>n.cnt[k]||0),j:n.jdir};if(n.tagIdx!=null)msg.ti=n.tagIdx;
+  const key=JSON.stringify(msg);
+  if(key!==n.lastMsg||G.frame-n.sentAt>30){n.lastMsg=key;n.sentAt=G.frame;n.ref.child('gi').set(msg).catch(()=>{});}
+}
+function poseFrom(a){return {lean:a[0],drop:a[1],rot:a[2],tw:a[3],lb:a[4],lf:a[5],hx:a[6],ba:[a[7],a[8]],fa:[a[9],a[10]],bl:[a[11],a[12]],fl:[a[13],a[14]]};}
+function flipBanner(b){let [text,t,color]=b;if(text==='YOU WIN'){text='YOU LOSE';color='#ff6b4a';}else if(text==='YOU LOSE'){text='YOU WIN';color='#ffc94d';}return {text,t,color};}
+function guestApply(s){
+  const n=G.net;if(G.mode!=='fight'||!G.teams||(s.n|0)<=n.lastN)return;n.lastN=s.n|0;n.gotSnap=Date.now();n.oppSeen=true;
+  (s.T||[]).forEach((t,si)=>{const tm=G.teams[si];if(!tm)return;tm.active=t[0]|0;tm.meter=t[1]||0;tm.combo=t[2]|0;tm.comboT=t[3]|0;tm.maxCombo=t[4]|0;tm.tagCd=t[5]|0;tm.callT=t[6]|0;
+    tm.exiting=t[7]>=0?tm.members[t[7]]:null;tm.dmg=t[8]||0;(t[9]||[]).forEach((h,i)=>{const m=tm.members[i];if(!m)return;m.hp=h[0]||0;m.rec=h[1]||0;m.alive=!!h[2];});});
+  const seen=new Set();
+  for(const v of s.V||[]){const tm=G.teams[v[0]],m=tm&&tm.members[v[1]];if(!m)continue;seen.add(m);
+    const far=!m._net||Math.abs(v[2]-m.x)>240||Math.abs(v[3]-m.y)>240;m._net={x:v[2],y:v[3],z:v[4]};
+    if(far){m.x=v[2];m.y=v[3];m.z=v[4];}
+    m.face=v[5]||1;m.state=v[6];m.t=v[7]|0;m.onGround=!!v[8];m.vx=v[9]||0;m.vy=v[10]||0;m.flash=v[11]|0;m.dying=!!v[12];m.hj=v[13]||0;m.airAtk=v[14]||null;m.ult=!!v[15];
+    const a=v.slice(16,31);if(far||!m._pt)m.pose=poseFrom(a);m._pt=a;m.introGone=false;
+    m.atk=m.state==='attack'?{s:v[31]|0,a:v[32]|0,limb:v[33]||'f',key:'jab'}:null;m.grabKind=v[34]||null;m.lock=!!v[35];m.lockT=v[36]|0;}
+  const g=s.g||[];
+  if((g[1]|0)>0)for(const tm of G.teams)tm.members.forEach((m,i)=>{if(i!==tm.active&&!seen.has(m))m.introGone=true;});
+  G.timer=g[0]|0;G.intro=g[1]|0;G.freeze=g[2]|0;G.shake=g[3]||0;G.zoomPunch=g[4]||0;G.tf=g[5]|0;
+  G.freezeBy=s.fb?G.teams[s.fb[0]].members[s.fb[1]]:null;
+  G.banner=s.b?flipBanner(s.b):null;G.supBanner=s.sb||null;
+  G.over=s.o?{w:s.o[0],t:s.o[1]|0,reason:s.o[2]||''}:null;
+  const old=new Map(G.projs.map(p=>[p.id,p]));
+  G.projs=(s.P||[]).map(a=>{const p=old.get(a[0])||{id:a[0],x:a[2]};const tm=G.teams[a[9]]||G.teams[0];
+    Object.assign(p,{kind:a[1],_tx:a[2],y:a[3],vx:a[4],ground:!!a[5],delay:a[6],act:a[7],life:a[8],team:tm,owner:tm.members[a[10]]||tm.members[0]});return p;});
+  for(const q of s.fx||[])G.fx.push(q);
+  for(const k of s.sf||[])sfx(k);
+  if(G.over&&G.over.t>=172)showResult();
+}
+function guestTick(){
+  if(G.banner){G.banner.t--;if(G.banner.t<=0)G.banner=null;}
+  updateFx();gestureTick();guestSendInput();
+  const k=0.42,L=(o,key,v)=>{o[key]=(o[key]||0)+((v||0)-(o[key]||0))*k;};
+  for(const tm of G.teams)for(const m of tm.members){
+    if(!m._net)continue;m.x+=(m._net.x-m.x)*k;m.y+=(m._net.y-m.y)*k;m.z=(m.z||0)+(m._net.z-(m.z||0))*k;
+    const a=m._pt,p=m.pose;if(!a||!p)continue;
+    L(p,'lean',a[0]);L(p,'drop',a[1]);L(p,'rot',a[2]);L(p,'tw',a[3]);L(p,'lb',a[4]);L(p,'lf',a[5]);L(p,'hx',a[6]);
+    L(p.ba,0,a[7]);L(p.ba,1,a[8]);L(p.fa,0,a[9]);L(p.fa,1,a[10]);L(p.bl,0,a[11]);L(p.bl,1,a[12]);L(p.fl,0,a[13]);L(p.fl,1,a[14]);
+  }
+  for(const p of G.projs){if(p._tx==null)continue;if(!p.delay)p._tx+=p.vx;p.x+=(p._tx-p.x)*0.5;}
+}
+function guestResult(v){const n=G.net;if(!n||n.finished||G.mode!=='fight')return;G.over={w:v.w,t:175,reason:v.reason||''};showResult();}
+/* ratings: ranked uses Elo with K 32; each player records their own result */
+async function netRecord(n,win,draw){
+  const ref=NET.db.ref('players/'+NET.uid),before=NET.profile.rating|0,opp=n.opp.rating|0;
+  const exp=1/(1+Math.pow(10,(opp-before)/400)),delta=n.ranked?Math.round(32*((win?1:draw?0.5:0)-exp)):0;
+  await ref.transaction(p=>{p=p||{name:NET.profile.name,rating:1000,w:0,l:0,d:0,cw:0,cl:0};
+    if(n.ranked){p.rating=Math.max(0,(p.rating|0)+delta);if(win)p.w=(p.w|0)+1;else if(draw)p.d=(p.d|0)+1;else p.l=(p.l|0)+1;}
+    else{if(win)p.cw=(p.cw|0)+1;else if(!draw)p.cl=(p.cl|0)+1;}
+    p.last=TS();return p;});
+  NET.profile=(await ref.once('value')).val()||NET.profile;NET.boardT=0;
+  return {before,after:NET.profile.rating|0,delta:(NET.profile.rating|0)-before};
+}
 
 /* ---------------- town hub ---------------- */
 /* Harbor City plaza. Move with the joystick (or WASD), drag to look. Each feature lives inside its own
@@ -3210,8 +3562,8 @@ const NPCS=[
   mark:()=>claimableMissions()>0},
  {key:'shop',who:'taro',role:'Shop',place:'Shop',act:'Open the shop',go:()=>openShop(),
   say:()=>'Welcome to the shop. Token packs aren’t on sale yet, but you can trade tokens for coins any time.',mark:()=>false},
- {key:'online',who:'bruno',role:'Online',place:'Arena',act:'Okay',go:()=>{closeDialog();},locked:true,
-  say:()=>'The arena’s locked, champ. Online battles open in a future update. I’ll keep your seat warm.',mark:()=>false},
+ {key:'online',who:'bruno',role:'Online',place:'Arena',act:'Enter the arena',go:()=>openOnline(),
+  say:()=>FIREBASE_CONFIG?`The arena\u2019s open, champ. Casual for fun, ranked for glory.${NET.profile?` You\u2019re sitting at ${NET.profile.rating|0}, ${tierOf(NET.profile.rating).name} league.`:''} Real fighters are waiting.`:'The arena isn\u2019t hooked up to its server yet. Once it is, you\u2019ll fight real players in here, casual or ranked.',mark:()=>false},
 ];
 /* building footprints: w = width, d = depth, DW = door width. Rotation turns each front toward the plaza */
 const BLD={story:{a:0,w:820,d:470},summon:{a:-33,w:640,d:440},events:{a:33,w:660,d:420},teams:{a:-66,w:660,d:440},missions:{a:66,w:620,d:400},shop:{a:-98,w:620,d:400},online:{a:98,w:760,d:460}};
@@ -3383,10 +3735,10 @@ defStage('town','Harbor City Plaza',(g,upd,rnd)=>{
     const gc=['#ff5a5a','#ffcf4a','#7fe3ff','#9dff7a','#ff9ad8'];for(let i=0;i<10;i++)box(b,26,26,26,TM(gc[i%5]),e.W/2-220+(i%5)*40,84+Math.floor(i/5)*26,e.fz+60+(i%2)*14);}},upd);
   townBuilding(out,'online',{h1:320,shutter:true,body:'#24242c',post:'#16161c',roof:'#121216',roofType:'flat',sign:'ARENA',col:'#ff3a3a',doorFrame:'#16161c',lantern:'#ff3a3a',extra:(b,e)=>{
     box(b,DOOR_W+30,180,10,TM('#5a5a66'),0,16+90,e.fz+6);for(let i=0;i<7;i++)box(b,DOOR_W+30,4,14,TM('#3a3a44'),0,30+i*24,e.fz+8);
-    const chain=TM('#9a9aa4');for(const s of [-1,1])for(let i=0;i<12;i++){const l=new THREE.Mesh(new THREE.TorusGeometry(7,2,6,10),chain);l.position.set(s*(-80+i*14.5),40+i*12,e.fz+18);l.rotation.y=i%2?Math.PI/2:0;l.rotation.z=s*0.68;b.add(l);}
-    const lk=box(b,34,40,14,TM('#c8a040'),0,92,e.fz+24);
+    const chain=TM('#9a9aa4');if(!FIREBASE_CONFIG)for(const s of [-1,1])for(let i=0;i<12;i++){const l=new THREE.Mesh(new THREE.TorusGeometry(7,2,6,10),chain);l.position.set(s*(-80+i*14.5),40+i*12,e.fz+18);l.rotation.y=i%2?Math.PI/2:0;l.rotation.z=s*0.68;b.add(l);}
+    if(!FIREBASE_CONFIG)box(b,34,40,14,TM('#c8a040'),0,92,e.fz+24);
     const neon=bmat('#ff3a5a');box(b,e.W+24,6,6,neon,0,16+e.H1+2,e.fz+12);for(const sx of [-1,1])box(b,6,e.H1,6,neon,sx*(e.W/2+12),16+e.H1/2,e.fz+12);
-    const ls=sign('LOCKED',170,46,'#2a0a0a','#ffffff','#ff3a3a');ls.position.set(0,150,e.fz+26);b.add(ls);
+    const ls=FIREBASE_CONFIG?sign('OPEN',170,46,'#0a2a14','#ffffff','#7fe3a0'):sign('LOCKED',170,46,'#2a0a0a','#ffffff','#ff3a3a');ls.position.set(0,150,e.fz+26);b.add(ls);
     upd.push(t=>{neon.color.setHSL(0.97,1,0.55+0.1*Math.sin(t*0.1));});}},upd);
   // low stone wall + gate closing the south side of the plaza
   for(let i=0;i<=24;i++){const a=(110+i*140/24)*RAD,x=Math.sin(a)*1560,z=-Math.cos(a)*1560;if(Math.abs(x)<200)continue;const w=box(out,240,60,30,stone,x,30,z);w.rotation.y=-a;box(out,250,12,40,TM('#5a4a40'),x,66,z).rotation.y=-a;}
@@ -3485,6 +3837,7 @@ function doorAt(x,z){for(const k in BLD){const B=BLD[k],[lx,lz]=toLocal(B,x,z);i
 function nearestDoor(x,z){let best=null,bd=1e9;for(const k in BLD){const B=BLD[k],d=Math.hypot(x-B.doorX,z-B.doorZ);if(d<bd){bd=d;best=k;}}return bd<230?best:null;}
 function townTransition(fn){if(TOWN.trans)return;TOWN.trans={t:0,fn};const f=$('#townFade');if(f)f.classList.add('on');sfx('ui');}
 function enterBuilding(k){
+  if(k==='online'){const b=TOWN.npcs.find(n=>n.npc.key==='online');if(b&&!TOWN.trans)openDialog(b);return;}
   if(BLD[k]&&NPCS.find(n=>n.key===k).locked){if(G.frame-TOWN.lockT>90){TOWN.lockT=G.frame;toast('The arena is locked. Online battles are coming in a future update.');}return;}
   townTransition(()=>{const R=ROOMS[k],p=TOWN.player;setArea(k);p.wx=R.ox;p.wz=R.oz+R.hd-230;p.heading=Math.PI/2;TOWN.yaw=Math.PI/2;TOWN.pitch=0;camS.tx=null;camS.lx=null;camS.ly=null;camS.lz=null;});
 }

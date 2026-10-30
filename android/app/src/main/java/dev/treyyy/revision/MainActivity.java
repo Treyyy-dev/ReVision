@@ -9,11 +9,19 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-/** Full-screen landscape WebView that runs the bundled game from app assets. */
+import androidx.webkit.WebViewAssetLoader;
+
+/**
+ * Full-screen landscape WebView that runs the bundled game from app assets.
+ * Assets are served from https://appassets.androidplatform.net so the page has a real
+ * secure origin (Firebase sign-in and storage need one; file:// does not qualify).
+ */
 public class MainActivity extends Activity {
     private WebView web;
 
@@ -41,13 +49,21 @@ public class MainActivity extends Activity {
         s.setSupportZoom(false);
         s.setBuiltInZoomControls(false);
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        web.setWebViewClient(new WebViewClient());
+        final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+                .build();
+        web.setWebViewClient(new WebViewClient() {
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                return loader.shouldInterceptRequest(request.getUrl());
+            }
+        });
         web.setWebChromeClient(new WebChromeClient());
         setContentView(web);
         hideSystemBars();
 
         if (savedInstanceState != null) web.restoreState(savedInstanceState);
-        else web.loadUrl("file:///android_asset/index.html");
+        else web.loadUrl("https://appassets.androidplatform.net/assets/index.html");
     }
 
     @SuppressWarnings("deprecation")

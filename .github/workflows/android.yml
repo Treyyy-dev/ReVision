@@ -52,6 +52,13 @@ jobs:
           test -s "$A/three.min.js"
           sed 's|https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js|three.min.js|' index.html > "$A/index.html"
           grep -q 'src="three.min.js"' "$A/index.html"
+          # Firebase (online play), bundled so the app doesn't depend on a CDN
+          mkdir -p "$A/fb"
+          for f in firebase-app-compat.js firebase-auth-compat.js firebase-database-compat.js; do
+            curl -fsSL --retry 3 "https://www.gstatic.com/firebasejs/10.12.2/$f" -o "$A/fb/$f" \
+              || curl -fsSL --retry 3 "https://cdn.jsdelivr.net/npm/firebase@10.12.2/$f" -o "$A/fb/$f"
+            test -s "$A/fb/$f"
+          done
 
       - name: Build APK
         working-directory: android
