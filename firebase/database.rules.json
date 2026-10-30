@@ -37,7 +37,7 @@
       "$area": {
         ".read": "auth != null",
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid && $area.matches(/^(out|story|summon|events|teams|missions|shop)$/)",
+          ".write": "auth != null && auth.uid === $uid && $area.matches(/^(out|story|summon|events|teams|missions|shop|online)$/)",
           ".validate": "newData.hasChildren(['n', 'x', 'z', 't'])",
           "n": {
             ".validate": "newData.isString() && newData.val().length <= 20"
