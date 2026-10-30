@@ -2070,7 +2070,7 @@ function updateBeam(f){
 /* ---------------- audio ---------------- */
 let AC=null,muted=false,noiseBuf=null;
 function wantFull(){
-  if(SAVE.set&&SAVE.set.full===false)return;const d=document,el=d.documentElement;
+  const d=document,el=d.documentElement;
   if(d.fullscreenElement||d.webkitFullscreenElement||/RevisionApp/.test(navigator.userAgent))return;
   const rq=el.requestFullscreen||el.webkitRequestFullscreen;if(!rq)return;
   try{const pr=rq.call(el,{navigationUI:'hide'});if(pr&&pr.then)pr.then(()=>{if(IS_TOUCH&&screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{});setTimeout(()=>{orient();fit();},120);}).catch(()=>{});}catch(_){}
@@ -5220,14 +5220,7 @@ function renderSettings(){
   const el=$('#menuBody'),f=fpsCap();
   el.innerHTML=`<div class="set-row"><div><h3 class="acc-h">Frame rate</h3><p class="hint">Higher looks smoother and uses more battery. 90 and 120 need a screen that refreshes that fast; on a 60 Hz screen they run at 60.</p></div>
     <div class="seg" role="radiogroup" aria-label="Frame rate">${[30,60,90,120].map(v=>`<button type="button" role="radio" aria-checked="${v===f}" data-fps="${v}">${v}<small>FPS</small></button>`).join('')}</div></div>
-    <p class="hint" id="fpsNow" aria-live="polite"></p>
-    <div class="set-row"><div><h3 class="acc-h">Summon animation</h3><p class="hint">Plays a short fight before your summon results. You can also skip it each time.</p></div>
-    <div class="seg" role="radiogroup" aria-label="Summon animation">${['On','Off'].map(v=>`<button type="button" role="radio" aria-checked="${(SAVE.set.cine!==false)===(v==='On')}" data-cine="${v}">${v}</button>`).join('')}</div></div>
-    <div class="set-row"><div><h3 class="acc-h">Full screen</h3><p class="hint">Hides the browser bars so the game fills the screen. On iPhone, use Share, then Add to Home Screen, and open the game from its icon.</p></div>
-    <div class="seg" role="radiogroup" aria-label="Full screen">${['On','Off'].map(v=>`<button type="button" role="radio" aria-checked="${(SAVE.set.full!==false)===(v==='On')}" data-full="${v}">${v}</button>`).join('')}</div></div>`;
-  el.querySelectorAll('[data-full]').forEach(b=>b.addEventListener('click',()=>{sfx('ui');SAVE.set.full=b.dataset.full==='On';persist();
-    if(SAVE.set.full)wantFull();else if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});renderSettings();}));
-  el.querySelectorAll('[data-cine]').forEach(b=>b.addEventListener('click',()=>{sfx('ui');SAVE.set.cine=b.dataset.cine==='On';persist();renderSettings();}));
+    <p class="hint" id="fpsNow" aria-live="polite"></p>`;
   el.querySelectorAll('[data-fps]').forEach(b=>b.addEventListener('click',()=>{sfx('ui');SAVE.set.fps=+b.dataset.fps;persist();renderSettings();}));
   const upd=()=>{const e=$('#fpsNow');if(e)e.textContent=`Running at about ${FPS_NOW} frames per second.`;};upd();fpsTimer=setInterval(upd,600);
 }
@@ -5334,7 +5327,6 @@ function showVsLoading(m,role,done){
 const CINE={on:false,actors:[],t:0,kind:'win',beats:null,done:null,flash:0,flashCol:'#ffffff'};
 const CINE_LEN=600;
 function playSummonCine(best,done){
-  if(SAVE.set&&SAVE.set.cine===false){done();return;}
   const ids=ROSTER.map(d=>d.id).sort(()=>Math.random()-0.5);
   toMenu();show(null);G.mode='cine';
   setStage(HOME_STAGES[Math.floor(Math.random()*HOME_STAGES.length)]);
