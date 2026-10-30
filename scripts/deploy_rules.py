@@ -14,9 +14,11 @@ def fail(msg):
     sys.exit(1)
 
 
-raw = os.environ.get("SA", "").strip()
+raw = os.environ.get("SA", "").strip().lstrip("\ufeff")
+# Phone copy/paste often turns the key's "\n" escapes or soft line wraps into real line breaks or
+# spaces inside the JSON strings. strict=False accepts those; the PEM body is rebuilt below.
 try:
-    info = json.loads(raw)
+    info = json.loads(raw, strict=False)
 except Exception as e:
     fail(f"The FIREBASE_SERVICE_ACCOUNT secret is not valid JSON ({type(e).__name__} at char "
          f"{getattr(e, 'pos', '?')} of {len(raw)}; starts with {raw[:1]!r}, ends with {raw[-1:]!r}). "
@@ -26,6 +28,14 @@ if not isinstance(info, dict) or info.get("type") != "service_account":
 missing = [k for k in ("private_key", "client_email", "project_id") if not info.get(k)]
 if missing:
     fail("The key file is missing: " + ", ".join(missing))
+import re
+pk = str(info.get("private_key", "")).replace("\\n", "\n")
+m = re.search(r"-----BEGIN ([A-Z ]*)PRIVATE KEY-----(.*?)-----END ([A-Z ]*)PRIVATE KEY-----", pk, re.S)
+if not m:
+    fail("The private_key in the secret is cut off (no BEGIN/END PRIVATE KEY lines). Paste the whole key file again.")
+b64 = re.sub(r"[^A-Za-z0-9+/=]", "", m.group(2))
+info["private_key"] = (f"-----BEGIN {m.group(1)}PRIVATE KEY-----\n" + "\n".join(b64[i:i+64] for i in range(0, len(b64), 64))
+                       + f"\n-----END {m.group(3)}PRIVATE KEY-----\n")
 if info.get("project_id") != "revision-7914f":
     print(f"::warning::Key is for project {info.get('project_id')!r}, expected 'revision-7914f'.")
 
