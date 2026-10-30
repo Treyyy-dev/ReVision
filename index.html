@@ -112,6 +112,8 @@
 .vs-bar{width:min(100%,520px);height:8px;background:var(--panel);border:1px solid var(--line)}
 .vs-bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--coral),var(--gold))}
 @media (prefers-reduced-motion:reduce){.vs-side{animation:none}.bkey.wait{animation:none}}
+.plv{display:grid;grid-template-columns:auto auto 1fr;align-items:center;gap:4px 10px;margin-top:10px}.plv .eyebrow{margin:0}.plv b{font-family:var(--display);font-weight:400;font-size:20px;color:var(--gold)}
+.plvbar{display:block;height:8px;background:var(--night);border:1px solid var(--line);min-width:80px}.plvbar i{display:block;height:100%;background:linear-gradient(90deg,var(--coral),var(--gold))}.plv small{grid-column:1/-1;color:var(--muted);font-size:12px}
 html,body{height:100%;margin:0;padding:0}
 body{background:var(--night);color:var(--ink);font-family:var(--body);font-size:15px;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 #app{position:relative;height:100%;height:100dvh;box-sizing:border-box;display:flex;flex-direction:column;gap:0;padding:0}
@@ -973,13 +975,17 @@ const DEF_KB={l:'KeyA',r:'KeyD',u:'KeyW',crh:'KeyS',light:'KeyJ',blk:'KeyK',sp1:
 const DEF_PAD={l:14,r:15,u:12,crh:13,light:0,blk:2,sp1:1,sp2:3,ult:5,tag:4,ast:11,dl:6,dr:7,act:0,pause:9};
 SAVE.binds={kb:Object.assign({},DEF_KB,(SAVE.binds&&SAVE.binds.kb)||{}),pad:Object.assign({},DEF_PAD,(SAVE.binds&&SAVE.binds.pad)||{})};
 SAVE.set=Object.assign({fps:60},SAVE.set||{});
-SAVE.stars=SAVE.stars||{};SAVE.lv=SAVE.lv||{};SAVE.tokens=SAVE.tokens||0;SAVE.teams=SAVE.teams||[];while(SAVE.teams.length<6)SAVE.teams.push([]);SAVE.mis=SAVE.mis||{};
+SAVE.stars=SAVE.stars||{};SAVE.lv=SAVE.lv||{};SAVE.plv=(SAVE.plv&&SAVE.plv.lv)?SAVE.plv:{lv:1,xp:0};SAVE.tokens=SAVE.tokens||0;SAVE.teams=SAVE.teams||[];while(SAVE.teams.length<6)SAVE.teams.push([]);SAVE.mis=SAVE.mis||{};
 let GIFT=false;if(!SAVE.summonGift){SAVE.summonGift=1;SAVE.coins+=1500;GIFT=true;try{localStorage.setItem(SAVE_KEY,JSON.stringify(SAVE));}catch(e){}}
 const starRow=st=>{let h='';for(let i=0;i<7;i++)h+=i<st-7?'<b class="st2">\u2605</b>':i<st?'\u2605':'\u2606';return h;};
 const MAX_LV=60,MAX_STARS=14,xpNeed=lv=>30+lv*14;
 const lvOf=id=>(SAVE.lv[id]&&SAVE.lv[id].lv)||1;
 const starsOf=id=>SAVE.stars[id]||(owns(id)?1:0);
 const statMul=(lv,st)=>(1+((lv||1)-1)*0.01)*(1+(Math.max(1,st||1)-1)*0.04);
+/* player level: your own account level, earned in every mode, win or lose */
+const PLV_MAX=100,plvNeed=lv=>100+(lv-1)*25;
+function addPlayerXP(amt){const v=SAVE.plv,from=v.lv;if(v.lv>=PLV_MAX||!(amt>0))return {from,to:from,amt:0};
+  v.xp+=amt;while(v.lv<PLV_MAX&&v.xp>=plvNeed(v.lv)){v.xp-=plvNeed(v.lv);v.lv++;}if(v.lv>=PLV_MAX)v.xp=0;return {from,to:v.lv,amt};}
 function addXP(id,amt){const v=SAVE.lv[id]||(SAVE.lv[id]={lv:1,xp:0}),from=v.lv;if(v.lv>=MAX_LV)return {from,to:from};
   v.xp+=amt;while(v.lv<MAX_LV&&v.xp>=xpNeed(v.lv)){v.xp-=xpNeed(v.lv);v.lv++;}if(v.lv>=MAX_LV)v.xp=0;return {from,to:v.lv};}
 const ownsCostume=(id,c)=>c===0||(SAVE.costumes[id]||[]).includes(c);
@@ -3667,7 +3673,7 @@ function startMatch(){
   setStage(G.kind==='online'&&G.net?G.net.stage:G.kind==='raid'?G.raid.boss.stage:G.kind==='story'&&STORY[G.chapter]?STORY[G.chapter].stage:'rooftop');
   if(G.kind==='raid')G.timer=180;
   leaveTownView();introLayout();
-  Object.assign(G,{ult:null,mode:'fight',projs:[],fx:[],hitstop:0,freeze:0,freezeBy:null,shake:0,timer:150,tf:0,intro:INTRO_LEN,over:null,paused:false,banner:null,supBanner:null,guideT:300,trails:[]});
+  G.trainT0=G.frame;Object.assign(G,{ult:null,mode:'fight',projs:[],fx:[],hitstop:0,freeze:0,freezeBy:null,shake:0,timer:150,tf:0,intro:INTRO_LEN,over:null,paused:false,banner:null,supBanner:null,guideT:300,trails:[]});
   show(null);document.body.classList.add('fighting');document.body.classList.toggle('pvp',G.kind==='pvp');fit();
   if(document.activeElement)document.activeElement.blur();
 }
@@ -3693,7 +3699,9 @@ function togglePause(){
 }
 $('#pauseBtn').addEventListener('click',()=>{unlock();togglePause();});
 $('#resumeBtn').addEventListener('click',togglePause);
-$('#quitBtn').addEventListener('click',()=>{if(G.kind==='online'&&G.net&&!G.net.finished&&G.mode==='fight'){netForfeit();return;}goHome();});
+$('#quitBtn').addEventListener('click',()=>{if(G.kind==='online'&&G.net&&!G.net.finished&&G.mode==='fight'){netForfeit();return;}
+  if(G.kind==='training'&&G.mode==='fight'&&G.frame-(G.trainT0||G.frame)>=1800){const r=addPlayerXP(evOn('dxp')?20:10);persist();if(r.amt)setTimeout(()=>toast(r.to>r.from?`Training done: +${r.amt} player EXP. Player level up! You are now level ${r.to}.`:`Training done: +${r.amt} player EXP.`),300);}
+  goHome();});
 $('#soundBtn').addEventListener('click',()=>{muted=!muted;syncPauseButtons();});
 $('#dummyBtn').addEventListener('click',()=>{const o=['stand','block','cpu'];G.train.dummy=o[(o.indexOf(G.train.dummy)+1)%3];syncPauseButtons();});
 $('#meterBtn').addEventListener('click',()=>{G.train.meter=!G.train.meter;syncPauseButtons();});
@@ -3741,12 +3749,19 @@ function showResult(){
     if(evOn('dxp'))xpGain*=2;if(evOn('coin'))coins=Math.round(coins*1.5);
   }
   const ups=xpGain?me.members.map(m=>[m.def,addXP(m.def.id,xpGain)]):[];
+  let pxp;{const won=k==='online'&&G.net?w===G.net.side:w===0,draw=w<0;
+    const base=k==='pvp'?30:k==='online'?(G.net&&G.net.ranked?60:50):k==='story'?50:k==='raid'?60:({easy:30,normal:45,hard:60}[G.diff]||45);
+    pxp=k==='pvp'?base:won?base:draw?Math.round(base*0.7):Math.round(base*0.45);if(evOn('dxp'))pxp*=2;}
+  const pup=addPlayerXP(pxp);
   SAVE.coins+=coins;SAVE.tokens=(SAVE.tokens||0)+tokens;persist();
   $('#resSub').textContent=sub;
   line.hidden=!text;line.textContent=text;
   const standing=me.members.filter(m=>m.alive).length;
   $('#resStats').innerHTML=(k==='pvp'?`<dt>P1 longest combo</dt><dd>${me.maxCombo} hits</dd><dt>P2 longest combo</dt><dd>${G.teams[1].maxCombo} hits</dd>`
     :`<dt>Longest combo</dt><dd>${me.maxCombo} hits</dd><dt>Damage dealt</dt><dd>${Math.round(me.dmg)}</dd><dt>Fighters standing</dt><dd>${standing} of ${me.members.length}</dd><dt>Coins earned</dt><dd>+${coins}${evOn('coin')?' (Coin Rush)':''}</dd>`+(tokens?`<dt>Tokens earned</dt><dd>+${tokens}</dd>`:'')+(evOn('dxp')&&xpGain?`<dt>Event</dt><dd>Double XP</dd>`:''))+(xpGain?`<dt>XP each</dt><dd>+${xpGain}</dd>`+ups.map(([d,r])=>`<dt>${d.name.split(' ')[0]}</dt><dd>${r.to>r.from?`Lv ${r.from} \u2192 ${r.to}`:`Lv ${r.to}`}</dd>`).join(''):'');
+  {const v=SAVE.plv,pct=v.lv>=PLV_MAX?100:Math.round(v.xp/plvNeed(v.lv)*100);
+   $('#resStats').insertAdjacentHTML('beforeend',`<dt>Player EXP</dt><dd>+${pup.amt} · Lv ${v.lv}${v.lv>=PLV_MAX?' (max)':` · ${pct}%`}</dd>`);
+   if(pup.to>pup.from)setTimeout(()=>toast(`Player level up! You are now level ${pup.to}.`),400);}
   const row=$('#resBtns');row.innerHTML='';
   btns.forEach(([label,fn],i)=>{const b=document.createElement('button');b.type='button';b.id='res-'+i;b.className='btn'+(i?' alt':'');b.textContent=label;b.addEventListener('click',()=>{sfx('ui');fn();});row.appendChild(b);});
   show('#result');fit();const f=row.firstChild;if(f)f.focus();
@@ -4940,7 +4955,7 @@ function folkStep(){
 }
 /* bump gag: the local hops back, flies in with a jump kick to your head, you hit the floor,
    sit up scratching your head, and get back up. Your controls pause until you're standing. */
-const GAG={back:14,crouch:24,kick:44,impact:36,lie:110,scratch:215,up:250};
+const GAG={back:14,crouch:24,kick:44,impact:36,lie:100,scratch:225,up:262};
 function startGag(f){const p=TOWN.player,dx=p.wx-f.wx,dz=p.wz-f.wz,d=Math.hypot(dx,dz)||1;
   TOWN.gag={f,t:0,ux:dx/d,uz:dz/d,sx:0,sz:0};f.act=null;f.prop=null;f.hopY=0;p.act=null;p.prop=null;p.hopY=0;f.state='idle';p.state='idle';p.vx=0;
   f.heading=angTo(dx,dz);resetJoy();TOWN.keys={};sfx('ui');}
@@ -4957,7 +4972,9 @@ function gagStep(){
   if(t<GAG.impact){p.tpose={lean:t>GAG.back?-12:0,drop:4,rot:0,tw:0,hx:0,lb:0,lf:0,ba:[40,120],fa:[40,120],bl:[-14,-6],fl:[16,4]};}
   else if(t<GAG.impact+12){p.wx+=ux*4.5;p.wz+=uz*4.5;[p.wx,p.wz]=collideTown(T.inside?ROOMS[T.inside].obst:T.outObst,p.wx,p.wz,28);if(T.inside){const R=ROOMS[T.inside];p.wx=R.ox+clamp(p.wx-R.ox,-R.hw+40,R.hw-40);p.wz=R.oz+clamp(p.wz-R.oz,-R.hd+40,R.hd-58);}p.tpose=Object.assign(cp(P.down),{tw:0,hx:0,lb:0,lf:0});}
   else if(t<GAG.lie){const tw=Math.sin(t*0.6)*(t<GAG.impact+30?4:0);p.tpose=Object.assign(cp(P.down),{tw:0,hx:0,lb:0,lf:0,lean:tw});}
-  else if(t<GAG.scratch){const s=Math.sin(t*0.55);p.tpose={lean:-10,drop:62,rot:-30,tw:6,hx:0,lb:0,lf:0,ba:[-40,-20],fa:[150+s*6,176+s*10],bl:[78,74],fl:[86,80]};}
+  else if(t<GAG.scratch){const k=clamp((t-GAG.lie)/14,0,1),s=Math.sin(t*0.9),s2=Math.sin(t*0.45);
+    p.tpose={lean:-6+s2*2,drop:58,rot:-14,tw:10+s2*4,hx:0,lb:0,lf:0,ba:[-55,-35],fa:[lerp(40,168,k)+s*4,lerp(60,236,k)+s*22],bl:[80,76],fl:[88,80]};
+    if(t===GAG.lie+20||t===GAG.lie+70)sfx('ui');}
   else if(t<GAG.up){p.tpose=Object.assign(cp(P.getup1),{rot:0,tw:0,hx:0,lb:0,lf:0});}
   else{p.tpose=null;f.tpose=null;f.hopY=0;f.cool=600;f.wait=90;f.tgt=null;if(f.room)f.heading=angTo(ROOMS[f.area].ox-f.wx,ROOMS[f.area].oz-f.wz);T.gag=null;T.gagCool=120;return false;}
   updatePose(f);return true;
@@ -5170,7 +5187,8 @@ function renderAccount(){
   const P=SAVE.prof,el=$('#menuBody'),lead=townLead();
   el.innerHTML=`<div class="acc-top"><canvas id="accCard" class="acc-card" width="720" height="180" role="img" aria-label="Your profile card"></canvas>
     <div class="pinfo"><label for="accName" class="eyebrow">Fighter name</label><div class="row"><input id="accName" maxlength="20" value="${esc(SAVE.name||'')}" autocomplete="off" spellcheck="false"><button type="button" class="btn alt" id="accSave">Save</button></div>
-    <p class="hint" id="accMsg">2 to 20 letters or numbers. Other players see this online.</p></div></div>
+    <p class="hint" id="accMsg">2 to 20 letters or numbers. Other players see this online.</p>
+    ${(()=>{const v=SAVE.plv,mx=v.lv>=PLV_MAX,need=plvNeed(v.lv),pct=mx?100:Math.round(v.xp/need*100);return `<div class="plv"><span class="eyebrow">Player level</span><b>Lv ${v.lv}</b><span class="plvbar" role="progressbar" aria-label="Player EXP" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${v.xp}"><i style="width:${pct}%"></i></span><small>${mx?'Max level':`${v.xp} / ${need} EXP · earned in every mode, win or lose`}</small></div>`;})()}</div></div>
    <h3 class="acc-h">Profile icon <small>${P.icons.length} of ${ALL_ICONS.length} collected · more drop from summons</small></h3><div class="cgrid" id="accIcons"></div>
    <h3 class="acc-h">Profile banner <small>${P.banners.length} of ${ALL_BANS.length} collected · more drop from summons</small></h3><div class="cgrid bans" id="accBans"></div>
    <h3 class="acc-h">Walking in town <small>${esc(ROSTER[RIDX(lead)].name)}</small></h3><div class="cgrid walk" id="accWalk"></div>`;
