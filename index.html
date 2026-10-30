@@ -1060,7 +1060,7 @@ const owns=id=>SAVE.owned.includes(id);
 const DEF_KB={l:'KeyA',r:'KeyD',u:'KeyW',crh:'KeyS',light:'KeyJ',blk:'KeyK',sp1:'KeyL',sp2:'KeyI',ult:'KeyO',tag:'KeyU',ast:'KeyH',dl:'KeyQ',dr:'KeyE',act:'KeyE',pause:'KeyP'};
 const DEF_PAD={l:14,r:15,u:12,crh:13,light:0,blk:2,sp1:1,sp2:3,ult:5,tag:4,ast:11,dl:6,dr:7,act:0,pause:9};
 SAVE.binds={kb:Object.assign({},DEF_KB,(SAVE.binds&&SAVE.binds.kb)||{}),pad:Object.assign({},DEF_PAD,(SAVE.binds&&SAVE.binds.pad)||{})};
-SAVE.set=Object.assign({fps:60},SAVE.set||{});
+SAVE.set=Object.assign({fps:60,music:0.6},SAVE.set||{});
 if(SAVE.tokens>0){SAVE.coins=(SAVE.coins|0)+Math.round(SAVE.tokens*3);SAVE.tokens=0;}SAVE.stars=SAVE.stars||{};SAVE.lv=SAVE.lv||{};SAVE.plv=(SAVE.plv&&SAVE.plv.lv)?SAVE.plv:{lv:1,xp:0};SAVE.tokens=SAVE.tokens||0;SAVE.teams=SAVE.teams||[];while(SAVE.teams.length<8)SAVE.teams.push([]);SAVE.mis=SAVE.mis||{};
 let GIFT=false;if(!SAVE.summonGift){SAVE.summonGift=1;SAVE.coins+=1500;GIFT=true;try{localStorage.setItem(SAVE_KEY,JSON.stringify(SAVE));}catch(e){}}
 const starRow=st=>{let h='';for(let i=0;i<7;i++)h+=i<st-7?'<b class="st2">\u2605</b>':i<st?'\u2605':'\u2606';return h;};
@@ -2200,6 +2200,76 @@ function sfx(k){
   } }catch(e){}
 }
 
+/* ---------------- music: two original dark tracks, made live with Web Audio ----------------
+   Town: slow D-minor night ambience (drone, dark pads, a far-off bell arpeggio, a heartbeat drum).
+   Battle: driving E-minor with a raised 7th (kick, snare, hats, a 16th-note bass and a minor-key lead).
+   The tracks crossfade when you move between town and a fight; pause lowers the battle track. */
+const MUS={bus:null,comp:null,fx:null,tr:{},cur:null,nextT:0,step:0,lvl:-1};
+const mf=m=>440*Math.pow(2,(m-69)/12);
+function musInit(){
+  if(MUS.bus||!AC)return;
+  MUS.comp=AC.createDynamicsCompressor();MUS.comp.threshold.value=-18;MUS.comp.ratio.value=3;MUS.comp.connect(AC.destination);
+  MUS.bus=AC.createGain();MUS.bus.gain.value=0;MUS.bus.connect(MUS.comp);
+  /* a dark echo that both tracks can send to */
+  const d=AC.createDelay(1.5),fb=AC.createGain(),lp=AC.createBiquadFilter(),wet=AC.createGain();
+  d.delayTime.value=0.62;fb.gain.value=0.42;lp.type='lowpass';lp.frequency.value=1600;wet.gain.value=0.5;
+  d.connect(lp).connect(fb).connect(d);lp.connect(wet).connect(MUS.bus);MUS.fx=d;
+  for(const k of ['town','battle']){const g=AC.createGain();g.gain.value=0;g.connect(MUS.bus);MUS.tr[k]=g;}
+}
+function mVoice(out,f,t,dur,o){
+  const osc=AC.createOscillator(),flt=AC.createBiquadFilter(),g=AC.createGain(),a=o.a||0.01,r=o.r||0.2,v=o.v||0.05;
+  osc.type=o.type||'sawtooth';osc.frequency.setValueAtTime(f,t);if(o.det)osc.detune.value=o.det;
+  flt.type='lowpass';flt.frequency.setValueAtTime(o.cut||1200,t);flt.Q.value=o.q||0.7;
+  if(o.sweep)flt.frequency.exponentialRampToValueAtTime(o.sweep,t+Math.max(0.05,dur));
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v,t+a);g.gain.setValueAtTime(v,t+Math.max(a,dur-r));g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  osc.connect(flt).connect(g).connect(out);if(o.send&&MUS.fx){const sg=AC.createGain();sg.gain.value=o.send;g.connect(sg).connect(MUS.fx);}
+  osc.start(t);osc.stop(t+dur+0.05);}
+function mKick(out,t,v,lo){const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.setValueAtTime(lo?110:150,t);o.frequency.exponentialRampToValueAtTime(lo?38:45,t+0.14);
+  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(0.0001,t+(lo?0.5:0.3));o.connect(g).connect(out);o.start(t);o.stop(t+0.6);}
+function mNoise(out,t,dur,v,type,f,q){const sN=AC.createBufferSource(),fl=AC.createBiquadFilter(),g=AC.createGain();sN.buffer=noiseBuf;fl.type=type;fl.frequency.value=f;fl.Q.value=q||0.7;
+  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);sN.connect(fl).connect(g).connect(out);sN.start(t);sN.stop(t+dur+0.05);}
+/* town: 72 bpm, 4 chords of 2 bars each — Dm, Bb, Gm, A */
+const TOWN_CH=[[50,53,57],[46,50,53],[43,46,50],[45,49,52]],TOWN_ARP=[0,3,6,10,12];
+function townMusic(out,i,t,sp){
+  const bar=Math.floor(i/16)%8,st=i%16,ch=TOWN_CH[Math.floor(bar/2)],first=bar%2===0&&st===0;
+  if(first){const len=sp*32;
+    mVoice(out,mf(ch[0]-24),t,len,{type:'sine',v:0.11,a:0.8,r:1.6,cut:300});
+    for(const n of ch){mVoice(out,mf(n),t,len,{v:0.022,a:1.6,r:2,cut:620,det:-7,send:0.25});mVoice(out,mf(n),t,len,{v:0.022,a:1.6,r:2,cut:620,det:8});}}
+  if(st===0||st===3)mKick(out,t,st===0?0.32:0.18,true);
+  if(TOWN_ARP.includes(st)&&bar>=2){const k=TOWN_ARP.indexOf(st),n=ch[(k+bar)%3]+24+(k===4?12:0);
+    mVoice(out,mf(n),t,1.6,{type:'triangle',v:0.028,a:0.005,r:1.5,cut:2600,send:0.6});}
+  if(bar===7&&st===8)mNoise(out,t,2.4,0.05,'bandpass',500,0.6);
+}
+/* battle: 132 bpm, Em, C, Am, B — 2 bars each */
+const BAT_CH=[[52,55,59],[48,52,55],[45,48,52],[47,51,54]];
+const BAT_LEAD=[76,null,79,null,78,null,76,null,75,null,null,null,71,null,null,null, 72,null,71,null,69,null,71,null,72,null,75,null,76,null,null,null];
+function battleMusic(out,i,t,sp){
+  const bar=Math.floor(i/16)%8,st=i%16,ch=BAT_CH[Math.floor(bar/2)],loop=Math.floor(i/128);
+  if(st===0||st===6||st===8||st===11)mKick(out,t,st%8===0?0.55:0.38);
+  if(st===4||st===12){mNoise(out,t,0.16,0.22,'bandpass',1900,0.9);mVoice(out,190,t,0.09,{type:'triangle',v:0.05,cut:900});}
+  if(st%2===0)mNoise(out,t,st%4===2?0.07:0.035,st%4===2?0.07:0.04,'highpass',7500);
+  const r=ch[0]-24,bn=(st%4===2)?r+12:(st===14?r+7:r);
+  mVoice(out,mf(bn),t,sp*0.9,{v:0.07,a:0.004,r:0.06,cut:520,sweep:220,q:4});
+  if(st===0&&bar%2===0)for(const n of ch)mVoice(out,mf(n+12),t,sp*30,{v:0.014,a:0.4,r:0.8,cut:1400,det:6,send:0.2});
+  if(bar>=4&&loop%2===0){const n=BAT_LEAD[(bar%2)*16+st];if(n)mVoice(out,mf(n-12),t,sp*3.2,{type:'square',v:0.03,a:0.01,r:0.25,cut:2200,sweep:900,send:0.35});}
+  if(i%128===0)mNoise(out,t,1.6,0.08,'highpass',3500);
+}
+const TRACKS={town:{bpm:72,fn:townMusic,vol:0.9},battle:{bpm:132,fn:battleMusic,vol:0.8}};
+function musLevel(){const v=SAVE.set&&SAVE.set.music;return typeof v==='number'?clamp(v,0,1):0.6;}
+function musicTick(){
+  if(!AC||AC.state!=='running')return;musInit();
+  const want=muted||musLevel()<=0?null:(G.mode==='fight'?'battle':'town'),now=AC.currentTime;
+  const L=(want?musLevel():0)*0.6;if(L!==MUS.lvl){MUS.lvl=L;MUS.bus.gain.setTargetAtTime(L,now,0.3);}
+  if(want!==MUS.cur){
+    for(const k in MUS.tr)MUS.tr[k].gain.setTargetAtTime(k===want?TRACKS[k].vol:0,now,k===want?0.6:0.35);
+    MUS.cur=want;MUS.step=0;MUS.nextT=now+0.12;}
+  if(!want)return;
+  const g=MUS.tr[want],paused=want==='battle'&&G.paused;g.gain.setTargetAtTime((paused?0.35:1)*TRACKS[want].vol,now,0.25);
+  if(MUS.nextT<now-0.5)MUS.nextT=now+0.05;
+  const sp=60/TRACKS[want].bpm/4;
+  while(MUS.nextT<now+0.25){try{TRACKS[want].fn(g,MUS.step,MUS.nextT,sp);}catch(e){}MUS.step++;MUS.nextT+=sp;}
+}
+
 
 /* ---------------- fighters & teams ---------------- */
 const METER_MAX=300,SP_COST=100,ULT_COST=300;
@@ -3292,7 +3362,7 @@ function updateFx(){
 }
 
 function tick(){
-  G.frame++;pollPads();tpTick();
+  G.frame++;pollPads();tpTick();musicTick();
   if(G.mode==='menu'){for(const f of menuF())updatePose(f);updateFx();return;}
   if(G.mode==='cine'){cineStep();updateFx();G.shake*=0.86;return;}
   if(G.mode==='town'){townStep();updateFx();return;}
@@ -5709,10 +5779,13 @@ function renderSettings(){
   el.innerHTML=`<div class="set-row"><div><h3 class="acc-h">Frame rate</h3><p class="hint">Higher looks smoother and uses more battery. 90 and 120 need a screen that refreshes that fast; on a 60 Hz screen they run at 60.</p></div>
     <div class="seg" role="radiogroup" aria-label="Frame rate">${[30,60,90,120].map(v=>`<button type="button" role="radio" aria-checked="${v===f}" data-fps="${v}">${v}<small>FPS</small></button>`).join('')}</div></div>
     <p class="hint" id="fpsNow" aria-live="polite"></p>
+    <div class="set-row"><div><h3 class="acc-h">Music</h3><p class="hint">Dark background music in town and in battle.</p></div>
+    <div class="seg" role="radiogroup" aria-label="Music volume">${[['Off',0],['Low',0.3],['Med',0.6],['High',1]].map(([n,v])=>`<button type="button" role="radio" aria-checked="${Math.abs(musLevel()-v)<0.01}" data-mus="${v}">${n}</button>`).join('')}</div></div>
     <div class="set-row"><div><h3 class="acc-h">Start menu</h3><p class="hint">Go back to the start menu. That’s where you choose Online or Offline. You’re ${TP.on?'<b>online</b>':'<b>offline</b>'} right now.</p></div>
     <button class="btn alt" type="button" id="toStart">Back to start menu</button></div>`;
   $('#toStart').addEventListener('click',()=>{sfx('ui');backToStart();});
   el.querySelectorAll('[data-fps]').forEach(b=>b.addEventListener('click',()=>{sfx('ui');SAVE.set.fps=+b.dataset.fps;persist();renderSettings();}));
+  el.querySelectorAll('[data-mus]').forEach(b=>b.addEventListener('click',()=>{unlock();SAVE.set.music=+b.dataset.mus;persist();sfx('ui');renderSettings();}));
   const upd=()=>{const e=$('#fpsNow');if(e)e.textContent=`Running at about ${FPS_NOW} frames per second.`;};upd();fpsTimer=setInterval(upd,600);
 }
 
