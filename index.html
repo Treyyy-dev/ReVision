@@ -3258,7 +3258,7 @@ $('#m-coll').addEventListener('click',()=>{unlock();sfx('ui');openCollection(nul
    - Battles are host-authoritative: the claimed player (host, left side) runs the fight and streams
      snapshots 20 times a second; the other player (guest, right side) sends inputs and draws the snapshots.
    - Ranked uses Elo (K 32) stored under players/<uid>; everyone fights at Lv 40, 3 stars. */
-const FIREBASE_CONFIG=null; // paste your Firebase web app config object here (see README, "Online setup")
+const FIREBASE_CONFIG={apiKey:"AIzaSyBYJHWjj1wOw1lIw_WZKSDzeg9bFH1BpVc",authDomain:"revision-7914f.firebaseapp.com",databaseURL:"https://revision-7914f-default-rtdb.firebaseio.com",projectId:"revision-7914f",storageBucket:"revision-7914f.firebasestorage.app",messagingSenderId:"1010007584026",appId:"1:1010007584026:web:48a61a716808e928c590a3"};
 const FB_VER='10.12.2';
 const NET={ready:false,busy:null,db:null,uid:null,offset:0,profile:null,err:'',search:null,board:[],boardT:0};
 const netNow=()=>Date.now()+NET.offset;
