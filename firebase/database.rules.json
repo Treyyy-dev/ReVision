@@ -2,18 +2,26 @@
   "rules": {
     "players": {
       ".read": "auth != null",
-      ".indexOn": ["rating"],
+      ".indexOn": [
+        "rating"
+      ],
       "$uid": {
         ".write": "auth != null && auth.uid === $uid",
         ".validate": "newData.hasChildren(['name', 'rating'])",
-        "name": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 16" },
-        "rating": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5000" }
+        "name": {
+          ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 16"
+        },
+        "rating": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 5000"
+        }
       }
     },
     "queue": {
       "$mode": {
         ".read": "auth != null",
-        ".indexOn": ["ts"],
+        ".indexOn": [
+          "ts"
+        ],
         "$uid": {
           ".write": "auth != null && (auth.uid === $uid || (data.exists() && !data.child('match').exists() && newData.child('match').isString() && newData.child('uid').val() === data.child('uid').val()))"
         }
@@ -23,6 +31,24 @@
       "$mid": {
         ".read": "auth != null && (data.child('a/uid').val() === auth.uid || data.child('b/uid').val() === auth.uid)",
         ".write": "auth != null && (data.exists() ? (data.child('a/uid').val() === auth.uid || data.child('b/uid').val() === auth.uid) : newData.child('b/uid').val() === auth.uid)"
+      }
+    },
+    "town": {
+      "$area": {
+        ".read": "auth != null",
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid && $area.matches(/^(out|story|summon|events|teams|missions|shop)$/)",
+          ".validate": "newData.hasChildren(['n', 'x', 'z', 't'])",
+          "n": {
+            ".validate": "newData.isString() && newData.val().length <= 16"
+          },
+          "x": {
+            ".validate": "newData.isNumber()"
+          },
+          "z": {
+            ".validate": "newData.isNumber()"
+          }
+        }
       }
     }
   }

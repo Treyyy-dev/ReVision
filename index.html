@@ -14,6 +14,7 @@
   --body:"Chakra Petch",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:dark;
 }
+[hidden]{display:none!important}
 html,body{height:100%}
 body{background:var(--night);color:var(--ink);font-family:var(--body);font-size:15px;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 #app{position:relative;height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px}
@@ -254,6 +255,27 @@ body.land .logo.big{font-size:clamp(48px,13vh,120px)}
 @keyframes stpulse{50%{transform:scale(1.06);box-shadow:0 0 28px rgba(255,201,77,.55)}}
 .st-hint{margin:0;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.startbtn{animation:none}}
+.st-step{display:flex;flex-direction:column;align-items:center;gap:8px}
+.st-row{display:flex;gap:8px;align-items:stretch}
+.st-name input{font:600 18px var(--body);color:var(--ink);background:rgba(22,15,42,.92);border:2px solid var(--line);padding:10px 12px;width:min(56vw,260px);text-align:center}
+.st-name input:focus-visible{outline:2px solid var(--gold);border-color:var(--gold)}
+.st-hi{margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.st-hi b{color:var(--gold);font-weight:700;letter-spacing:.06em}
+.st-link{font:600 12px var(--body);color:var(--muted);background:none;border:0;border-bottom:1px solid var(--line);padding:2px 0;cursor:pointer;letter-spacing:0;text-transform:none}
+.st-link:hover,.st-link:focus-visible{color:var(--ink);outline:none;border-color:var(--gold)}
+.st-modes{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.st-mode{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:200px;padding:12px 26px 12px 20px;border:0;cursor:pointer;text-align:left;color:var(--ink);background:var(--plum);clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);box-shadow:inset 4px 0 0 var(--muted)}
+.st-mode.on{background:var(--gold);color:var(--night);box-shadow:inset 4px 0 0 var(--coral)}
+.st-mode .mt{font-family:var(--display);font-size:22px;letter-spacing:.04em}
+.st-mode .md{font-size:12px;font-weight:600;opacity:.85}
+.st-mode:hover{filter:brightness(1.12)}
+.st-mode:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.st-mode:disabled{opacity:.5;cursor:wait}
+#townNet{pointer-events:auto;font:700 11px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:rgba(22,15,42,.78);border:1px solid var(--line);padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:6px}
+#townNet::before{content:"";width:8px;height:8px;border-radius:50%;background:#6c6188}
+#townNet.on{color:var(--ink);border-color:#3c8a5c}
+#townNet.on::before{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+#townNet:focus-visible{outline:2px solid var(--gold)}
 .detail h3{font-family:var(--display);font-weight:400;font-size:21px;margin:0}
 .detail .dt{margin:0 0 6px;color:var(--coral);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
 .detail .bio{margin:0 0 10px;color:var(--muted);line-height:1.45}
@@ -426,7 +448,7 @@ body.fighting #townFade{display:none}
       </div>
       <div id="townFade" aria-hidden="true"></div>
       <div id="townHud" hidden>
-        <div class="th-top"><p class="th-place" id="thPlace">Harbor City Plaza<small id="thSub">Walk into a building to visit</small></p><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p><button id="townMenu" type="button">Menu</button></div>
+        <div class="th-top"><p class="th-place" id="thPlace">Harbor City Plaza<small id="thSub">Walk into a building to visit</small></p><button id="townNet" type="button">Offline</button><p class="coins" data-coins>0</p><p class="coins tok" data-tokens>0</p><button id="townMenu" type="button">Menu</button></div>
         <div id="joy" aria-label="Move joystick"><div id="joyKnob"></div></div>
         <button id="talkBtn" type="button" hidden>Talk</button>
         <div id="dialog" role="dialog" aria-labelledby="dlgName" hidden>
@@ -440,7 +462,22 @@ body.fighting #townFade{display:none}
 
     <section id="start" class="overlay startscr" aria-label="Start screen">
       <div class="st-top"><p class="eyebrow">3 vs 3 tag battle</p><h1 class="logo big"><span>Re</span><span>Vision</span></h1></div>
-      <div class="st-bot"><button class="btn startbtn" id="startBtn" type="button">Start</button><p class="st-hint" id="startHint">Harbor City is waiting</p></div>
+      <div class="st-bot">
+        <div class="st-step" id="stStart"><button class="btn startbtn" id="startBtn" type="button">Start</button><p class="st-hint" id="startHint">Harbor City is waiting</p></div>
+        <form class="st-step st-name" id="stName" hidden autocomplete="off">
+          <label class="eyebrow" for="stNameIn">Choose your fighter name</label>
+          <div class="st-row"><input id="stNameIn" maxlength="16" spellcheck="false" autocapitalize="off" placeholder="Your name"><button class="btn" type="submit">Continue</button></div>
+          <p class="st-hint" id="stNameMsg">2 to 16 letters or numbers. Other players see this online.</p>
+        </form>
+        <div class="st-step" id="stMode" hidden>
+          <p class="eyebrow st-hi">Welcome, <b id="stHi"></b> <button class="st-link" id="stRename" type="button">Change name</button></p>
+          <div class="st-modes">
+            <button class="st-mode" id="stOff" type="button"><span class="mt">Offline</span><span class="md">Just you and the townsfolk</span></button>
+            <button class="st-mode on" id="stOn" type="button"><span class="mt">Online</span><span class="md">See other players around town</span></button>
+          </div>
+          <p class="st-hint" id="stMsg" aria-live="polite"></p>
+        </div>
+      </div>
     </section>
 
     <section id="home" class="overlay" hidden>
@@ -2496,7 +2533,7 @@ function updateFx(){
 }
 
 function tick(){
-  G.frame++;
+  G.frame++;tpTick();
   if(G.mode==='menu'){for(const f of menuF())updatePose(f);updateFx();return;}
   if(G.mode==='town'){townStep();updateFx();return;}
   if(G.paused)return;
@@ -3294,14 +3331,16 @@ async function netInit(){
 const NET_NAMES=['Neon','Ronin','Comet','Blaze','Echo','Viper','Nova','Rook','Drift','Onyx','Kite','Ember'];
 async function loadProfile(){
   const ref=NET.db.ref('players/'+NET.uid);let p=(await ref.once('value')).val();
-  if(!p||!p.name){p=Object.assign({rating:1000,w:0,l:0,d:0,cw:0,cl:0},p||{},{name:SAVE.netName||(NET_NAMES[Math.floor(Math.random()*NET_NAMES.length)]+Math.floor(100+Math.random()*900))});await ref.set(p);}
-  if(SAVE.netName!==p.name){SAVE.netName=p.name;persist();}
+  if(!p||!p.name){p=Object.assign({rating:1000,w:0,l:0,d:0,cw:0,cl:0},p||{},{name:SAVE.name||SAVE.netName||(NET_NAMES[Math.floor(Math.random()*NET_NAMES.length)]+Math.floor(100+Math.random()*900))});await ref.set(p);}
+  if(SAVE.name&&p.name!==SAVE.name){try{await ref.child('name').set(SAVE.name);p.name=SAVE.name;}catch(e){}}
+  if(SAVE.netName!==p.name||!SAVE.name){SAVE.netName=p.name;SAVE.name=SAVE.name||p.name;persist();}
   NET.profile=p;
 }
+const cleanName=n=>String(n||'').replace(/[^\w \-.]/g,'').replace(/\s+/g,' ').trim().slice(0,16);
 async function saveNetName(n){
-  n=String(n||'').replace(/[^\w \-.]/g,'').replace(/\s+/g,' ').trim().slice(0,16);
+  n=cleanName(n);
   if(n.length<2){toast('Names need 2 to 16 letters or numbers.');return;}
-  try{await NET.db.ref('players/'+NET.uid+'/name').set(n);NET.profile.name=n;SAVE.netName=n;persist();toast('Name saved.');}catch(e){toast('Couldn’t save your name. Try again.');}
+  try{await NET.db.ref('players/'+NET.uid+'/name').set(n);NET.profile.name=n;SAVE.netName=n;SAVE.name=n;persist();if(TP.last)TP.last.n=null;toast('Name saved.');}catch(e){toast('Couldn’t save your name. Try again.');}
   renderOnline();
 }
 async function loadBoard(){
@@ -3839,7 +3878,7 @@ function townTransition(fn){if(TOWN.trans)return;TOWN.trans={t:0,fn};const f=$('
 function enterBuilding(k){
   if(k==='online'){const b=TOWN.npcs.find(n=>n.npc.key==='online');if(b&&!TOWN.trans)openDialog(b);return;}
   if(BLD[k]&&NPCS.find(n=>n.key===k).locked){if(G.frame-TOWN.lockT>90){TOWN.lockT=G.frame;toast('The arena is locked. Online battles are coming in a future update.');}return;}
-  townTransition(()=>{const R=ROOMS[k],p=TOWN.player;setArea(k);p.wx=R.ox;p.wz=R.oz+R.hd-230;p.heading=Math.PI/2;TOWN.yaw=Math.PI/2;TOWN.pitch=0;camS.tx=null;camS.lx=null;camS.ly=null;camS.lz=null;});
+  townTransition(()=>{const R=ROOMS[k],p=TOWN.player;setArea(k);p.wx=R.ox+Math.round((Math.random()-0.5)*160);p.wz=R.oz+R.hd-230+Math.round(Math.random()*60);p.heading=Math.PI/2;TOWN.yaw=Math.PI/2;TOWN.pitch=0;camS.tx=null;camS.lx=null;camS.ly=null;camS.lz=null;});
 }
 function exitBuilding(){
   const k=TOWN.inside;if(!k)return;
@@ -3863,12 +3902,12 @@ function buildTown(){
   }
   if(!TOWN.player||TOWN.player.def.id!==lead){const old=TOWN.player;
     if(old&&old.rig){disposeRig(old.rig);const k=rigs.indexOf(old.rig);if(k>=0)rigs.splice(k,1);}
-    TOWN.player=townActor(lead,old?old.wx:0,old?old.wz:760,old?old.heading:Math.PI/2);}
+    TOWN.player=townActor(lead,old?old.wx:Math.round((Math.random()-0.5)*360),old?old.wz:760+Math.round(Math.random()*140),old?old.heading:Math.PI/2);}
 }
 function enterTown(){
   toMenu();buildTown();G.mode='town';setStage('town');setArea(TOWN.inside||'out');
   cam.fov=56;cam.updateProjectionMatrix();if(TOWN.player&&!TOWN.seen){TOWN.yaw=TOWN.player.heading;TOWN.seen=true;}
-  show(null);document.body.classList.add('town');$('#townHud').hidden=false;closeDialog();refreshCoins();fit();
+  show(null);document.body.classList.add('town');$('#townHud').hidden=false;closeDialog();refreshCoins();fit();tpLabel();
 }
 function townStep(){
   const T=TOWN,p=T.player;if(!p)return;
@@ -3909,7 +3948,7 @@ function townStep(){
   const pl=$('#thPlace');const nm=area?NPCS.find(n=>n.key===area).place:'Harbor City Plaza';if(pl.dataset.v!==nm){pl.dataset.v=nm;pl.firstChild.textContent=nm;$('#thSub').textContent=area?'Walk back out the door to leave':'Walk into a building to visit';}
 }
 function placeTownRig(f){const r=f.rig,s=f.def.scale;r.root.position.set(f.wx,0,f.wz);r.root.rotation.y=f.heading;r.root.scale.set(s,s,s);r.shadow.position.set(f.wx,0.8,f.wz);}
-function townVisible(){const a=TOWN.inside;return [TOWN.player,...TOWN.npcs.filter(n=>areaOf(n)===a)];}
+function townVisible(){const a=TOWN.inside;return [TOWN.player,...TOWN.npcs.filter(n=>areaOf(n)===a),...tpShown()];}
 /* over-the-shoulder camera: behind and right of your fighter, turned by drag / arrow keys,
    pulled in when a wall is in the way, and framing the other person while you talk */
 function townCamera(){
@@ -3946,6 +3985,9 @@ function drawTownTags(c){
   for(const n of T.npcs){if(areaOf(n)!==area)continue;const dist=Math.hypot(n.wx-p.wx,n.wz-p.wz);if(dist>1600)continue;
     const [x,y,z]=townToScreen(n.wx,222*n.def.scale,n.wz);if(z>1||x<-60||x>W+60||y<0)continue;
     tagBox(c,x,y,n.def.name.split(' ')[0],n.npc.role.toUpperCase(),n.npc.locked?'#ff6b4a':n.def.fx,T.near===n?1:clamp(1.25-dist/1400,0.45,0.9),n.npc.mark());}
+  for(const f of tpShown()){const o=f.remote,dist=Math.hypot(f.wx-p.wx,f.wz-p.wz);if(dist>1500)continue;
+    const [x,y,z]=townToScreen(f.wx,222*f.def.scale,f.wz);if(z>1||x<-60||x>W+60||y<0)continue;const tr=tierOf(o.r);
+    tagBox(c,x,y,o.n,'PLAYER · '+tr.name.toUpperCase(),tr.col,clamp(1.2-dist/1300,0.4,0.9),false);}
   if(!area)for(const N of NPCS){if(N.locked)continue;const B=BLD[N.key],dist=Math.hypot(B.doorX-p.wx,B.doorZ-p.wz);
     const [x,y,z]=townToScreen(B.doorX+B.fx*20,250,B.doorZ+B.fz*20);if(z>1||x<-60||x>W+60||y<0)continue;
     if(N.mark()&&dist>260){const by=y+Math.sin(G.frame*0.12)*3;c.globalAlpha=clamp(1.3-dist/2200,0.5,1);c.fillStyle='#ffc94d';c.beginPath();c.arc(x,by,12,0,TAU);c.fill();c.fillStyle='#160f2a';c.font=`15px ${FONT_D}`;c.textAlign='center';c.textBaseline='middle';c.fillText('!',x,by+1);c.globalAlpha=1;}}
@@ -4002,13 +4044,118 @@ addEventListener('keyup',e=>{if(TKEY[e.code])TOWN.keys[TKEY[e.code]]=0;});
 function leaveTownView(){if(cam.fov!==30){cam.fov=30;cam.updateProjectionMatrix();}keyL.position.set(-300,500,700);keyL.target.position.set(0,0,0);keyL.target.updateMatrixWorld();document.body.classList.remove('town');const h=$('#townHud');if(h)h.hidden=true;closeDialog();resetJoy();TOWN.keys={};camS.tx=null;camS.tz=null;camS.lx=null;camS.ly=null;camS.lz=null;
   const st=STAGES.town;if(st&&st.grp){for(const k in TOWN.areaGrp)TOWN.areaGrp[k].visible=false;}}
 
+/* ---- online town: other players walk around with you ----
+   Each player writes town/<area>/<uid> (area = 'out' or a building key) about 5 times a second while moving,
+   every 10 s while standing, and removes it on leaving, backgrounding or disconnecting.
+   You only listen to the area you're in, so the plaza and each building have their own crowd. */
+const TP={on:false,area:null,ref:null,me:null,others:{},sendT:-999,last:null,err:false,busy:false};
+const TP_MAX=12,TP_STALE=30000;
+const tpCount=()=>Object.keys(TP.others).length;
+function tpStart(){if(!NET.ready||TP.on)return;TP.on=true;TP.err=false;tpLabel();}
+function tpStop(){TP.on=false;tpLeave();tpLabel();}
+function tpLeave(){
+  if(TP.ref)TP.ref.off();
+  if(TP.me){const me=TP.me;me.onDisconnect().cancel().catch(()=>{});me.remove().catch(()=>{});}
+  TP.ref=TP.me=TP.area=null;TP.last=null;
+  for(const k in TP.others)tpDrop(k);
+}
+function tpFail(e){console.warn('town',e);if(TP.err)return;TP.err=true;toast('Couldn’t share the town. Ask the game owner to update the Firebase database rules.');}
+function tpJoin(a){
+  tpLeave();TP.area=a;
+  const base=NET.db.ref('town/'+a);TP.ref=base;TP.me=base.child(NET.uid);
+  TP.me.onDisconnect().remove().catch(()=>{});
+  base.on('child_added',x=>tpGot(x.key,x.val()),tpFail);
+  base.on('child_changed',x=>tpGot(x.key,x.val()));
+  base.on('child_removed',x=>tpDrop(x.key));
+  tpSend();
+}
+function tpSend(){
+  const p=TOWN.player;if(!p||!TP.me)return;TP.sendT=G.frame;
+  const v={n:SAVE.name||(NET.profile&&NET.profile.name)||'Player',f:p.def.id,c:p.costume||0,x:Math.round(p.wx),z:Math.round(p.wz),h:Math.round(p.heading*100)/100,w:p.state==='walk'?1:0,r:(NET.profile&&NET.profile.rating)||1000,t:TS()};
+  TP.last={x:p.wx,z:p.wz,h:p.heading,w:v.w,n:v.n,f:v.f,c:v.c};
+  TP.me.set(v).catch(tpFail);
+}
+const tpNum=v=>typeof v==='number'&&isFinite(v);
+function tpGot(uid,v){
+  if(uid===NET.uid||!v||typeof v!=='object'||!tpNum(v.x)||!tpNum(v.z))return;
+  if(tpNum(v.t)&&netNow()-v.t>TP_STALE+15000){if(!TP.others[uid])return;}
+  const fid=typeof v.f==='string'&&RIDX(v.f)>=0?v.f:'kai',c=Math.max(0,Math.min(9,v.c|0));
+  let o=TP.others[uid];
+  if(!o)o=TP.others[uid]={uid,actor:null};
+  if(o.actor&&(o.f!==fid||o.c!==c))tpDispose(o);
+  Object.assign(o,{n:String(v.n||'Player').slice(0,16),f:fid,c,tx:v.x,tz:v.z,th:tpNum(v.h)?v.h:0,w:!!v.w,r:tpNum(v.r)?v.r:1000,seen:Date.now()});
+}
+function tpDispose(o){const f=o.actor;if(f&&f.rig){disposeRig(f.rig);const k=rigs.indexOf(f.rig);if(k>=0)rigs.splice(k,1);}o.actor=null;}
+function tpDrop(uid){const o=TP.others[uid];if(!o)return;tpDispose(o);delete TP.others[uid];}
+function tpActor(o){const f=makeFighter(ROSTER[RIDX(o.f)],{side:0},o.c);
+  Object.assign(f,{isDemo:true,state:'idle',wx:o.tx,wz:o.tz,heading:o.th,face:1,town:true,remote:o});f.pose=cp(IDLE[o.f]||P.idle);return f;}
+function tpTick(){
+  if(!TP.on||!NET.ready)return;
+  const want=G.mode==='town'&&!document.hidden&&TOWN.player&&!TOWN.trans?(TOWN.inside||'out'):(G.mode==='town'&&TOWN.trans?TP.area:null);
+  if(want!==TP.area){if(want)tpJoin(want);else tpLeave();return;}
+  if(!want)return;
+  const p=TOWN.player,L=TP.last,walk=p.state==='walk'?1:0;
+  const changed=!L||Math.hypot(p.wx-L.x,p.wz-L.z)>3||Math.abs(p.heading-L.h)>0.06||walk!==L.w||L.n!==SAVE.name||L.f!==p.def.id||L.c!==(p.costume||0);
+  if((changed&&G.frame-TP.sendT>=12)||G.frame-TP.sendT>=600)tpSend();
+  const now=Date.now(),list=[];
+  for(const k in TP.others){const o=TP.others[k];if(now-o.seen>TP_STALE){tpDrop(k);continue;}o.d=Math.hypot(o.tx-p.wx,o.tz-p.wz);list.push(o);}
+  list.sort((a,b)=>a.d-b.d);
+  list.forEach((o,i)=>{
+    if(i>=TP_MAX){if(o.actor)tpDispose(o);return;}
+    if(!o.actor)o.actor=tpActor(o);
+    const f=o.actor,dx=o.tx-f.wx,dz=o.tz-f.wz,dist=Math.hypot(dx,dz);
+    if(dist>700){f.wx=o.tx;f.wz=o.tz;}
+    else if(dist>0.5){const st=Math.min(dist,Math.max(7.5,dist*0.14));f.wx+=dx/dist*st;f.wz+=dz/dist*st;}
+    const moving=dist>2.5;
+    f.heading=lerpAng(f.heading,moving&&dist>20?angTo(dx,dz):o.th,0.2);
+    if(moving||o.w){f.state='walk';f.walkT+=1.15;f.vx=7;}else{f.vx=0;if(f.state==='walk'){f.state='idle';f.t=0;}}
+    updatePose(f);
+  });
+  if(G.frame%20===0)tpLabel();
+}
+function tpShown(){const out=[];for(const k in TP.others){const o=TP.others[k];if(o.actor)out.push(o.actor);}return out;}
+function tpLabel(){const b=$('#townNet');if(!b)return;const n=tpCount();
+  const t=TP.on?(n?`Online · ${n} nearby`:'Online'):'Offline';
+  if(b.dataset.t!==t){b.dataset.t=t;b.textContent=t;b.classList.toggle('on',TP.on);b.setAttribute('aria-label',TP.on?`Online, ${n} other players here. Tap to go offline.`:'Offline. Tap to go online.');}}
+$('#townNet').addEventListener('click',async()=>{
+  sfx('ui');if(TP.busy)return;
+  if(TP.on){tpStop();SAVE.lastNet=0;persist();toast('You’re offline. Other players are hidden.');return;}
+  if(!FIREBASE_CONFIG){toast('Online isn’t set up in this build yet.');return;}
+  TP.busy=true;const b=$('#townNet');b.dataset.t='';b.textContent='Connecting…';
+  const ok=await netInit();TP.busy=false;
+  if(ok){tpStart();SAVE.lastNet=1;persist();toast('You’re online. Other players in this area show up around you.');}
+  else{tpLabel();toast('Couldn’t connect. Check your connection and try again.');}
+});
+addEventListener('pagehide',()=>{if(TP.me)TP.me.remove().catch(()=>{});});
+
 const SCREEN_EL=()=>SCREEN_EL.c||(SCREEN_EL.c=SCREENS.map(s=>$(s)));
 const townBusy=()=>SCREEN_EL().some(e=>!e.hidden);
 
 G.title=true;buildTitle();setStage('shrine');show('#start');
-function leaveTitle(){if(!G.title)return;unlock();sfx('bell');G.title=false;goHome();}
+/* title: Start → (first time) pick a name → Offline / Online */
+let titleStep='start';
+function titleTo(step){titleStep=step;for(const [id,k] of [['#stStart','start'],['#stName','name'],['#stMode','mode']])$(id).hidden=k!==step;
+  if(step==='name'){const i=$('#stNameIn');i.value=SAVE.name||SAVE.netName||'';$('#stNameMsg').textContent='2 to 16 letters or numbers. Other players see this online.';setTimeout(()=>i.focus(),30);}
+  if(step==='mode'){$('#stHi').textContent=SAVE.name;$('#stMsg').textContent='';$('#stOn').disabled=$('#stOff').disabled=false;setTimeout(()=>$(SAVE.lastNet===0?'#stOff':'#stOn').focus(),30);}}
+function leaveTitle(){if(!G.title||titleStep!=='start')return;unlock();sfx('bell');titleTo(SAVE.name?'mode':'name');}
 $('#startBtn').addEventListener('click',leaveTitle);
-addEventListener('keydown',e=>{if(G.title&&(e.key==='Enter'||e.key===' ')){e.preventDefault();leaveTitle();}});
+addEventListener('keydown',e=>{if(G.title&&titleStep==='start'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();leaveTitle();}});
+$('#stNameIn').addEventListener('keydown',e=>e.stopPropagation());
+$('#stName').addEventListener('submit',e=>{e.preventDefault();const n=cleanName($('#stNameIn').value);
+  if(n.length<2){$('#stNameMsg').textContent='Names need 2 to 16 letters or numbers.';sfx('ui');return;}
+  SAVE.name=n;SAVE.netName=n;persist();sfx('ui');$('#stNameIn').blur();
+  if(NET.ready&&NET.profile&&NET.profile.name!==n)saveNetName(n);titleTo('mode');});
+$('#stRename').addEventListener('click',()=>{sfx('ui');titleTo('name');});
+function finishTitle(online){G.title=false;SAVE.lastNet=online?1:0;persist();goHome();if(online)tpStart();else tpStop();}
+$('#stOff').addEventListener('click',()=>{sfx('bell');finishTitle(false);});
+$('#stOn').addEventListener('click',async()=>{
+  if(!FIREBASE_CONFIG){$('#stMsg').textContent='Online isn’t set up in this build yet. Play offline for now.';return;}
+  sfx('ui');$('#stOn').disabled=$('#stOff').disabled=true;$('#stMsg').textContent='Connecting to Harbor City…';
+  const ok=await netInit();
+  if(!G.title)return;
+  if(ok){sfx('bell');finishTitle(true);}
+  else{$('#stOn').disabled=$('#stOff').disabled=false;$('#stMsg').textContent=NET.err==='sdk'?'Couldn’t load the online service. Check your connection, or play offline.':'Couldn’t connect. Check your connection and try again, or play offline.';}
+});
 if(GIFT)setTimeout(()=>toast('Summon is open: 1,500 coins added for your first pulls.'),700);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>paintNeon());
 })();

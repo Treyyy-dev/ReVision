@@ -14,8 +14,12 @@ story mode, summons, events, raids and missions. Runs in the browser and on Andr
 
 ## Online setup (Firebase)
 
-Online play (casual and ranked) runs on a free Firebase project. Until it's connected,
-the Arena shows "not open yet".
+Online play runs on a free Firebase project: casual and ranked matches in the Arena, and the
+shared town (choose **Online** after Start to see other players walking around the plaza and
+inside buildings). Until it's connected, the Arena shows "not open yet".
+
+If you change `firebase/database.rules.json` (for example, the `town` section added for the
+shared town), paste it into **Realtime Database → Rules** again and press **Publish**.
 
 1. Go to [console.firebase.google.com](https://console.firebase.google.com) and add a project
    (Google Analytics is optional).
