@@ -132,6 +132,15 @@ body.ultcine #moves,body.ultcine #pauseBtn,body.ultcine.fighting #pad{visibility
 .nogl{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted)}
 #pauseBtn{position:absolute;z-index:3;left:50%;top:11.5%;transform:translateX(-50%);font-family:var(--display);font-size:11px;letter-spacing:.06em;color:var(--ink);background:rgba(22,15,42,.75);border:1px solid var(--line);border-radius:4px;padding:5px 12px;cursor:pointer}
 #pauseBtn:focus-visible{outline:2px solid var(--gold)}
+#pause .panel{max-width:min(760px,96%)}
+#pauseHelp{display:block;text-align:left}
+.pa-title{display:block;font-family:var(--display);font-size:18px;letter-spacing:.04em;margin:4px 0 6px;color:var(--gold)}
+@media (max-height:520px){#pause .panel>h2{display:none}#pause .pa-grid{max-height:52vh}}
+.pa-grid{width:100%;box-sizing:border-box;display:grid;grid-template-columns:minmax(90px,auto) minmax(0,1fr);gap:0;font-size:13px;border:1px solid var(--line);max-height:46vh;overflow:auto}
+.pa-row{display:contents}.pa-row>span{padding:5px 10px;border-bottom:1px solid rgba(75,59,124,.5)}.pa-row:nth-child(even)>span{background:rgba(36,26,68,.5)}
+.pa-head>span{position:sticky;top:0;background:#241a44!important;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pa-n{font-weight:700;color:#f6efe4}.pa-grid kbd{font:600 12px var(--body);background:#160f2a;border:1px solid var(--line);border-bottom-width:2px;padding:1px 6px;border-radius:3px}
+.pa-note{display:block;font-size:12px;color:var(--muted);margin-top:6px}
 body:not(.fighting) #pauseBtn{display:none}
 #cineSkip{position:absolute;z-index:6;right:14px;top:12px;font-family:var(--display);font-size:12px;letter-spacing:.06em;color:var(--ink);background:rgba(22,15,42,.75);border:1px solid var(--line);padding:7px 14px;cursor:pointer}
 #cineSkip:focus-visible{outline:2px solid var(--gold)}
@@ -3543,7 +3552,7 @@ function drawGestures(c){
     c.globalAlpha=a*0.7;c.strokeStyle='#fff6dc';c.lineWidth=7;c.beginPath();t.pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke();
     if(t.at&&t.label){c.globalAlpha=a;c.textAlign='center';c.textBaseline='middle';otext(c,t.label,clamp(t.at[0],60,W-60),clamp(t.at[1]-28,70,H-30),15,'#ffc94d',OUT,4);}t.life--;}
   G.trails=G.trails.filter(t=>t.life>0);
-  if(IS_TOUCH&&G.guideT>0&&G.mode==='fight'&&G.intro<=0){
+  if(false){
     G.guideT--;const a=Math.min(1,G.guideT/40);c.globalAlpha=a;
     const cols=G.kind==='pvp'?GUIDE_PVP:GUIDE_SOLO;
     cols.forEach((lines,i)=>{const x=i?W*0.52:W*0.04,w=W*0.44,y=H*0.4,h=26+lines.length*22;
@@ -3886,16 +3895,33 @@ function startMatch(){
   if(G.kind==='raid')G.timer=180;
   leaveTownView();introLayout();
   G.chal=pickChallenges();
-  G.trainT0=G.frame;Object.assign(G,{ult:null,mode:'fight',projs:[],fx:[],hitstop:0,freeze:0,freezeBy:null,shake:0,timer:150,tf:0,intro:INTRO_LEN,over:null,paused:false,banner:null,supBanner:null,guideT:300,trails:[]});
+  G.trainT0=G.frame;Object.assign(G,{ult:null,mode:'fight',projs:[],fx:[],hitstop:0,freeze:0,freezeBy:null,shake:0,timer:150,tf:0,intro:INTRO_LEN,over:null,paused:false,banner:null,supBanner:null,guideT:0,trails:[]});
   show(null);document.body.classList.add('fighting');document.body.classList.toggle('pvp',G.kind==='pvp');fit();
   if(document.activeElement)document.activeElement.blur();
 }
 
 /* pause */
+/* every action in a fight: what to do on touch, keyboard and controller */
+const PACTS=[
+  ['Walk',null,'l/r','\u2014 (dash instead)'],['Dash',null,'dl/dr','Swipe left or right'],['Jump',null,'u','Swipe up'],
+  ['Crouch',null,'crh','Swipe down and hold'],['Combo',null,'light','Tap'],['Air attack','Jump, then combo',null,'Swipe up, then tap'],
+  ['Low combo','Crouch, then combo',null,'Swipe down, then tap'],['Block',null,'blk','Hold two fingers'],
+  ['Counter','Block right as a hit lands',null,'Two fingers right as a hit lands'],
+  ['Special 1',null,'sp1','SP1 button · 1 bar'],['Special 2',null,'sp2','SP2 button · 1 bar'],['Ultimate',null,'ult','ULT button · 3 bars'],
+  ['Tag partner',null,'tag','Tap a teammate portrait'],['Assist',null,'ast','AST button'],
+  ['Quick get-up','Combo while knocked down',null,'Tap while knocked down'],['Pause',null,'pause','Pause button'],
+];
+function pauseActions(){
+  const B=SAVE.binds,kb=a=>a.split('/').map(k=>keyName(B.kb[k])).join(' / '),pd=a=>a.split('/').map(k=>padName(B.pad[k])).join(' / ');
+  const touch=IS_TOUCH,pad=!!PAD.name;
+  const kbc=!touch,pc=pad||!touch,cols=1+(touch?1:0)+(kbc?1:0)+(pc?1:0);
+  const head=`<div class="pa-row pa-head"><span>Action</span>${touch?'<span>Touch</span>':''}${kbc?'<span>Keyboard</span>':''}${pc?'<span>Controller</span>':''}</div>`;
+  const rows=PACTS.map(([name,how,act,tch])=>`<div class="pa-row"><span class="pa-n">${name}</span>${touch?`<span>${tch}</span>`:''}${kbc?`<span>${act?`<kbd>${esc(kb(act))}</kbd>`:esc(how)}</span>`:''}${pc?`<span>${act?esc(pd(act)):esc(how)}</span>`:''}</div>`).join('');
+  return `<span class="pa-title">Actions</span><span class="pa-grid" style="grid-template-columns:minmax(96px,auto) repeat(${cols-1},minmax(0,1fr))">${head}${rows}</span>`+(G.kind==='pvp'?`<span class="pa-note">${touch?'<b>Player 1</b> uses the left half of the screen, <b>Player 2</b> the right.':'Player 2 on the keyboard: arrows to move and jump, plus , . / ; \u2019 for combo, block and specials.'}</span>`:'')
+    +(touch&&!pad?'':`<span class="pa-note">Change keys and controller buttons in Menu \u203a Binds.</span>`);
+}
 function syncPauseButtons(){
-  $('#pauseHelp').innerHTML=IS_TOUCH?(G.kind==='pvp'?'<b>Player 1</b> uses the left half, <b>Player 2</b> the right. Tap to combo, swipe left or right to dash, up to jump, down to crouch. Hold two fingers to block; block right as a hit lands to counter. Tap a teammate portrait to tag.'
-    :'Tap to combo. Swipe left or right to dash, up to jump (tap in the air to attack), down to crouch (tap for a low combo). Hold two fingers to block; block right as a hit lands to counter-grab. Specials cost one bar, the ultimate all three. Tap a teammate portrait to tag.')
-    :'<b>Keys:</b> A D walk, Q E dash, W jump, S crouch, J combo, K block, L and I specials, O ultimate, U tag. Block right as a hit lands to counter.';
+  $('#pauseHelp').innerHTML=pauseActions();
   {const pc=$('#pauseChal');if(pc){pc.hidden=G.kind==='training'||!G.chal;pc.innerHTML=(G.chal||[]).map(id=>`<li>${esc(CHAL[id].t)}</li>`).join('');}}
   const tr=G.kind==='training';$('#dummyBtn').hidden=!tr;$('#meterBtn').hidden=!tr;
   $('#dummyBtn').textContent='Dummy: '+{stand:'Stand',block:'Block',cpu:'Fight'}[G.train.dummy];
