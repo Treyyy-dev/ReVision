@@ -282,6 +282,8 @@ body.pvp .mbtn .mn{display:none}
 .banner{position:relative;overflow:hidden;border:2px solid var(--bc,var(--gold));background:var(--panel)}
 .banner canvas{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:12/5}
 .btn.fest{background:linear-gradient(90deg,#7a3ad8,#c58bff);color:#fff}
+.block-tag{position:absolute;top:12px;right:54px;z-index:2;font-family:var(--display);font-size:13px;letter-spacing:.08em;color:#fff;background:rgba(22,15,42,.85);border:2px solid #fff;padding:5px 10px}
+.btn.block{background:var(--plum);color:var(--muted);opacity:1;cursor:not-allowed}
 .binfo-btn{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;display:grid;place-items:center;font:italic 700 20px Georgia,serif;color:#fff;background:rgba(22,15,42,.82);border:2px solid #fff;cursor:pointer;padding:0}
 .binfo-btn:hover,.binfo-btn:focus-visible{background:var(--bc,var(--gold));color:#160f2a;outline:none}
 .bi-grid{list-style:none;margin:6px 0 16px;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
@@ -1060,8 +1062,8 @@ const EVENTS=[
   rewText:'450 Rebucks · 60 XP',rew:{coins:450,xp:60},
   foes:(P1,avg)=>['ozzy','bastion','bruno'].map(id=>({i:RIDX(id),c:2,lv:evLv(avg),st:1+Math.floor(evLv(avg)/12)}))},
  {id:'fest',name:'Vision Festival',days:[3,4,6],col:'#c58bff',stage:'shrine',diff:'hard',
-  desc:'Three Vision fighters hold the festival grounds. Win and you get a free Festival summon with an 8% Vision rate.',
-  rewText:'1 free Festival summon (8% Vision) · 120 Rebucks · 120 XP',rew:{coins:120,xp:120,fest:1},
+  desc:'Three Vision fighters hold the festival grounds. Beat them for the festival purse.',
+  rewText:'400 Rebucks · 300 XP',rew:{coins:400,xp:300},
   foes:(P1,avg)=>randFoes(ROSTER.map((d,i)=>d.rarity==='legend'?i:-1).filter(i=>i>=0),3).map(i=>({i,c:0,lv:evLv(avg),st:1+Math.floor(evLv(avg)/12)}))},
  {id:'titan',name:'Titan Night',days:[1,3,5],col:'#ff6b4a',stage:'subway',diff:'normal',
   desc:'Three giants walk the underground tonight: bigger, tougher, with 60% more health and 10% more power.',
@@ -1102,9 +1104,9 @@ const weekIndex=d=>Math.round(weekStart(d).getTime()/(7*DAY));
 const raidBoss=()=>RAIDS[weekIndex()%RAIDS.length];
 function raidDef(r){const b=ROSTER[RIDX(r.id)];return Object.assign({},b,{name:r.name+' \u00b7 '+b.name.split(' ')[0],hp:b.hp*7,power:b.power*1.25,scale:b.scale*1.32,speed:b.speed*0.95});}
 const MISSIONS={
- daily:[{id:'d1',text:'Win 3 fights',stat:'wins',n:3,r:{coins:150}},{id:'d2',text:'Use 5 specials',stat:'specials',n:5,r:{coins:100}},{id:'d3',text:'Land a 10-hit combo',stat:'combo10',n:1,r:{coins:30}},{id:'d4',text:'Summon once',stat:'summons',n:1,r:{coins:100}},{id:'d5',text:'Counter 2 attacks',stat:'counters',n:2,r:{coins:30}}],
- weekly:[{id:'w1',text:'Win 15 fights',stat:'wins',n:15,r:{coins:150}},{id:'w2',text:'Beat a raid boss',stat:'raids',n:1,r:{coins:120}},{id:'w3',text:'Use 5 ultimates',stat:'ults',n:5,r:{coins:600}},{id:'w4',text:'Summon 10 times',stat:'summons',n:10,r:{coins:90}},{id:'w5',text:'Knock out 40 fighters',stat:'kos',n:40,r:{coins:800}}],
- monthly:[{id:'m1',text:'Win 60 fights',stat:'wins',n:60,r:{coins:600}},{id:'m2',text:'Beat 4 raid bosses',stat:'raids',n:4,r:{coins:450}},{id:'m3',text:'Summon 50 times',stat:'summons',n:50,r:{coins:360}},{id:'m4',text:'Land 30 combos of 10+ hits',stat:'combo10',n:30,r:{coins:3000}},{id:'m5',text:'Clear 20 story chapters (replays count)',stat:'chapters',n:20,r:{coins:300}}],
+ daily:[{id:'d1',text:'Win 3 fights',stat:'wins',n:3,r:{coins:150}},{id:'d2',text:'Use 5 specials',stat:'specials',n:5,r:{coins:100}},{id:'d3',text:'Land a 10-hit combo',stat:'combo10',n:1,r:{coins:30}},{id:'d4',text:'Win an event fight',stat:'events',n:1,r:{coins:100}},{id:'d5',text:'Counter 2 attacks',stat:'counters',n:2,r:{coins:30}}],
+ weekly:[{id:'w1',text:'Win 15 fights',stat:'wins',n:15,r:{coins:150}},{id:'w2',text:'Beat a raid boss',stat:'raids',n:1,r:{coins:120}},{id:'w3',text:'Use 5 ultimates',stat:'ults',n:5,r:{coins:600}},{id:'w4',text:'Win 5 event fights',stat:'events',n:5,r:{coins:90}},{id:'w5',text:'Knock out 40 fighters',stat:'kos',n:40,r:{coins:800}}],
+ monthly:[{id:'m1',text:'Win 60 fights',stat:'wins',n:60,r:{coins:600}},{id:'m2',text:'Beat 4 raid bosses',stat:'raids',n:4,r:{coins:450}},{id:'m3',text:'Win 20 event fights',stat:'events',n:20,r:{coins:360}},{id:'m4',text:'Land 30 combos of 10+ hits',stat:'combo10',n:30,r:{coins:3000}},{id:'m5',text:'Clear 20 story chapters (replays count)',stat:'chapters',n:20,r:{coins:300}}],
 };
 function periodKey(p,d){d=d||new Date();const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
   if(p==='daily')return `${y}-${m}-${dd}`;if(p==='monthly')return `${y}-${m}`;return 'W'+weekIndex(d);}
@@ -1134,6 +1136,9 @@ SAVE.binds={kb:Object.assign({},DEF_KB,(SAVE.binds&&SAVE.binds.kb)||{}),pad:Obje
 SAVE.set=Object.assign({fps:60,music:0.6},SAVE.set||{});
 if(SAVE.tokens>0){SAVE.coins=(SAVE.coins|0)+Math.round(SAVE.tokens*3);SAVE.tokens=0;}SAVE.stars=SAVE.stars||{};SAVE.lv=SAVE.lv||{};SAVE.plv=(SAVE.plv&&SAVE.plv.lv)?SAVE.plv:{lv:1,xp:0};SAVE.tokens=SAVE.tokens||0;SAVE.teams=SAVE.teams||[];while(SAVE.teams.length<8)SAVE.teams.push([]);SAVE.mis=SAVE.mis||{};
 let GIFT=false;if(!SAVE.summonGift){SAVE.summonGift=1;SAVE.coins+=1500;GIFT=true;try{localStorage.setItem(SAVE_KEY,JSON.stringify(SAVE));}catch(e){}}
+/* every fighter is unlocked for everyone (new fighters too), and the summon banners are locked */
+const SUMMON_LOCKED=true;
+{let add=0;for(const d of ROSTER)if(!SAVE.owned.includes(d.id)){SAVE.owned.push(d.id);SAVE.stars[d.id]=SAVE.stars[d.id]||1;add++;}if(add)try{localStorage.setItem(SAVE_KEY,JSON.stringify(SAVE));}catch(e){}}
 const starRow=st=>{let h='';for(let i=0;i<7;i++)h+=i<st-7?'<b class="st2">\u2605</b>':i<st?'\u2605':'\u2606';return h;};
 const MAX_LV=60,MAX_STARS=14,xpNeed=lv=>30+lv*14;
 const lvOf=id=>(SAVE.lv[id]&&SAVE.lv[id].lv)||1;
@@ -4222,6 +4227,7 @@ function showResult(){
     sub=reason||(win?'Rival crew knocked out':'Your crew was knocked out');
     if(k==='vs'){coins=win?{easy:60,normal:90,hard:130}[G.diff]:20;xpGain=win?{easy:40,normal:60,hard:90}[G.diff]:15;btns=[['Rematch',startMatch],['New team',()=>openDraft('vs')],['Town',goHome]];}
     if(k==='event'){const E=G.evb,R=E.rew;
+      if(win)track('events');
       if(win&&evWinsLeft(E)>0){evWinUse(E);coins=R.coins||0;xpGain=(R.xp||0)*(R.xpMul||1);G.evPx=R.pxpMul||1;
         if(R.fest){SAVE.festPulls=(SAVE.festPulls|0)+R.fest;}
         text=`${E.name} cleared! ${E.rewText}.${R.fest?' Your free Festival summon is waiting in Summon.':''} ${evWinsLeft(E)?evWinsLeft(E)+' more rewarded '+(evWinsLeft(E)===1?'win':'wins')+' today.':'That was the last rewarded win today.'}`;}
@@ -4372,10 +4378,10 @@ let curBanner=0,lastPull=1;
 function openSummon(){toHub();if(!openBanners().includes(BANNERS[curBanner]))curBanner=BANNERS.indexOf(todayBanner());renderBannerList();show('#summon');}
 function bannerRates(b){return 'Vision 5% · Improved 25% · Fresh 70%'+(b.feat.length?' · featured fighters take half of their tier':'')+(COS_POOL[b.id]?` · Bonus: ${Math.round(COS_RATE*100)}% per pull for a profile icon or banner (${cosLeft(b).length} left here)`:'');}
 function renderBannerList(){
-  const L=$('#blist');L.innerHTML='';BSHOW.cards=[];BSHOW.day=bannerDay();
+  const L=$('#blist');L.innerHTML='';if(SUMMON_LOCKED){const sb=$('#summon .sub');if(sb)sb.textContent='The banners are locked for now. Every fighter in the league is already on your roster. You can still watch the featured fighters show off and tap the i box to see everything on a banner.';}BSHOW.cards=[];BSHOW.day=bannerDay();
   openBanners().forEach(b=>{const i=BANNERS.indexOf(b),daily=!!b.feat.length;const card=document.createElement('article');card.className='bcard';card.id='bcard-'+i;card.style.setProperty('--bc',b.col);
-    card.innerHTML=`<div class="banner"><canvas width="960" height="400" aria-hidden="true"></canvas><button type="button" class="binfo-btn" aria-label="Everything you can pull on ${esc(b.name)}">i</button><div class="bcopy"><p class="eyebrow">${daily?'Today’s banner · <span class="bnext">new one in '+untilNextBanner()+'</span>':'Always open · standard'}</p><h3>${esc(b.name)}</h3><p>${esc(b.sub)}</p><p class="rates">${bannerRates(b)}</p></div></div>
-      <div class="row sumrow"><button class="btn alt" type="button" data-n="1" ${SAVE.coins<100?'disabled':''}>Summon ×1 · 100 Rebucks</button><button class="btn" type="button" data-n="10" ${SAVE.coins<1000?'disabled':''}>Summon ×10 · 1,000 Rebucks</button>${(SAVE.festPulls|0)>0?`<button class="btn fest" type="button" data-n="1" data-fest="1">Festival summon · free · 8% Vision (${SAVE.festPulls})</button>`:''}</div>`;
+    card.innerHTML=`<div class="banner"><canvas width="960" height="400" aria-hidden="true"></canvas><button type="button" class="binfo-btn" aria-label="Everything you can pull on ${esc(b.name)}">i</button>${SUMMON_LOCKED?'<span class="block-tag">\ud83d\udd12 LOCKED</span>':''}<div class="bcopy"><p class="eyebrow">${daily?'Today’s banner · <span class="bnext">new one in '+untilNextBanner()+'</span>':'Always open · standard'}</p><h3>${esc(b.name)}</h3><p>${esc(b.sub)}</p><p class="rates">${bannerRates(b)}</p></div></div>
+      ${SUMMON_LOCKED?'<div class="row sumrow"><button class="btn block" type="button" disabled>\ud83d\udd12 Banner locked</button></div><!--':''}<div class="row sumrow"><button class="btn alt" type="button" data-n="1" ${SAVE.coins<100?'disabled':''}>Summon ×1 · 100 Rebucks</button><button class="btn" type="button" data-n="10" ${SAVE.coins<1000?'disabled':''}>Summon ×10 · 1,000 Rebucks</button>${(SAVE.festPulls|0)>0?`<button class="btn fest" type="button" data-n="1" data-fest="1">Festival summon · free · 8% Vision (${SAVE.festPulls})</button>`:''}${SUMMON_LOCKED?'-->':''}</div>`;
     const cv=card.querySelector('canvas');paintBanner(b,cv);
     BSHOW.cards.push({b,cv,ids:(b.feat.length?b.feat:b.show).slice(0,2),cur:0,t:0,bg:null});
     card.querySelector('.binfo-btn').addEventListener('click',()=>{sfx('ui');openBannerInfo(b);});
@@ -4603,6 +4609,7 @@ function rollOne(b,guar,fest){
 }
 let lastTok=false,lastFest=false;
 function doSummon(n,tok,fest){
+  if(SUMMON_LOCKED){toast('The banners are locked. Every fighter is already on your roster.');return;}
   n=n===10?10:1;tok=false;if(fest){n=1;if((SAVE.festPulls|0)<1)return;}
   const cost=fest?0:n===10?1000:100,have=SAVE.coins;if(have<cost){toast('Not enough Rebucks yet. Win fights, clear missions, events and raid bosses to earn more.');return;}
   unlock();if(fest)SAVE.festPulls--;else SAVE.coins-=cost;lastPull=n;lastTok=false;lastFest=!!fest;track('summons',n);const b=BANNERS[curBanner],res=[];
@@ -4711,10 +4718,10 @@ function purchaseTokens(pack){
 const EXCHANGE=[{id:'x1',tokens:50,coins:500},{id:'x2',tokens:200,coins:2200},{id:'x3',tokens:500,coins:6000}];
 function renderShop(){
   $('#packs').innerHTML=TOKEN_PACKS.map(p=>`<div class="pack">${p.tag?`<span class="ptag">${p.tag}</span>`:''}<p class="pt">${(p.tokens*3).toLocaleString()} Rebucks</p><p class="pb">${p.bonus||'Starter pack'}</p><button type="button" class="buy" id="pk-${p.id}" data-id="${p.id}">${p.price}</button></div>`).join('');
-  $('#exch').innerHTML=`<div class="pack"><p class="pt">Summon ×10</p><p class="pb">on any banner</p><button type="button" class="buy" id="ex-sum">1,000 Rebucks</button></div>`;
+  $('#exch').innerHTML=SUMMON_LOCKED?`<div class="pack"><p class="pt">All fighters</p><p class="pb">already on your roster</p><button type="button" class="buy" disabled>Unlocked</button></div>`:`<div class="pack"><p class="pt">Summon ×10</p><p class="pb">on any banner</p><button type="button" class="buy" id="ex-sum">1,000 Rebucks</button></div>`;
   document.querySelectorAll('#packs .buy').forEach(b=>b.addEventListener('click',()=>purchaseTokens(TOKEN_PACKS.find(p=>p.id===b.dataset.id))));
 
-  $('#ex-sum').addEventListener('click',()=>{sfx('ui');openSummon();});
+  if($('#ex-sum'))$('#ex-sum').addEventListener('click',()=>{sfx('ui');openSummon();});
 }
 
 /* home */
@@ -5092,9 +5099,9 @@ const NPCS=[
  {key:'story',who:'doc',role:'Story',place:'Story Hall',act:'Continue the story',go:()=>openStory(),
   say:()=>SAVE.cleared>=STORY.length?'You finished every chapter. Old stories are still worth replaying, and they still pay XP.':`Ah, you made it. ${PARTS[STORY[SAVE.cleared].part]} is where your crew stands. Next up is Chapter ${SAVE.cleared+1}, ${STORY[SAVE.cleared].name}.`,
   mark:()=>SAVE.cleared<STORY.length},
- {key:'summon',who:'mei',role:'Summon',place:'Summon Shrine',act:'Open the banners',go:()=>openSummon(),
-  say:()=>`Today’s banner is ${todayBanner().name}, with ${todayBanner().feat.map(id=>ROSTER[RIDX(id)].name.split(' ')[0]).join(' and ')}. A new one arrives in ${untilNextBanner()}.${(SAVE.festPulls|0)>0?` You have ${SAVE.festPulls} free Festival summon${SAVE.festPulls>1?'s':''} waiting.`:''} You have ${SAVE.coins.toLocaleString()} Rebucks.`,
-  mark:()=>SAVE.coins>=100},
+ {key:'summon',who:'mei',role:'Summon',place:'Summon Shrine',act:'See the banners',go:()=>openSummon(),
+  say:()=>SUMMON_LOCKED?`The banners are locked for now. Every fighter in the league already answers to your crew, so go train them. Today\u2019s showcase is ${todayBanner().name}.`:`Today’s banner is ${todayBanner().name}, with ${todayBanner().feat.map(id=>ROSTER[RIDX(id)].name.split(' ')[0]).join(' and ')}. A new one arrives in ${untilNextBanner()}.${(SAVE.festPulls|0)>0?` You have ${SAVE.festPulls} free Festival summon${SAVE.festPulls>1?'s':''} waiting.`:''} You have ${SAVE.coins.toLocaleString()} Rebucks.`,
+  mark:()=>!SUMMON_LOCKED&&SAVE.coins>=100},
  {key:'events',who:'ozzy',role:'Events',place:'Event Hall',act:'See the events',go:()=>openEvents(),
   say:()=>{const l=liveEvents();return `Listen up, Harbor City! ${l.length?l.map(e=>e.name).join(', ')+(l.length>1?' are':' is')+' live right now. Win them for big rewards!':'No events right now.'} This week’s raid boss is ${raidBoss().name}. Think your crew can take it?`;},
   mark:()=>liveEvents().length>0},
@@ -6375,7 +6382,7 @@ $('#stOn').addEventListener('click',async()=>{
   if(ok){sfx('bell');finishTitle(true);}
   else{$('#stOn').disabled=$('#stOff').disabled=false;$('#stMsg').textContent=(NET.why||'Couldn’t connect.')+' You can still play offline.';}
 });
-if(GIFT)setTimeout(()=>toast('Summon is open: 1,500 Rebucks added for your first pulls.'),700);
+if(GIFT)setTimeout(()=>toast('Welcome to Harbor City! Every fighter is unlocked, and 1,500 Rebucks are yours to spend.'),700);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>paintNeon());
 })();
 </script>
