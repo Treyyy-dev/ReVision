@@ -3225,8 +3225,8 @@ const talkSide=()=>{if(!G.teams||!G.talk||G.intro<=0)return -1;const e=introE()-
 function talkStep(e){
   if(e===0){introLayout();G.teams.forEach((tm,ti)=>tm.members.forEach((m,i)=>{m.state='idle';m.t=0;m.tx0=null;if(ti>1||i!==tm.active){m.x=W/2+(tm.side?1:-1)*4200;m.introGone=false;}}));}
   const side=e<TALK_EACH?0:1,te=e%TALK_EACH,tm=G.teams[side],f=active(tm),dir=side?-1:1,other=active(G.teams[1-side]);
-  if(te===0){other.x=W/2+(other.team.side?1:-1)*4200;if(f.tx0==null)f.tx0=f.x;f.x=f.tx0-dir*190;f.face=dir;f.yawOv=null;f.state='walk';f.t=0;}
-  if(te<46){f.x=lerp(f.tx0-dir*190,f.tx0,te/45);f.walkT+=1.15;f.state='walk';f.vx=7;f.face=dir;}
+  if(te===0){other.x=W/2+(other.team.side?1:-1)*4200;if(f.tx0==null)f.tx0=f.x;f.x=f.tx0-dir*190;f.face=dir;f.yawOv=null;f.state='introwalk';f.t=0;}
+  if(te<46){f.x=lerp(f.tx0-dir*190,f.tx0,te/45);f.walkT+=0.7;f.state='introwalk';f.vx=4;f.face=dir;}
   else if(te===46){f.x=f.tx0;f.vx=0;f.state='idle';f.t=0;f.face=dir;sfx('ui');}
   for(const T of G.teams)for(const m of T.members){m.t++;updatePose(m);}
 }
@@ -3525,6 +3525,7 @@ function targetPose(f){
   const t=f.t,id=f.def.id;
   switch(f.state){
     case 'idle':{if(f.town&&f.tpose)return f.tpose;if(f.town)return townIdlePose(f);const p=idlePose(id,G.frame+(f.team&&f.team.side?97:0));if(f.landT>0)p.drop+=f.landT*2.2;return p;}
+    case 'introwalk':{const q=townWalkPose(f);if(f.def.weapon&&!isGun(f.def))q.fa=[-18,-12];return q;}
     case 'walk':{if(f.town&&f.tpose)return f.tpose;if(f.town){const q=f.sprint?townSprintPose(f):townWalkPose(f);if(f.def.weapon&&!isGun(f.def)){q.fa=f.sprint?[-30,-20]:[-18,-12];}return q;}const fwd=Math.sign(f.vx||0)===f.face,ph=f.walkT*0.24,s=Math.sin(ph),c=Math.cos(ph),b=IDLE[id]||P.idle,p=cp(b),st=fwd?20:13;
       p.bl=[-14+s*st,-6+s*st*0.6];p.fl=[20-s*st,6-s*st*0.6];p.lb=Math.max(0,c)*9;p.lf=Math.max(0,-c)*9;
       p.drop=Math.max(3,b.drop*0.6)+Math.abs(c)*3;p.lean+=fwd?4:-3;p.tw=s*(fwd?9:4);p.hx=(fwd?2:-2)+c*1.5;
