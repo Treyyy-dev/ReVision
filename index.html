@@ -218,6 +218,49 @@ body.land .logo{font-size:clamp(40px,8.5vh,92px)}
 .foes b{color:var(--ink)}
 
 .sel{max-width:1060px;display:flex;flex-direction:column;gap:10px}
+#select.csel{padding:0;background:#000;overflow:hidden}
+.cs-wrap{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:100%;min-height:100%;max-width:1280px;margin:0 auto}
+.cs-top{display:flex;align-items:center;gap:12px;padding:8px max(14px,env(safe-area-inset-right,0px)) 0 max(14px,env(safe-area-inset-left,0px))}
+.cs-top .ttl h2{font-size:clamp(18px,2.6vw,26px)}
+.cs-timer{font-family:var(--display);font-size:26px;color:var(--gold);margin:0 0 0 auto;min-width:48px;text-align:center}
+.cs-timer.low{color:var(--coral)}
+.cs-stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,280px) minmax(0,1fr);align-items:stretch;min-height:0;padding:0 10px;gap:8px;overflow:hidden}
+.cs-side{position:relative;display:flex;flex-direction:column;align-items:center;min-height:0;justify-content:flex-end;overflow:hidden}
+.cs-meta{position:absolute;left:0;right:0;bottom:4px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
+.cs-meta .cs-team{pointer-events:auto}
+.cs-side canvas.big{height:100%;max-height:520px;min-height:0;width:auto;max-width:100%;aspect-ratio:4/5;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,.65));margin-bottom:-6%}
+.cs-side.right canvas.big{transform:scaleX(-1)}
+.cs-tag{font-family:var(--display);font-size:12px;letter-spacing:.08em;padding:1px 8px;color:#fff}
+.p1t{background:#ff5a3a}.p2t{background:#3aa8ff}
+.cs-tag.ready::after{content:" · READY"}
+.cs-name{font-family:var(--display);font-size:clamp(16px,3vw,32px);letter-spacing:.06em;text-transform:uppercase;margin:0;line-height:1;color:#fff;text-shadow:0 2px 0 #000,0 0 14px rgba(0,0,0,.9);text-align:center}
+.cs-who{font-size:11px;color:#e8e2f4;margin:0 0 3px;letter-spacing:.08em;text-transform:uppercase;text-align:center;text-shadow:0 1px 2px #000}
+.cs-team{display:flex;gap:6px}
+.cs-slot{width:clamp(36px,4.6vw,50px);aspect-ratio:1;border:2px solid var(--line);background:rgba(22,15,42,.85);display:grid;place-items:center;position:relative;padding:0;color:var(--muted);font-family:var(--display);font-size:18px}
+.cs-slot canvas{width:100%;height:100%;display:block}
+.cs-slot.lead{border-color:var(--gold)}
+.cs-mid{display:flex;flex-direction:column;gap:8px;align-items:stretch;justify-content:flex-end;padding-bottom:6px;text-align:center}
+.cs-mid .sub{font-size:13px;max-height:9.5em;overflow:auto;text-shadow:0 1px 0 #000}
+.cs-mid .diff{justify-content:center}
+.cs-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;padding:8px 10px max(10px,env(safe-area-inset-bottom,0px));background:#000;border-top:1px solid #1e1e24}
+.cs-tile{position:relative;width:clamp(42px,5.9vw,68px);aspect-ratio:1;padding:0;border:2px solid #4a6a4a;background:#0f0b1c;cursor:pointer}
+.cs-tile canvas{width:100%;height:100%;display:block}
+.cs-tile.r-legend{border-color:#8a5ad8}.cs-tile.r-epic{border-color:#3a7ad0}
+.cs-tile:hover,.cs-tile:focus-visible{transform:translateY(-2px);outline:2px solid #fff;outline-offset:1px;z-index:1}
+.cs-tile.p1{box-shadow:0 0 0 3px #ff5a3a,0 0 14px rgba(255,90,58,.7)}
+.cs-tile.p2{box-shadow:0 0 0 3px #3aa8ff,0 0 14px rgba(58,168,255,.6)}
+.cs-tile.p1.p2{box-shadow:0 0 0 3px #ff5a3a,0 0 0 6px #3aa8ff}
+.cs-b1,.cs-b2{position:absolute;top:1px;font:700 10px var(--body);padding:0 4px;color:#fff;display:none;z-index:1}
+.cs-b1{left:1px;background:#ff5a3a}.cs-b2{right:1px;background:#3aa8ff}
+.cs-tile.p1 .cs-b1,.cs-tile.p2 .cs-b2{display:block}
+.cs-nm{position:absolute;left:0;right:0;bottom:0;font:600 9px var(--body);background:rgba(0,0,0,.62);color:#fff;text-align:center;white-space:nowrap;overflow:hidden;line-height:1.4}
+@media (max-height:460px){.cs-mid .sub{display:none}.cs-mid{gap:6px}.cs-mid .btn{padding:8px 12px;font-size:14px}.cs-tile{width:clamp(34px,4.6vw,48px)}.cs-nm{font-size:8px}.cs-top{padding-top:4px}.cs-top .eyebrow{display:none}.cs-slot{width:34px}}
+.fgal{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.fgal button{display:flex;flex-direction:column;align-items:stretch;padding:0;background:var(--panel);border:2px solid #4a6a4a;color:var(--ink);cursor:pointer;text-align:left}
+.fgal button.r-epic{border-color:#3a7ad0}.fgal button.r-legend{border-color:#8a5ad8}
+.fgal canvas{width:100%;aspect-ratio:1;display:block;background:#f8f7f3}
+.fgal b{font-family:var(--display);font-weight:400;font-size:14px;padding:5px 7px 0}
+.fgal span{font-size:11px;color:var(--muted);padding:0 7px 6px}
 .roster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 @media (min-width:760px){.roster{grid-template-columns:repeat(9,minmax(0,1fr))}}
 body.land .roster{grid-template-columns:repeat(9,minmax(0,1fr))}
@@ -722,16 +765,13 @@ body.fighting #townFade{display:none}
       </div>
     </section>
 
-    <section id="select" class="overlay" hidden>
-      <div class="sel">
-        <header class="bar"><button class="back" type="button" id="selBack">‹ Back</button><div class="ttl"><p class="eyebrow" id="selEyebrow"></p><h2 id="selTitle"></h2></div><p class="coins" data-coins>0</p></header>
-        <p class="sub" id="selSub"></p>
-        <div class="row teamrow" id="savedTeams"></div>
-        <div class="roster" id="roster"></div>
-        <div class="sel-bottom">
-          <div class="detail" id="detail"></div>
-          <div class="side">
-            <div class="slots" id="slots"></div>
+    <section id="select" class="overlay csel" hidden>
+      <div class="cs-wrap">
+        <div class="cs-top"><button class="back" type="button" id="selBack">‹ Back</button><div class="ttl"><p class="eyebrow" id="selEyebrow"></p><h2 id="selTitle"></h2></div><p class="cs-timer" id="selTimer" hidden></p><p class="coins" data-coins>0</p></div>
+        <div class="cs-stage">
+          <div class="cs-side left"><canvas class="big" id="csL" width="320" height="400" aria-hidden="true"></canvas><div class="cs-meta"><span class="cs-tag p1t" id="csLTag">P1</span><p class="cs-name" id="csLName"></p><p class="cs-who" id="csLWho"></p><div class="cs-team" id="csLTeam"></div></div></div>
+          <div class="cs-mid">
+            <p class="sub" id="selSub"></p>
             <div class="diff" id="diff" role="group" aria-label="CPU difficulty">
               <button type="button" id="d-easy" data-d="easy" aria-pressed="false">Easy</button>
               <button type="button" id="d-normal" data-d="normal" aria-pressed="true">Normal</button>
@@ -742,9 +782,12 @@ body.fighting #townFade{display:none}
               <button type="button" id="dm-block" data-m="block" aria-pressed="false">Block</button>
               <button type="button" id="dm-cpu" data-m="cpu" aria-pressed="false">Fight</button>
             </div>
+            <button class="btn alt" id="lastBtn" type="button">Last team</button>
             <button class="btn" id="goBtn" type="button" disabled>Fight</button>
           </div>
+          <div class="cs-side right"><canvas class="big" id="csR" width="320" height="400" aria-hidden="true"></canvas><div class="cs-meta"><span class="cs-tag p2t" id="csRTag">CPU</span><p class="cs-name" id="csRName"></p><p class="cs-who" id="csRWho"></p><div class="cs-team" id="csRTeam"></div></div></div>
         </div>
+        <div class="cs-grid" id="csGrid" role="group" aria-label="Fighters"></div>
       </div>
     </section>
 
@@ -761,7 +804,7 @@ body.fighting #townFade{display:none}
 
     <section id="collection" class="overlay" hidden>
       <div class="screen">
-        <header class="bar"><button class="back" type="button" id="collBack">‹ Back</button><div class="ttl"><p class="eyebrow">Characters</p><h2>Teams</h2></div><p class="coins" data-coins>0</p></header>
+        <header class="bar"><button class="back" type="button" id="collBack">‹ Back</button><div class="ttl"><p class="eyebrow">Dojo</p><h2>Fighters</h2></div><p class="coins" data-coins>0</p></header>
         <div id="charTeams"></div>
       </div>
     </section>
@@ -4046,91 +4089,105 @@ $('#siGo').addEventListener('click',()=>{sfx('ui');openDraft('story');});
 $('#siBack').addEventListener('click',openStory);
 $('#storyBack').addEventListener('click',goHome);
 
-/* draft */
-const draft={kind:'vs',step:1,p1:[],p2:[]};
+/* ---------- character select: pick from the roster before every match ----------
+   Offline, your fighters fill the left side and the right side shows who you face.
+   Online, matchmaking comes first; then both players pick live and see each other's picks. */
+const draft={kind:'vs',step:1,p1:[],p2:[],hov:[null,null],live:null};
 const curPicks=()=>draft.step===1?draft.p1:draft.p2;
-function draftFromTeams(){}
+const needN=()=>isCoopDraft()?2:3;
 function openDraft(kind){
-  toHub();
-  if(draft.kind!==kind){draft.p1=[];draft.p2=[];}
-  draft.kind=kind;draft.step=1;
-  draft.p1=draft.p1.filter(i=>owns(ROSTER[i].id));draft.p2=draft.p2.filter(i=>owns(ROSTER[i].id));
-  G.kind=kind;
+  toHub();liveStop();draft.live=null;
+  draft.kind=kind;draft.step=1;draft.p1=[];draft.p2=[];draft.hov=[null,null];G.kind=kind;
   renderDraft();show('#select');
 }
-function renderDraft(){
+const lastTeamIdx=()=>((SAVE.teams&&SAVE.teams[0])||[]).filter(id=>id&&owns(id)).map(id=>RIDX(id));
+function foeInfo(){
   const k=draft.kind;
-  const head={vs:['Sparring','Choose your team','Flip through your saved teams with the arrows. The fighter marked STARTS opens the fight; the other two heal on the bench.'],
-    story:[`Story · Chapter ${G.chapter+1}`,STORY[G.chapter]?STORY[G.chapter].name:'',`Choose one of your teams to face ${STORY[G.chapter]?STORY[G.chapter].foes.map(id=>ROSTER[RIDX(id)].name.split(' ')[0]).join(', '):''}.`],
-    training:['Training Hall','Choose your team','Practice against a sparring partner with no timer. Its health never drops, so you can drill combos forever. It stands still by default; change that below or from the pause menu.'],
+  if(k==='story'&&STORY[G.chapter]){const ch=STORY[G.chapter];return {tag:'CPU',who:'Story · Chapter '+(G.chapter+1),ids:ch.foes.slice(0,3),lv:ch.lvl};}
+  if(k==='raid'&&G.raid)return {tag:'BOSS',who:'Raid boss · '+G.raid.tier.name,ids:[G.raid.boss.id],name:G.raid.boss.name,lv:G.raid.tier.lv};
+  if(k==='event'&&G.evb){const fixed={coin:['ozzy','bastion','bruno'],legends:['warden','ren','saya']}[G.evb.id];return {tag:'CPU',who:'Event · '+G.evb.name,ids:G.evb.id==='mirror'?draft.p1.map(i=>ROSTER[i].id):fixed||null};}
+  if(k==='training')return {tag:'CPU',who:'Training partner',ids:null};
+  return {tag:'CPU',who:'Rival crew · '+(G.vsDiff||'normal'),ids:null};
+}
+function renderDraft(){
+  const k=draft.kind,L=draft.live;
+  const head={vs:['Sparring','Pick your fighters','Tap three fighters from the roster. The first one you pick starts the fight. Hold a fighter to see their moves and costumes.'],
+    story:[`Story · Chapter ${G.chapter+1}`,STORY[G.chapter]?STORY[G.chapter].name:'','Pick three fighters to take on this chapter’s crew. Your first pick starts the fight.'],
+    training:['Training Hall','Pick your fighters','Practice against a partner with no timer. Its health never drops, so drill combos forever.'],
     event:['Event',G.evb?G.evb.name:'',G.evb?`${G.evb.desc} Win reward: ${G.evb.rewText}${evWinsLeft(G.evb)?` (${evWinsLeft(G.evb)} left today)`:' (collected today)'}.`:''],
-    raid:['Raid boss',G.raid?`${G.raid.boss.name} \u00b7 ${G.raid.tier.name}`:'',G.raid?`Choose a team to face a giant boss at Lv ${G.raid.tier.lv}. It has seven times the health of a normal fighter and fights alone.`:''],
-    online:isCoopMode(G.netMode)?[`Online \u00b7 Co-op \u00b7 ${coopModeName(G.netMode)}`,'Pick your duo','Co-op teams have two fighters. Choose Team 7 or 8, then you and an online teammate fight side by side, at your fighters\u2019 own levels and stars.']
-      :[`Online \u00b7 PvP \u00b7 ${G.netMode==='ranked'?'Ranked':'Casual'}`,'Pick your team',G.netMode==='ranked'?'Ranked uses your fighters\u2019 own levels and stars. Win to climb the ladder.':'Casual puts every fighter at max power, Lv 60 and 14\u2605, so it comes down to skill.'],
-    pvp:['2 players',`Player ${draft.step}: choose a team`,draft.step===1?'Player 1 picks first, then hands over. On keyboard, P1 uses WASD + J K L I U; P2 uses the arrows + , . / ; ’.':'Player 2, choose a team. You can use the same team as Player 1.']}[k];
+    raid:['Raid boss',G.raid?`${G.raid.boss.name} · ${G.raid.tier.name}`:'',G.raid?`Pick three fighters to face a giant boss at Lv ${G.raid.tier.lv}. It has seven times the health of a normal fighter.`:''],
+    online:L?[`Online · ${L.coop?'Co-op · '+coopModeName(G.netMode):G.netMode==='ranked'?'Ranked':'Casual'}`,L.coop?'Pick your duo':'Pick your team',L.coop?`You and ${L.opp.name||'your teammate'} pick two fighters each. You can see each other’s picks live.`:`${L.opp.name||'Your rival'} is picking right now. Watch their picks on the right, then lock in.`]:['Online','',''],
+    pvp:['2 players',draft.step===1?'Player 1 picks':'Player 2 picks',draft.step===1?'Player 1, tap three fighters. Then Player 2 picks on the right.':'Player 2, tap three fighters. You can pick the same fighters as Player 1.']}[k]||['','',''];
   $('#selEyebrow').textContent=head[0];$('#selTitle').textContent=head[1];$('#selSub').textContent=head[2];
-  $('#diff').hidden=k!=='vs';$('#dummy').hidden=k!=='training';
+  $('#diff').hidden=k!=='vs';$('#dummy').hidden=k!=='training';$('#lastBtn').hidden=!!(L&&L.myLock)||!lastTeamIdx().length;
   document.querySelectorAll('#diff button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===G.vsDiff));
   document.querySelectorAll('#dummy button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===G.train.dummy));
-  $('#roster').hidden=true;$('#roster').innerHTML='';$('#detail').hidden=true;$('#slots').hidden=true;
-  renderTeamPick();updateSel();
+  const g=$('#csGrid');
+  g.innerHTML=ROSTER.filter(d=>owns(d.id)).map(d=>`<button type="button" class="cs-tile r-${d.rarity}" id="cst-${d.id}" data-i="${RIDX(d.id)}" aria-label="${esc(d.name)}" aria-pressed="false"><canvas width="96" height="96" aria-hidden="true"></canvas><span class="cs-b1"></span><span class="cs-b2"></span><span class="cs-nm">${esc(d.name.split(' ')[0])}</span></button>`).join('');
+  g.querySelectorAll('.cs-tile').forEach(b=>{const i=+b.dataset.i,id=ROSTER[i].id;drawPortrait(b.querySelector('canvas'),id,equipped(id));
+    b.addEventListener('click',()=>pickTile(i));onHold(b,()=>openFighter(id));
+    b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'){draft.hov[draft.step-1]=i;drawSides();}});
+    b.addEventListener('focus',()=>{draft.hov[draft.step-1]=i;drawSides();});});
+  $('#selTimer').hidden=!L;
+  updateSel();
 }
-/* match screen: one saved team at a time, arrows flip through Team 1-6. Teams are only edited in the Dojo. */
-const teamReady=t=>!!t&&t.length>=3&&t.slice(0,3).every(id=>id&&owns(id));
-function renderTeamPick(){
-  const pi=draft.kind==='pvp'&&draft.step===2?1:0,coop=isCoopDraft(),idxs=coop?DUOS:TRIOS,sz=coop?2:3,ready=coop?duoReady:teamReady,n=idxs.length;
-  if(!draft.ti)draft.ti=[SAVE.lastTeam|0,SAVE.lastTeam|0];
-  let ti=draft.ti[pi];if(!idxs.includes(ti))ti=coop?(DUOS.includes(SAVE.lastDuo)?SAVE.lastDuo:DUO0):(TRIOS.includes(SAVE.lastTeam|0)?SAVE.lastTeam|0:0);
-  if(!ready(SAVE.teams[ti])&&!draft.moved){const r=idxs.find(i=>ready(SAVE.teams[i]));if(r!=null)ti=r;}
-  draft.ti[pi]=ti;const pos=idxs.indexOf(ti);
-  const t=SAVE.teams[ti]||[],ok=ready(t),picks=pi?draft.p2:draft.p1;picks.length=0;if(ok)for(const id of t.slice(0,sz))picks.push(RIDX(id));
-  const ranked=draft.kind==='online'&&G.netMode==='casual',lv=id=>ranked?MAX_LV:lvOf(id),st=id=>ranked?MAX_STARS:starsOf(id);
-  const el=$('#savedTeams');el.className='tpwrap';
-  el.innerHTML=`<div class="tpick">
-    <button type="button" class="tarrow" id="tPrev" aria-label="Previous team">‹</button>
-    <div class="tshow" aria-live="polite"><p class="tname">Team ${ti+1} <small>${coop?`co-op duo ${pos+1} of ${n}`:`of ${n}`}${pi?' · Player 2':draft.kind==='pvp'?' · Player 1':''}</small></p>
-    ${ok?`<div class="tfig${coop?' duo':''}">${t.slice(0,sz).map((id,k)=>{const d=ROSTER[RIDX(id)];return `<figure class="${k?'':'lead'}" style="--fx:${d.fx}">${k?'':'<span class="tstart">STARTS</span>'}<canvas width="200" height="250" aria-hidden="true"></canvas>
-        <figcaption>${esc(d.name)}<small>Lv ${lv(id)} · ${st(id)}★ · ${esc(d.cls)}</small></figcaption></figure>`;}).join('')}</div>
-      <p class="tpow">${ranked?'Casual sets everyone to Lv 60, 14★':'Team power '+teamPower(t.slice(0,sz)).toLocaleString()}</p>`
-    :`<div class="tempty"><p>Team ${ti+1} ${t.filter(Boolean).length?'isn’t full yet':'is empty'}. ${coop?'Co-op uses your two-fighter duos, Teams 7 and 8. Build them':'Teams are built'} in the Dojo’s team maker.</p><button type="button" class="btn alt" id="tBuild">Open the team maker</button></div>`}
-    </div>
-    <button type="button" class="tarrow" id="tNext" aria-label="Next team">›</button></div>
-    <div class="tdots" aria-hidden="true">${idxs.map(i=>`<span class="${i===ti?'on':''}${ready(SAVE.teams[i])?' ok':''}"></span>`).join('')}</div>`;
-  el.querySelectorAll('.tfig canvas').forEach((cv,k)=>{const id=t[k];drawPortrait(cv,id,equipped(id));});
-  const flip=d=>{sfx('ui');draft.moved=true;draft.ti[pi]=idxs[(pos+d+n)%n];if(!pi){if(coop)SAVE.lastDuo=draft.ti[0];else SAVE.lastTeam=draft.ti[0];persist();}renderTeamPick();updateSel();
-    const b=$(d<0?'#tPrev':'#tNext');if(b)b.focus({preventScroll:true});};
-  $('#tPrev').addEventListener('click',()=>flip(-1));$('#tNext').addEventListener('click',()=>flip(1));
-  const tb=$('#tBuild');if(tb)tb.addEventListener('click',()=>{sfx('ui');teamEdit={t:ti,s:0};openCollection(draft.kind);});
+function pickTile(i){
+  const L=draft.live;if(L&&L.myLock)return;
+  const P=curPicks(),at=P.indexOf(i);
+  if(at>=0)P.splice(at,1);
+  else{if(P.length>=needN()){toast('Your team is full. Tap a picked fighter to take them out.');return;}P.push(i);}
+  draft.hov[draft.step-1]=at>=0?(P.length?P[P.length-1]:null):i;sfx('ui');updateSel();if(L)livePush();
 }
-addEventListener('keydown',e=>{if($('#select').hidden||e.target.tagName==='INPUT')return;
-  if(e.key==='ArrowLeft'){e.preventDefault();$('#tPrev')&&$('#tPrev').click();}else if(e.key==='ArrowRight'){e.preventDefault();$('#tNext')&&$('#tNext').click();}});
-function showDraftDetail(i){
-  const d=ROSTER[i],el=$('#detail');el.style.setProperty('--tint',d.fx);
-  el.innerHTML=infoHTML(d)+(owns(d.id)?'':`<p class="note">Locked. Summon ${d.name.split(' ')[0]} from a banner to add them to your roster.</p>`);paintHeads(el);
+function bigArt(cv,id,c,name){const x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);
+  if(id){drawFullBody(cv,id,c);return;}
+  x.save();x.fillStyle='rgba(255,255,255,.08)';x.beginPath();x.ellipse(160,250,90,150,0,0,TAU);x.fill();x.fillStyle='rgba(255,255,255,.55)';x.font=`170px ${FONT_D}`;x.textAlign='center';x.textBaseline='middle';x.fillText('?',160,215);x.restore();}
+function teamSlots(el,ids,n,mask){el.innerHTML=Array.from({length:n},(_,k)=>{const id=ids[k];return `<span class="cs-slot${k?'':' lead'}">${id&&!mask?`<canvas width="96" height="96" data-head="${id}" data-c="${equipped(id)}"></canvas>`:mask&&id!==undefined||mask&&!ids.length?'?':''}</span>`;}).join('');paintHeads(el);}
+function rightSide(){
+  const L=draft.live;
+  if(L)return {tag:L.coop?'P2 · TEAMMATE':'P2',who:(L.opp.name||'Rival')+(L.oppLock?' · locked in':' · picking…'),ids:L.oppPicks.map(o=>o.id),cs:L.oppPicks.map(o=>o.c||0),ready:L.oppLock,n:needN()};
+  if(draft.kind==='pvp')return {tag:'P2',who:draft.step===2?'Player 2 · picking':'Player 2 · waiting',ids:draft.p2.map(i=>ROSTER[i].id),n:3,hov:draft.step===2?draft.hov[1]:null};
+  const F=foeInfo();return {tag:F.tag,who:F.who,ids:F.ids||[],mask:!F.ids,name:F.name,n:F.ids?F.ids.length:3,lv:F.lv};
+}
+function drawSides(){
+  const lIds=draft.p1.map(i=>ROSTER[i].id),lh=draft.step===1&&draft.hov[0]!=null?ROSTER[draft.hov[0]].id:lIds[0]||null;
+  bigArt($('#csL'),lh,lh?equipped(lh):0);
+  const ld=lh?ROSTER[RIDX(lh)]:null;$('#csLName').textContent=ld?ld.name:'Pick a fighter';
+  const L=draft.live;$('#csLWho').textContent=L?`${NET.profile&&NET.profile.name||SAVE.name||'You'} · ${L.myLock?'locked in':'picking'}`:draft.kind==='pvp'?'Player 1':(SAVE.name||'You');
+  $('#csLTag').textContent=L&&L.coop?'P1 · YOU':'P1';$('#csLTag').classList.toggle('ready',!!(L&&L.myLock));
+  teamSlots($('#csLTeam'),lIds,needN());
+  const R=rightSide(),rh=R.hov!=null?ROSTER[R.hov].id:R.mask?null:(draft.live?R.ids[R.ids.length-1]:R.ids[0])||null,rd=rh?ROSTER[RIDX(rh)]:null;
+  bigArt($('#csR'),rh,R.cs?R.cs[R.ids.indexOf(rh)]||0:0);
+  $('#csRName').textContent=R.name||(rd?rd.name:R.mask?'???':'Waiting…');$('#csRWho').textContent=R.who+(R.lv?` · Lv ${R.lv}`:'');
+  $('#csRTag').textContent=R.tag;$('#csRTag').classList.toggle('ready',!!R.ready);
+  teamSlots($('#csRTeam'),R.ids,R.n,R.mask);
 }
 function updateSel(){
-  const list=curPicks();
-  ROSTER.forEach((d,i)=>{const b=$('#card-'+d.id);if(!b)return;const o=b.querySelector('.ord'),at=list.indexOf(i);b.classList.toggle('picked',at>=0);b.setAttribute('aria-pressed',at>=0);o.hidden=at<0;o.textContent=at+1;});
-  const L=isCoopDraft()?['Lead','Partner']:['Lead','Second','Anchor'];
-  const need=L.length;$('#slots').innerHTML=L.map((l,k)=>{const d=list[k]==null?null:ROSTER[list[k]];return `<div class="slot">${d?`<canvas class="shd" width="64" height="64" data-head="${d.id}" data-c="${equipped(d.id)}"></canvas>`:'<span class="shd"></span>'}<span class="lbl">${l.toUpperCase()}</span><span class="who${d?'':' empty'}">${d?d.name:'Open slot'}</span></div>`;}).join('');
-  paintHeads($('#slots'));
-  const go=$('#goBtn');go.disabled=list.length<need;
-  go.textContent=list.length<need?(need===2?'Pick a full duo':'Pick a full team'):draft.kind==='online'?'Find match':draft.kind==='pvp'&&draft.step===1?'Next: Player 2':draft.kind==='training'?'Start training':'Fight';
+  const k=draft.kind,n=needN(),L=draft.live,mine=curPicks(),p2set=new Set(L?L.oppPicks.map(o=>RIDX(o.id)):draft.kind==='pvp'?draft.p2:[]);
+  document.querySelectorAll('#csGrid .cs-tile').forEach(b=>{const i=+b.dataset.i,a1=draft.p1.indexOf(i),a2=draft.kind==='pvp'?draft.p2.indexOf(i):L?L.oppPicks.findIndex(o=>RIDX(o.id)===i):-1;
+    b.classList.toggle('p1',a1>=0);b.classList.toggle('p2',a2>=0);b.querySelector('.cs-b1').textContent=a1>=0?a1+1:'';b.querySelector('.cs-b2').textContent=a2>=0?a2+1:'';
+    b.setAttribute('aria-pressed',String(curPicks().includes(i)));});
+  drawSides();
+  const go=$('#goBtn');
+  if(L){go.disabled=L.myLock;go.textContent=L.myLock?(L.oppLock?'Starting…':`Waiting for ${L.opp.name||'your rival'}…`):mine.length<n?`Lock in (${mine.length}/${n})`:'Lock in';}
+  else{go.disabled=mine.length<n;go.textContent=mine.length<n?`Pick ${n-mine.length} more`:k==='pvp'&&draft.step===1?'Next: Player 2':k==='training'?'Start training':'Fight';}
+  $('#lastBtn').hidden=!!(L&&L.myLock)||!lastTeamIdx().length;
 }
-document.querySelectorAll('#diff button').forEach(b=>b.addEventListener('click',()=>{G.vsDiff=b.dataset.d;document.querySelectorAll('#diff button').forEach(x=>x.setAttribute('aria-pressed',x===b));sfx('ui');}));
+document.querySelectorAll('#diff button').forEach(b=>b.addEventListener('click',()=>{G.vsDiff=b.dataset.d;document.querySelectorAll('#diff button').forEach(x=>x.setAttribute('aria-pressed',x===b));sfx('ui');drawSides();}));
 document.querySelectorAll('#dummy button').forEach(b=>b.addEventListener('click',()=>{G.train.dummy=b.dataset.m;document.querySelectorAll('#dummy button').forEach(x=>x.setAttribute('aria-pressed',x===b));sfx('ui');}));
+$('#lastBtn').addEventListener('click',()=>{const L=draft.live;if(L&&L.myLock)return;const P=curPicks();P.length=0;for(const i of lastTeamIdx().slice(0,needN()))P.push(i);draft.hov[draft.step-1]=P[0]??null;sfx('ui');updateSel();if(L)livePush();});
 $('#selBack').addEventListener('click',()=>{
+  if(draft.live){liveLeave();return;}
   if(draft.kind==='pvp'&&draft.step===2){draft.step=1;renderDraft();return;}
   if(draft.kind==='story'){openStoryIntro(G.chapter);return;}
   if(draft.kind==='raid'||draft.kind==='event'){openEvents();return;}
-  if(draft.kind==='online'){openOnline();return;}
   goHome();
 });
 $('#goBtn').addEventListener('click',()=>{
-  if(curPicks().length<(isCoopDraft()?2:3))return;
+  if(draft.live){liveLock();return;}
+  if(curPicks().length<needN())return;
   sfx('ui');
-  if(draft.kind==='online'){startSearch(G.netMode||'casual');return;}
-  if(draft.kind==='pvp'&&draft.step===1){draft.step=2;renderDraft();$('#select').scrollTop=0;return;}
+  if(draft.kind==='pvp'&&draft.step===1){draft.step=2;renderDraft();return;}
+  SAVE.teams[0]=draft.p1.map(i=>ROSTER[i].id);SAVE.lastTeam=0;persist();
   const pv=draft.kind==='pvp',mine=i=>{const id=ROSTER[i].id;return {i,c:equipped(id),lv:pv?1:lvOf(id),st:pv?1:starsOf(id)};};
   const P1=draft.p1.map(mine),avg=Math.max(1,Math.round(P1.reduce((a,m)=>a+m.lv,0)/3));
   let P2;
@@ -4143,6 +4200,36 @@ $('#goBtn').addEventListener('click',()=>{
   G.lineup={P1,P2};
   startMatch();
 });
+/* ---- online live pick: both players' picks are written to matches/<id>/pick/<a|b> and shown on both screens ---- */
+const PICK_SECS=40;
+function openLivePick(mid,m,role){
+  const R=NET.db.ref('matches/'+mid),myK=role==='host'?'a':'b',opK=myK==='a'?'b':'a';
+  G.netMode=m.mode;toHub();liveStop();
+  draft.kind='online';draft.step=1;draft.p1=[];draft.p2=[];draft.hov=[null,null];G.kind='online';
+  const L=draft.live={mid,m,role,R,myK,opK,coop:!!m.coop,opp:m[opK]||{},me:m[myK]||{},oppPicks:[],oppLock:false,myLock:false,t0:Date.now(),done:false};
+  L.ref=R.child('pick/'+opK);
+  L.sub=L.ref.on('value',sn=>{const v=sn.val();if(!v||L.done||draft.live!==L)return;
+    if(v.left){liveAbort(`${L.opp.name||'Your rival'} left before the fight.`);return;}
+    L.oppPicks=(Array.isArray(v.p)?v.p:[]).filter(x=>x&&typeof x.id==='string'&&RIDX(x.id)>=0).slice(0,needN());L.oppLock=!!v.l;if(L.oppLock&&!L.oppSeenLock){L.oppSeenLock=true;sfx('bell');}
+    if(!$('#select').hidden)updateSel();liveCheck();});
+  L.timer=setInterval(()=>{if(draft.live!==L){clearInterval(L.timer);return;}const left=Math.max(0,Math.ceil(PICK_SECS-(Date.now()-L.t0)/1000)),el=$('#selTimer');
+    if(el){el.textContent=left;el.classList.toggle('low',left<=10);}
+    if(left<=0&&!L.myLock)liveLock();
+    if(Date.now()-L.t0>(PICK_SECS+25)*1000&&!L.oppLock)liveAbort(`${L.opp.name||'Your rival'} didn’t pick in time.`);},250);
+  livePush();renderDraft();show('#select');sfx('bell');
+}
+function liveTeam(){const maxed=G.netMode==='casual';return draft.p1.slice(0,needN()).map(i=>{const id=ROSTER[i].id;return {id,c:equipped(id),lv:maxed?MAX_LV:lvOf(id),st:maxed?MAX_STARS:Math.max(1,starsOf(id))};});}
+function livePush(){const L=draft.live;if(!L)return;L.R.child('pick/'+L.myK).set({p:liveTeam(),l:L.myLock?1:0}).catch(()=>{});}
+function autoFill(){const pool=ROSTER.map((d,i)=>i).filter(i=>owns(ROSTER[i].id)&&!draft.p1.includes(i)).sort(()=>Math.random()-.5);while(draft.p1.length<needN()&&pool.length)draft.p1.push(pool.pop());}
+function liveLock(){const L=draft.live;if(!L||L.myLock)return;if(draft.p1.length<needN()){autoFill();toast('Time’s up. Your empty slots were filled for you.');}
+  L.myLock=true;livePush();sfx('bell');updateSel();liveCheck();}
+function liveCheck(){const L=draft.live;if(!L||L.done||!L.myLock||!L.oppLock||L.oppPicks.length<needN())return;
+  L.done=true;liveStop();const m=L.m;m[L.myK].team=liveTeam();m[L.opK].team=L.oppPicks;
+  SAVE.teams[0]=draft.p1.map(i=>ROSTER[i].id);SAVE.lastTeam=0;persist();draft.live=null;$('#selTimer').hidden=true;
+  setTimeout(()=>showVsLoading(m,L.role,()=>beginOnlineMatch(L.mid,m,L.role)),500);}
+function liveStop(){const L=draft.live;if(!L)return;clearInterval(L.timer);if(L.ref&&L.sub){L.ref.off('value',L.sub);L.sub=null;}}
+function liveAbort(msg){const L=draft.live;if(!L||L.done)return;L.done=true;liveStop();draft.live=null;$('#selTimer').hidden=true;toast(msg);openOnline();}
+function liveLeave(){const L=draft.live;if(!L)return;L.R.child('pick/'+L.myK).set({left:1}).catch(()=>{});liveAbort('You left the match.');}
 
 function startMatch(){
   unlock();clearMatchRigs();clearInputs();
@@ -4235,7 +4322,7 @@ function showResult(){
     netCleanup(n);
     if(win&&!(n.coop&&!(G.coop&&G.coop.boss))){for(const m of me.members)SAVE.wins[m.def.id]=(SAVE.wins[m.def.id]||0)+1;track('wins');}
     netRecord(n,win,draw).then(r=>{if(G.mode!=='result')return;line.hidden=false;line.textContent=n.ranked?`${text} Rating ${r.before} \u2192 ${r.after} (${r.delta>=0?'+':''}${r.delta}) \u00b7 ${tierOf(r.after).name}`:text;}).catch(()=>{});
-    btns=[['Find another',()=>{G.netMode=n.mode;openDraft('online');}],['Arena',openOnline],['Town',goHome]];
+    btns=[['Find another',()=>{G.netMode=n.mode;startSearch(n.mode);}],['Arena',openOnline],['Town',goHome]];
   } else {
 
     const win=w===0;t.textContent=win?'Victory':w===1?'Defeated':'Draw';t.className=win?'win':w===1?'lose':'';
@@ -4337,7 +4424,7 @@ function openFighter(id){
   el.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{const c=+b.dataset.c;
     if(!ownsCostume(id,c)){const pr=COSTUMES[c].price;if(SAVE.coins<pr){toast(`${COSTUMES[c].name} costs ${pr} Rebucks. Win story chapters to earn more.`);return;}
       SAVE.coins-=pr;(SAVE.costumes[id]=SAVE.costumes[id]||[]).push(c);sfx('bell');toast(`${COSTUMES[c].name} unlocked for ${d.name.split(' ')[0]}.`);}
-    SAVE.equipped[id]=c;persist();sfx('ui');openFighter(id);refreshCoins();if(!$('#collection').hidden)renderTeams();}));
+    SAVE.equipped[id]=c;persist();sfx('ui');openFighter(id);refreshCoins();if(!$('#collection').hidden)renderTeams();if(!$('#select').hidden)renderDraft();}));
   const sb=$('#fdSummon');if(sb)sb.addEventListener('click',()=>{closeFighter();sfx('ui');openSummon();});
   $('#fdetail').hidden=false;$('#fdetail').scrollTop=0;sfx('ui');$('#fdClose').focus();
 }
@@ -4349,24 +4436,14 @@ addEventListener('keydown',e=>{if(e.key==='Escape'&&fdId)closeFighter();});
 const DUO0=6,tSize=ti=>ti>=DUO0?2:3,TRIOS=[0,1,2,3,4,5],DUOS=[6,7];
 const duoReady=t=>!!t&&t.length>=2&&t.slice(0,2).every(id=>id&&owns(id));
 function renderTeams(){
-  const root=$('#charTeams'),T=SAVE.teams;
-  root.innerHTML=`<p class="sub">Build six teams of three, plus two co-op duos (Teams 7 and 8) for online co-op raids and survival. Before every fight you flip through them with the arrows and pick one. Tap a slot, then tap a fighter; the first slot leads. Hold any fighter to see their full body, stats and costumes.</p><div class="teams">${T.map((t,ti)=>`<div class="tcard${teamEdit.t===ti?' on':''}${ti>=DUO0?' duo':''}"><p class="tname">Team ${ti+1}${ti>=DUO0?' <small>Co-op duo</small>':''}</p><div class="tslots">${Array.from({length:tSize(ti)},(_,si)=>si).map(si=>{const id=t[si];
-    return `<button type="button" class="tslot${teamEdit.t===ti&&teamEdit.s===si?' sel':''}" id="ts-${ti}-${si}" data-t="${ti}" data-s="${si}">${id?`<canvas width="96" height="96" data-head="${id}" data-c="${equipped(id)}"></canvas><span>${ROSTER[RIDX(id)].name.split(' ')[0]}</span>`:'<span class="plus">+</span><span>Empty</span>'}</button>`;}).join('')}</div><p class="tpow">${t.slice(0,tSize(ti)).filter(Boolean).length===tSize(ti)?'Team power '+teamPower(t.slice(0,tSize(ti))).toLocaleString():ti>=DUO0?'Add two fighters':'Add three fighters'}</p></div>`).join('')}</div>
-  <h3 class="sec">PICK FOR TEAM ${teamEdit.t+1}, SLOT ${teamEdit.s+1}</h3><div class="pickgrid">${ROSTER.map(d=>{const own=owns(d.id);return `<button type="button" class="pick${own?'':' locked'}" id="tp-${d.id}" data-id="${d.id}" style="--rc:${RAR[d.rarity].col}"><canvas width="96" height="96" data-head="${d.id}" data-c="${own?equipped(d.id):0}"></canvas><span>${d.name.split(' ')[0]}</span><span class="pl">${own?`Lv ${lvOf(d.id)} · ${starsOf(d.id)}\u2605`:'Locked'}</span></button>`;}).join('')}</div>
-  <div class="row"><button type="button" class="btn alt" id="tclear">Clear slot</button></div>`;
-  paintHeads(root);
-  root.querySelectorAll('.tslot').forEach(b=>{const id=T[+b.dataset.t][+b.dataset.s];if(id)onHold(b,()=>openFighter(id));b.addEventListener('click',()=>{teamEdit={t:+b.dataset.t,s:+b.dataset.s};sfx('ui');renderTeams();});});
-  root.querySelectorAll('.pick').forEach(b=>onHold(b,()=>openFighter(b.dataset.id)));
-  root.querySelectorAll('.pick').forEach(b=>b.addEventListener('click',()=>{const t=T[teamEdit.t],id=b.dataset.id,at=t.indexOf(id);
-    if(!owns(id)){toast(`Hold to see ${ROSTER[RIDX(id)].name.split(' ')[0]}. Summon them to add them to a team.`);return;}
-    const n=tSize(teamEdit.t);if(teamEdit.s>=n)teamEdit.s=n-1;
-    if(at>=0&&at!==teamEdit.s){t[at]=t[teamEdit.s];}t[teamEdit.s]=id;for(let k=0;k<n;k++)if(t[k]===undefined)t[k]=null;
-    SAVE.teams[teamEdit.t]=t.slice(0,n);persist();sfx('ui');teamEdit.s=Math.min(n-1,teamEdit.s+1);renderTeams();}));
-  $('#tclear').addEventListener('click',()=>{T[teamEdit.t][teamEdit.s]=null;persist();renderTeams();});
+  const root=$('#charTeams');
+  root.innerHTML=`<p class="sub">Every fighter in the league is on your roster. You pick your team right before each match now. Tap a fighter to see their moves, stats and costumes.</p>
+    <div class="fgal">${ROSTER.filter(d=>owns(d.id)).map(d=>`<button type="button" class="r-${d.rarity}" id="fg-${d.id}" data-id="${d.id}"><canvas width="128" height="128" data-head="${d.id}" data-c="${equipped(d.id)}" aria-hidden="true"></canvas><b>${esc(d.name)}</b><span>${RAR[d.rarity].name} \u00b7 ${esc(d.cls)} \u00b7 Lv ${lvOf(d.id)} \u00b7 ${starsOf(d.id)}\u2605</span></button>`).join('')}</div>`;
+  paintHeads(root);root.querySelectorAll('.fgal button').forEach(b=>b.addEventListener('click',()=>openFighter(b.dataset.id)));
 }
 let charReturn=null;
 function openCollection(ret){charReturn=ret||null;toHub();show('#collection');renderTeams();}
-$('#collBack').addEventListener('click',()=>{if(charReturn){const k=charReturn;charReturn=null;openDraft(k);}else goHome();});
+$('#collBack').addEventListener('click',()=>{charReturn=null;goHome();});
 
 /* summon */
 const BANNERS=[
@@ -4888,21 +4965,22 @@ function renderOnline(){
     <div class="oncard"><p class="eyebrow">Ranked leaderboard</p><ol class="board">${board}</ol></div>`;
   $('#onSaveName').addEventListener('click',()=>{sfx('ui');saveNetName($('#onName').value);});
   $('#onName').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')saveNetName(e.target.value);});
-  $('#onCasual').addEventListener('click',()=>{sfx('ui');G.netMode='casual';openDraft('online');});
-  $('#onRanked').addEventListener('click',()=>{sfx('ui');G.netMode='ranked';openDraft('online');});
-  el.querySelectorAll('[data-coop]').forEach(b=>b.addEventListener('click',()=>{sfx('ui');G.netMode=b.dataset.coop;openDraft('online');}));
+  $('#onCasual').addEventListener('click',()=>{sfx('ui');G.netMode='casual';startSearch('casual');});
+  $('#onRanked').addEventListener('click',()=>{sfx('ui');G.netMode='ranked';startSearch('ranked');});
+  el.querySelectorAll('[data-coop]').forEach(b=>b.addEventListener('click',()=>{sfx('ui');G.netMode=b.dataset.coop;startSearch(b.dataset.coop);}));
 }
 function tickSearchTimer(){const S=NET.search,el=$('#onTimer');if(!S||!el)return;const s=Math.floor((Date.now()-S.t0)/1000);el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
 $('#onBack').addEventListener('click',()=>{sfx('ui');if(NET.search&&!NET.search.done)cancelSearch();goHome();});
 
 /* ---- matchmaking ---- */
 /* casual puts everyone at max power; ranked and co-op use your own levels and stars */
+function queueTeam(mode){const n=isCoopMode(mode)?2:3,ids=lastTeamIdx().slice(0,n);for(let i=0;i<ROSTER.length&&ids.length<n;i++)if(owns(ROSTER[i].id)&&!ids.includes(i))ids.push(i);draft.p1=ids;return onlineTeam(mode);}
 function onlineTeam(mode){const maxed=mode==='casual',n=isCoopMode(mode)?2:3;return draft.p1.slice(0,n).map(i=>{const id=ROSTER[i].id;return {id,c:equipped(id),lv:maxed?MAX_LV:lvOf(id),st:maxed?MAX_STARS:Math.max(1,starsOf(id))};});}
 async function startSearch(mode){
   show('#online');
   if(!NET.ready&&!(await netInit())){renderOnline();return;}
   if(NET.search&&!NET.search.done)cancelSearch();
-  const ranked=mode==='ranked',team=onlineTeam(mode),p=NET.profile;
+  const ranked=mode==='ranked',team=queueTeam(mode),p=NET.profile;
   const S=NET.search={mode,ranked,coop:isCoopMode(mode),team,t0:Date.now(),done:false,claiming:false};
   S.ref=NET.db.ref(`queue/${mode}/${NET.uid}`);
   renderOnline();
@@ -4963,7 +5041,7 @@ async function joinFound(S,mid,role,m){
   if(S.done)return;stopSearch(S,true);
   if(!m){try{m=(await NET.db.ref('matches/'+mid).once('value')).val();}catch(e){m=null;}}
   if(!m){toast('That match fell through. Searching again…');startSearch(S.mode);return;}
-  showVsLoading(m,role,()=>beginOnlineMatch(mid,m,role));
+  openLivePick(mid,m,role);
 }
 
 /* ---- live match ---- */
@@ -5120,9 +5198,9 @@ const NPCS=[
  {key:'events',who:'ozzy',role:'Events',place:'Event Hall',act:'See the events',go:()=>openEvents(),
   say:()=>{const l=liveEvents();return `Listen up, Harbor City! ${l.length?l.map(e=>e.name).join(', ')+(l.length>1?' are':' is')+' live right now. Win them for big rewards!':'No events right now.'} This week’s raid boss is ${raidBoss().name}. Think your crew can take it?`;},
   mark:()=>liveEvents().length>0},
- {key:'teams',who:'dex',role:'Teams',place:'Dojo',act:'Build teams',go:()=>openCollection(null),
-  say:()=>SAVE.teams.some(t=>t.length>=3&&t.slice(0,3).every(id=>id&&owns(id)))?'A fighter is only as good as the team behind them. Want to change your lineups?':'You don’t have a full team yet. Let’s build one before your next fight.',
-  mark:()=>!SAVE.teams.some(t=>t.length>=3&&t.slice(0,3).every(id=>id&&owns(id)))},
+ {key:'teams',who:'dex',role:'Fighters',place:'Dojo',act:'See your fighters',go:()=>openCollection(null),
+  say:()=>'Every fighter in the league trains here. Want to look over their moves, stats and costumes? You pick your team right before each fight.'||'You don’t have a full team yet. Let’s build one before your next fight.',
+  mark:()=>false},
  {key:'missions',who:'sora',role:'Missions',place:'Mission Office',act:'Check missions',go:()=>openMissions(),
   say:()=>{const n=claimableMissions();return `I pin new jobs to this board every day, week and month. ${n?`You have ${n} reward${n>1?'s':''} ready to claim!`:'Nothing to claim yet, so get out there and fight!'}`;},
   mark:()=>claimableMissions()>0},
