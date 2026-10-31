@@ -957,11 +957,23 @@ const ROSTER=[
  {id:'amara',cls:'Dambe',name:'Amara Okoye',title:'River Fist',bio:'Dambe boxer who wraps her lead fist like a spearhead and hits like a river in flood.',hp:104,speed:4.4,power:1.1,jump:1.0,scale:1.0,reach:1.0,build:'f',
   gear:{sleeveless:1,acc:['armguard'],gloves:'#e8dcc4',under:'#c0392b',haori:40,pattern:'chevron',obi:'#ffd23a',tabi:'#2a1a12'},
   col:{skin:'#4a2a18',main:'#c0392b',alt:'#1f6a3a',pants:'#2a2a33',trim:'#ffd23a',hair:'#120c0a'},hair:'locs',face:{eye:'sharp',iris:'#3a2a1a',brow:12,mouth:'grin'},special:'uppercut',spName:'River Hammer',sup:'rush',supName:'Flood Strikes',ultName:'Champion of the Ring',fx:'#ffd23a'},
+ {id:'rio',cls:'Gun Kata',name:'Rio Vasquez',title:'Twin Barrels',bio:'Harbor bodyguard who fights with two pistols and spins them like a drummer spins sticks. Never misses a beat, rarely misses a shot.',hp:96,speed:4.7,power:1.06,jump:1.06,scale:1.0,reach:1.02,build:'m',
+  weapon:{kind:'gun',dual:1,col:'#2a2a30',hilt:'#6a4a2a',accent:'#ffb347'},
+  gear:{open:1,acc:['scarf:#c0392b'],under:'#e8e2d8',lapel:'#3a2a22',haori:74,pattern:'plain',obi:'#2a1a12',tabi:'#1a1a1a'},
+  col:{skin:'#c8946a',main:'#3a2a22',alt:'#c0392b',pants:'#1e1e24',trim:'#ffb347',hair:'#14100e'},hair:'slick',face:{eye:'sharp',iris:'#5a3a1a',brow:12,mouth:'smirk',stubble:1},special:'shot',spName:'Double Tap',sup:'rush',supName:'Bullet Ballet',ultName:'Last Call',fx:'#ffb347'},
+ {id:'kira',cls:'Marksman',name:'Kira Holt',title:'Red Sight',bio:'Rooftop sniper who got bored of waiting and started walking up to her targets instead. Her rifle does the talking.',hp:90,speed:4.4,power:1.12,jump:1.04,scale:0.97,reach:1.06,build:'f',
+  weapon:{kind:'rifle',col:'#3a3e46',hilt:'#4a3424',accent:'#ff4a4a'},
+  gear:{acc:['scarf:#2a3a2a','cuffs'],under:'#2a3a2a',haori:64,pattern:'plain',obi:'#ff4a4a',tabi:'#1a1a1a',longhair:1},
+  col:{skin:'#f2d6c0',main:'#3a4a34',alt:'#1e1e24',pants:'#2a2a22',trim:'#ff4a4a',hair:'#c8442a'},hair:'long',face:{eye:'cool',iris:'#2a8a5a',brow:6,mouth:'smirk'},special:'snipe',spName:'Red Dot',sup:'rush',supName:'Rapid Fire',ultName:'One Shot, One Story',fx:'#ff4a4a'},
+ {id:'duke',cls:'Buckshot Brawler',name:'Duke Malloy',title:'Scatter King',bio:'Dock bouncer with a sawed-off shotgun and a temper to match. He fires once, then swings the stock.',hp:120,speed:3.6,power:1.18,jump:0.92,scale:1.1,reach:1.0,build:'h',
+  weapon:{kind:'shotgun',col:'#4a4a52',hilt:'#7a4a2a',accent:'#ffd27a'},
+  gear:{sleeveless:1,acc:['fur','cuffs'],under:'#3a2a1a',haori:52,pattern:'plain',obi:'#6a3a1a',tabi:'#2a1a12'},
+  col:{skin:'#8a5a3a',main:'#5a3a24',alt:'#2a2a30',pants:'#24242a',trim:'#ffd27a',hair:'#1a1210'},hair:'crop',face:{eye:'small',iris:'#3a2a1a',brow:16,browThick:8,mouth:'flat',stubble:1},special:'blast',spName:'Scattershot',sup:'rush',supName:'Stock & Smoke',ultName:'Twelve Gauge Finale',fx:'#ffd27a'},
 ];
 const RIDX=id=>ROSTER.findIndex(d=>d.id===id);
 const RAR={rare:{name:'Fresh',col:'#5fe08a'},epic:{name:'Improved',col:'#5aa8ff'},legend:{name:'Vision',col:'#b07cff'}};
-{const R={ozzy:'epic',lena:'epic',sora:'epic',taro:'epic',nadia:'epic',bruno:'epic',dex:'legend',mei:'legend',warden:'legend',tavi:'epic',bayu:'epic',devi:'legend',ines:'rare',junho:'rare',ren:'legend',saya:'legend',gunnar:'epic',noor:'epic',kaito:'rare',amara:'rare'};ROSTER.forEach(d=>{d.rarity=R[d.id]||'rare';});}
-const SPDESC={fireball:'throws a fireball across the screen.',dash:'electric dash that knocks down.',slam:'leaping ground pound with a shockwave.',kunai:'fans out three fast blades.',orb:'slow, heavy orb that knocks down.',wave:'ground wave you have to jump.',sonic:'a clap shockwave that flies across the arena.',spike:'ice erupts under your rival after a short delay.',uppercut:'rising uppercut that beats jump-ins.'};
+{const R={ozzy:'epic',lena:'epic',sora:'epic',taro:'epic',nadia:'epic',bruno:'epic',dex:'legend',mei:'legend',warden:'legend',tavi:'epic',bayu:'epic',devi:'legend',ines:'rare',junho:'rare',ren:'legend',saya:'legend',gunnar:'epic',noor:'epic',kaito:'rare',amara:'rare',rio:'legend',kira:'epic',duke:'rare'};ROSTER.forEach(d=>{d.rarity=R[d.id]||'rare';});}
+const SPDESC={shot:'fires a quick double-tap of bullets. Crouch to duck them.',snipe:'aims, then fires a heavy rifle round that knocks down.',blast:'a close-range shotgun spread that shoves rivals back.',fireball:'throws a fireball across the screen.',dash:'electric dash that knocks down.',slam:'leaping ground pound with a shockwave.',kunai:'fans out three fast blades.',orb:'slow, heavy orb that knocks down.',wave:'ground wave you have to jump.',sonic:'a clap shockwave that flies across the arena.',spike:'ice erupts under your rival after a short delay.',uppercut:'rising uppercut that beats jump-ins.'};
 const SUPDESC={beam:'full-screen beam.',rush:'dash in, then a 7-hit combo.'};
 const ULTDESC='unblockable dash into a 10-hit finisher. Needs all three bars.';
 const COSTUMES=[{name:'Classic',price:0},{name:'Night Shift',price:150},{name:'Champion',price:250}];
@@ -1260,6 +1272,9 @@ Object.assign(IDLE,{
  bayu:{lean:8,drop:18,rot:0,ba:[40,110],fa:[75,130],bl:[-28,-10],fl:[34,12]},
  junho:{lean:2,drop:8,rot:0,ba:[35,120],fa:[60,100],bl:[-16,-6],fl:[20,6]},
  ren:{lean:6,drop:12,rot:0,ba:[30,100],fa:[60,140],bl:[-26,-10],fl:[30,10]},
+ rio:{lean:4,drop:10,rot:0,ba:[78,84],fa:[84,88],bl:[-22,-10],fl:[28,10]},
+ kira:{lean:2,drop:8,rot:0,ba:[62,40],fa:[82,86],bl:[-20,-8],fl:[26,8]},
+ duke:{lean:10,drop:16,rot:0,ba:[60,30],fa:[80,84],bl:[-28,-10],fl:[32,12]},
  saya:{lean:2,drop:10,rot:0,ba:[40,120],fa:[70,125],bl:[-20,-8],fl:[26,8]},
  gunnar:{lean:8,drop:16,rot:0,ba:[40,110],fa:[80,150],bl:[-28,-10],fl:[32,12]},
  noor:{lean:0,drop:8,rot:0,ba:[100,160],fa:[60,115],bl:[-18,-6],fl:[22,6]},
@@ -1804,6 +1819,28 @@ function makeRig(f,sc,keep){
       const cs=new THREE.Shape();cs.moveTo(0,5);cs.quadraticCurveTo(52,22,94,-38);cs.quadraticCurveTo(44,-4,0,-7);cs.closePath();
       const bg=new THREE.ExtrudeGeometry(cs,{depth:2.4,bevelEnabled:false,curveSegments:10});bg.translate(0,0,-1.2);bg.scale(sc,sc,1);bg.translate(0,136*sc,0);part(bg,bl,wg,{});
       const cl=new THREE.TorusGeometry(3.6,1.4,6,12);cl.rotateX(Math.PI/2);cl.translate(0,133*sc,0);part(cl,ac,wg,{ol:false});wg.userData={len:150*sc,kind:'scythe'};}
+    else if(wd.kind==='gun'||wd.kind==='rifle'||wd.kind==='shotgun'){
+      /* guns: grip at the hand, barrel along +y, grip hanging along +x (down when aiming) */
+      const metal=bl,wood=hl,acc=ac;
+      const build=(G2,kind)=>{
+        if(kind==='gun'){const gp=new THREE.BoxGeometry(13,6,6);gp.translate(6,-2,0);gp.rotateZ(-0.25);part(gp,wood,G2,{});
+          const sl=new THREE.BoxGeometry(7,30,6);sl.translate(-3,10,0);part(sl,metal,G2,{});
+          const br=new THREE.CylinderGeometry(1.6,1.6,6,8);br.translate(-3,27,0);part(br,metal,G2,{ol:false});
+          const sg=new THREE.BoxGeometry(2,3,2);sg.translate(-7.5,20,0);part(sg,acc,G2,{ol:false});return 30;}
+        if(kind==='rifle'){const st=new THREE.BoxGeometry(9,30,5);st.translate(2,-18,0);part(st,wood,G2,{});
+          const gp=new THREE.BoxGeometry(11,5,5);gp.translate(6,0,0);part(gp,wood,G2,{});
+          const rc=new THREE.BoxGeometry(8,30,6);rc.translate(-2,12,0);part(rc,metal,G2,{});
+          const br=new THREE.CylinderGeometry(1.8,1.8,52,8);br.translate(-3,52,0);part(br,metal,G2,{});
+          const sc2=new THREE.CylinderGeometry(2.6,2.6,16,10);sc2.translate(-9,14,0);part(sc2,metal,G2,{});
+          const lens=new THREE.CylinderGeometry(2.7,2.7,1,10);lens.translate(-9,22.5,0);part(lens,acc,G2,{ol:false});
+          const mz=new THREE.CylinderGeometry(2.4,2.4,6,8);mz.translate(-3,79,0);part(mz,metal,G2,{});return 82;}
+        const gp=new THREE.BoxGeometry(14,8,6);gp.translate(6,-3,0);gp.rotateZ(-0.3);part(gp,wood,G2,{});
+        const rc=new THREE.BoxGeometry(9,18,7);rc.translate(-2,7,0);part(rc,metal,G2,{});
+        for(const dz of [-1.9,1.9]){const br=new THREE.CylinderGeometry(2.3,2.3,34,8);br.translate(-3,32,dz);part(br,metal,G2,{});}
+        const fe2=new THREE.BoxGeometry(7,12,7);fe2.translate(-6,24,0);part(fe2,wood,G2,{});
+        const bd=new THREE.BoxGeometry(2,3,7.6);bd.translate(-3,16,0);part(bd,acc,G2,{ol:false});return 49;};
+      const len=build(wg,wd.kind);wg.userData={len,kind:wd.kind,gun:1};
+      if(wd.dual){const w2=new THREE.Group();body.add(w2);build(w2,wd.kind);w2.userData={len,kind:wd.kind,gun:1};wg.userData.twin=w2;}}
     else{const L=(wd.slim?132:122)*sc,Wd=(wd.slim?7:13)*sc;part(new THREE.CylinderGeometry(2.6,2.6,24,8),hl,wg,{});
       const pm=new THREE.SphereGeometry(4.2,8,6);pm.translate(0,-14,0);part(pm,ac,wg,{});
       const gd=new THREE.BoxGeometry(wd.slim?14:30*sc,5,9);gd.translate(0,13,0);part(gd,ac,wg,{});
@@ -1869,7 +1906,10 @@ function updateRig(f){
   place(S.bUp,shB,be,-zS);place(S.bFore,be,bh,-zS);hand(S.bFist,be,bh,-zS);
   place(S.fUp,shF,fe,zS);place(S.fFore,fe,fh,zS);hand(S.fFist,fe,fh,zS);
   if(r.propK!==(f.prop||null)){if(r.prop)r.body.remove(r.prop);r.prop=f.prop?makeProp(f.prop,f):null;if(r.prop)r.body.add(r.prop);r.propK=f.prop||null;}
-  if(r.weapon){const wg=r.weapon,len=wg.userData.len*0.97,walk=f.state==='walk'&&!f.tpose;
+  if(r.weapon&&r.weapon.userData.gun){const wg=r.weapon,tw2=wg.userData.twin,hide=!!f.town;wg.visible=!hide;if(tw2)tw2.visible=!hide;
+    const aim=(g2,e,h,z)=>{g2.position.set(h[0],-h[1],z);g2.quaternion.setFromUnitVectors(UP,TV.set(h[0]-e[0],-(h[1]-e[1]),0).normalize());};
+    aim(wg,fe,fh,zS+4);if(tw2)aim(tw2,be,bh,-zS-4);}
+  else if(r.weapon){const wg=r.weapon,len=wg.userData.len*0.97,walk=f.state==='walk'&&!f.tpose;
     const mode=f.town?(walk?'drag':(f.act||f.prop||f.tpose)?'back':'rest'):(walk?'drag':'align');
     let px=fh[0],py=-fh[1],pz=zS+4,dx,dy;
     if(mode==='align'){dx=fh[0]-fe[0];dy=-(fh[1]-fe[1]);}
@@ -2168,6 +2208,10 @@ function makeProjMesh(p){
   switch(p.kind){
     case 'fire':g.add(add2(sphereGeo(9),new THREE.MeshBasicMaterial({color:'#fff3c4'})));g.add(add2(sphereGeo(19),glowMat('#ff8a3d',.65)));
       for(let i=1;i<4;i++){const t=add2(sphereGeo(13-i*3),glowMat('#ff6a2a',.5-i*.1));t.position.x=-i*13;g.add(t);}break;
+    case 'bullet':{const L=p.big?34:22,core=add2(new THREE.CylinderGeometry(p.big?2.6:2,p.big?2.6:2,10,8),new THREE.MeshBasicMaterial({color:'#fff6d8'}));core.rotation.z=Math.PI/2;g.add(core);
+      const tr=add2(new THREE.CylinderGeometry(p.big?3.4:2.4,0.4,L,8),glowMat(p.owner&&p.owner.def.fx||'#ffcf8a',.75));tr.rotation.z=-Math.PI/2;tr.position.x=-L/2-4;g.add(tr);break;}
+    case 'pellet':{for(const [dx,dy] of [[0,0],[-6,4],[-4,-5]]){const b=add2(sphereGeo(2.6),new THREE.MeshBasicMaterial({color:'#fff2c0'}));b.position.set(dx,dy,0);g.add(b);}
+      g.add(add2(sphereGeo(10),glowMat('#ffb347',.35)));break;}
     case 'kunai':{const c=add2(new THREE.ConeGeometry(4.5,22,6),new THREE.MeshToonMaterial({color:'#e6e9f2',gradientMap:GRAD}));c.rotation.z=-Math.PI/2;g.add(c);
       const tr=add2(new THREE.CylinderGeometry(1.5,1.5,26,6),glowMat('#ff7aa8',.7));tr.rotation.z=Math.PI/2;tr.position.x=-22;g.add(tr);break;}
     case 'orb':g.add(add2(sphereGeo(11),new THREE.MeshBasicMaterial({color:'#f2fcff'})));g.add(add2(sphereGeo(25),glowMat('#3fb8ff',.55)));
@@ -2249,6 +2293,7 @@ function sfx(k){
     case 'heavy': noise(.16,.55,700); tone(120,.16,'square',.07,.4); break;
     case 'block': tone(1500,.05,'triangle',.06); noise(.05,.2,4200); break;
     case 'whoosh': noise(.07,.07,3200); break;
+    case 'gun': noise(.09,.6,2400); noise(.18,.25,600); tone(150,.09,'square',.06,.35); break;
     case 'special': tone(300,.25,'sawtooth',.045,2.2); break;
     case 'super': tone(220,.6,'sawtooth',.05,1.6); tone(330,.6,'square',.035,1.6); break;
     case 'ko': tone(170,.8,'sawtooth',.08,.25); noise(.5,.45,380); break;
@@ -2498,10 +2543,16 @@ function startSpecial(f,tm){
   f.state='special';f.t=0;f.hasHit=false;f.landed=false;f.vx=0;f.actId++;f.spCd=30;sfx('special');
 }
 function spawn(f,o){G.projs.push(Object.assign({owner:f,team:f.team,life:140,id:++G.projId,dir:Math.sign(o.vx)},o));}
+function muzzle(f,dy){const s=f.def.scale,x=f.x+f.face*(f.def.weapon.kind==='rifle'?96:62)*s,y=f.y-(dy||112)*s;
+  G.fx.push({k:'imp',x,y,r:16,life:6,max:6,color:'#fff2c0',rot:Math.random()*TAU});for(let i=0;i<5;i++)G.fx.push({k:'sp',x,y,vx:f.face*(3+Math.random()*4),vy:(Math.random()-.5)*3,life:10,max:10,color:f.def.fx});
+  G.shake=Math.max(G.shake,f.def.weapon.kind==='shotgun'?7:3);sfx('gun');return [x,y];}
 function stepSpecial(f,o){
   const t=f.t,s=f.def.scale,end=()=>{f.state='idle';f.t=0;f.vx=0;};
   switch(f.def.special){
     case 'fireball': if(t===12) spawn(f,{kind:'fire',x:f.x+f.face*52*s,y:f.y-108*s,vx:f.face*8,w:34,h:30,dmg:11,stun:18,kb:5}); if(t>=34) end(); break;
+    case 'shot': if(t===8||t===15){const [x,y]=muzzle(f,t===8?114:108);spawn(f,{kind:'bullet',x,y,vx:f.face*17,w:18,h:8,dmg:5,stun:12,kb:2,life:70});} if(t>=30) end(); break;
+    case 'snipe': if(t===18){const [x,y]=muzzle(f,112);spawn(f,{kind:'bullet',big:1,x,y,vx:f.face*23,w:24,h:10,dmg:13,stun:20,kb:7,kd:true,heavy:true,launch:-6,life:60});f.vx=-f.face*3;} if(t>=42) end(); break;
+    case 'blast': if(t===12){const [x,y]=muzzle(f,108);for(const dy of [-18,0,18])spawn(f,{kind:'pellet',x,y:y+dy,vx:f.face*15,w:16,h:14,dmg:6,stun:16,kb:6,life:13});f.vx=-f.face*5;} if(t>=34) end(); break;
     case 'kunai': if(t===8) for(const dy of [118,100,82]) spawn(f,{kind:'kunai',x:f.x+f.face*44*s,y:f.y-dy*s,vx:f.face*12,w:20,h:10,dmg:5,stun:11,kb:2}); if(t>=28) end(); break;
     case 'orb': if(t===14) spawn(f,{kind:'orb',x:f.x+f.face*56*s,y:f.y-100*s,vx:f.face*4.2,w:46,h:46,dmg:15,stun:20,kb:6,kd:true,heavy:true,life:220}); if(t>=40) end(); break;
     case 'wave': if(t===12) spawn(f,{kind:'wave',x:f.x+f.face*60*s,y:FLOOR-24,vx:f.face*7,w:56,h:48,dmg:12,stun:20,kb:6,kd:true,life:120,ground:true}); if(t>=38) end(); break;
@@ -3095,7 +3146,7 @@ const SHOW_LEN=300,TALK_EACH=210,TALK_LEN=TALK_EACH*2,CD0=SHOW_LEN*2+TALK_LEN,IN
 /* ---- pre-fight talk: Player 1's lead walks in and says a line to the camera, then the enemy lead answers.
    Subtitles only for now (voice lines can be added later). Every fighter is cool, mean or flirty. ---- */
 const PERSONA={kai:'cool',vela:'flirty',bastion:'mean',mira:'cool',doc:'cool',juno:'flirty',ozzy:'flirty',lena:'mean',dex:'cool',sora:'flirty',bruno:'mean',mei:'cool',taro:'mean',nadia:'flirty',
-  warden:'mean',tavi:'flirty',ines:'flirty',devi:'cool',bayu:'mean',junho:'cool',ren:'cool',saya:'mean',gunnar:'mean',noor:'cool',kaito:'flirty',amara:'mean'};
+  warden:'mean',tavi:'flirty',ines:'flirty',devi:'cool',bayu:'mean',junho:'cool',ren:'cool',saya:'mean',gunnar:'mean',noor:'cool',kaito:'flirty',amara:'mean',rio:'cool',kira:'flirty',duke:'mean'};
 const TALK_LINES={
   cool:['{o}, huh? Don\u2019t blink. You\u2019ll miss it.','I didn\u2019t come here to talk. Let\u2019s go.','Relax, {o}. This\u2019ll be over fast.','Nice stance. Too bad it won\u2019t help.',
     'Neon, rain, and you in my way. Classic night.','Take your best shot, {o}. I\u2019ll wait.','I\u2019ve seen your moves, {o}. I\u2019m not impressed yet.','Stay cool. It hurts less that way.'],
@@ -3368,8 +3419,9 @@ function townActPose(f){
   }
   return P0;
 }
+const isGun=d=>!!(d&&d.weapon&&['gun','rifle','shotgun'].includes(d.weapon.kind));
 function townBasePose(f){const b=Math.sin((G.frame+(f.wx||0)*0.37)*0.045);
-  if(f.def.weapon)return {lean:2,drop:1.5+b*0.8,rot:0,tw:0,hx:0,lb:0,lf:0,fa:[26+b*2,42],ba:[7-b*2,22-b*2],fl:[6,3],bl:[-5,-6]};
+  if(f.def.weapon&&!isGun(f.def))return {lean:2,drop:1.5+b*0.8,rot:0,tw:0,hx:0,lb:0,lf:0,fa:[26+b*2,42],ba:[7-b*2,22-b*2],fl:[6,3],bl:[-5,-6]};
   return {lean:1,drop:1.5+b*0.8,rot:0,tw:0,hx:0,lb:0,lf:0,fa:[9+b*2,24+b*2],ba:[7-b*2,22-b*2],fl:[6,3],bl:[-5,-6]};}
 function townIdlePose(f){if(f.act)return townActPose(f);return townBasePose(f);}
 function townIdlePoseOld(f){const b=Math.sin((G.frame+(f.wx||0)*0.37)*0.045);
@@ -3419,10 +3471,10 @@ function targetPose(f){
   const t=f.t,id=f.def.id;
   switch(f.state){
     case 'idle':{if(f.town&&f.tpose)return f.tpose;if(f.town)return townIdlePose(f);const p=idlePose(id,G.frame+(f.team&&f.team.side?97:0));if(f.landT>0)p.drop+=f.landT*2.2;return p;}
-    case 'walk':{if(f.town&&f.tpose)return f.tpose;if(f.town){const q=f.sprint?townSprintPose(f):townWalkPose(f);if(f.def.weapon){q.fa=f.sprint?[-30,-20]:[-18,-12];}return q;}const fwd=Math.sign(f.vx||0)===f.face,ph=f.walkT*0.24,s=Math.sin(ph),c=Math.cos(ph),b=IDLE[id]||P.idle,p=cp(b),st=fwd?20:13;
+    case 'walk':{if(f.town&&f.tpose)return f.tpose;if(f.town){const q=f.sprint?townSprintPose(f):townWalkPose(f);if(f.def.weapon&&!isGun(f.def)){q.fa=f.sprint?[-30,-20]:[-18,-12];}return q;}const fwd=Math.sign(f.vx||0)===f.face,ph=f.walkT*0.24,s=Math.sin(ph),c=Math.cos(ph),b=IDLE[id]||P.idle,p=cp(b),st=fwd?20:13;
       p.bl=[-14+s*st,-6+s*st*0.6];p.fl=[20-s*st,6-s*st*0.6];p.lb=Math.max(0,c)*9;p.lf=Math.max(0,-c)*9;
       p.drop=Math.max(3,b.drop*0.6)+Math.abs(c)*3;p.lean+=fwd?4:-3;p.tw=s*(fwd?9:4);p.hx=(fwd?2:-2)+c*1.5;
-      p.fa[0]+=s*(fwd?10:4);p.ba[0]-=s*(fwd?10:4);if(f.landT>0)p.drop+=f.landT*2;if(f.def.weapon){p.fa=[-14,-8];p.tw=0;}return p;}
+      p.fa[0]+=s*(fwd?10:4);p.ba[0]-=s*(fwd?10:4);if(f.landT>0)p.drop+=f.landT*2;if(f.def.weapon){if(isGun(f.def)){const I=IDLE[id]||P.idle;p.fa=[I.fa[0],I.fa[1]];if(f.def.weapon.dual||f.def.weapon.kind==='rifle')p.ba=[I.ba[0],I.ba[1]];}else p.fa=[-14,-8];p.tw=0;}return p;}
     case 'crouch':return crouchPose(id);
     case 'guard':{const p=cp(P.block);p.drop+=Math.sin(G.frame*0.1)*1.2;p.hx=-2;return p;}
     case 'dash':{const fwd=f.dashDir===f.face,p=cp(fwd?P.dashF:P.dashB);if(fwd){const s=Math.sin(f.t*0.9);p.bl=[-30+s*30,-20+s*10];p.fl=[40-s*30,10-s*8];p.lb=Math.max(0,-s)*8;p.lf=Math.max(0,s)*8;}return p;}
@@ -4306,6 +4358,7 @@ const BANNERS=[
  {id:'fest',name:'Summer Festival',sub:'Sora Kiriyama and Juno Tide at the night festival.',feat:['sora','juno'],col:'#ffb070'},
  {id:'warden',name:'The Warden’s Trial',sub:'Akio Kurogane, founder of the Triad, and Doc Halcyon have boosted rates.',feat:['warden','doc'],col:'#b07cff'},
  {id:'blades',name:'Blades at Dusk',sub:'Ren Kurobane and Saya Tsukimori lead a crew that fights with steel.',feat:['ren','saya'],col:'#9fd3ff'},
+ {id:'guns',name:'Lock & Load',sub:'Rio Vasquez and his twin pistols, and Kira Holt with her red-sight rifle, bring firepower to Harbor City.',feat:['rio','kira'],col:'#ffb347'},
  {id:'world',name:'World Tour',sub:'New in Harbor City: Devi Raman and Tavi Ronda have boosted rates.',feat:['devi','tavi'],col:'#5fe08a'},
 ];
 /* one featured banner a day (it changes at the same time as the raid bosses), plus the standard banner */
@@ -4449,7 +4502,7 @@ const PBAN={night:{name:'Harbor Night',a:'#160f2a',b:'#3a2466',acc:'#ffc94d',pat
   warden:{name:'The Warden',a:'#0a0614',b:'#4a2a8a',acc:'#b07cff',pat:'rays'},
   dusk:{name:'Blades at Dusk',a:'#140f24',b:'#6a3a5a',acc:'#9fd3ff',pat:'slashes'},
   tour:{name:'World Tour',a:'#0a2a20',b:'#ff9a5a',acc:'#ffe07a',pat:'waves'}};
-const COS_POOL={std:{i:['h:kai','h:vela','h:bastion','h:doc','e:bolt','e:star'],b:['rooftop','neon']},champ:{i:['h:dex','e:fist'],b:['dojo','gold']},
+const COS_POOL={guns:{i:['h:rio','h:kira','h:duke'],b:['neon']},std:{i:['h:kai','h:vela','h:bastion','h:doc','e:bolt','e:star'],b:['rooftop','neon']},champ:{i:['h:dex','e:fist'],b:['dojo','gold']},
   frost:{i:['h:lena','h:kai','e:snow','e:flame'],b:['frost']},iron:{i:['h:taro','h:bruno','e:fist'],b:['iron']},dragon:{i:['h:mei','e:jade'],b:['jade']},
   shadow:{i:['h:mira','h:nadia','e:moon'],b:['shadow']},fest:{i:['h:sora','h:ozzy','h:juno','e:lantern'],b:['fest','sakura']},warden:{i:['h:warden','e:crown'],b:['warden','gold']},
   blades:{i:['h:ren','h:saya','h:gunnar','h:noor','h:kaito','h:amara','e:sword','e:scythe'],b:['dusk']},
