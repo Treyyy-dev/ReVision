@@ -3090,7 +3090,58 @@ function dummyInput(tm,opp){
 }
 
 /* ---------------- match flow ---------------- */
-const SHOW_LEN=300,INTRO_BASE=250,INTRO_LEN=SHOW_LEN*2+INTRO_BASE;
+const SHOW_LEN=300,TALK_EACH=210,TALK_LEN=TALK_EACH*2,CD0=SHOW_LEN*2+TALK_LEN,INTRO_BASE=250,INTRO_LEN=CD0+INTRO_BASE;
+/* ---- pre-fight talk: Player 1's lead walks in and says a line to the camera, then the enemy lead answers.
+   Subtitles only for now (voice lines can be added later). Every fighter is cool, mean or flirty. ---- */
+const PERSONA={kai:'cool',vela:'flirty',bastion:'mean',mira:'cool',doc:'cool',juno:'flirty',ozzy:'flirty',lena:'mean',dex:'cool',sora:'flirty',bruno:'mean',mei:'cool',taro:'mean',nadia:'flirty',
+  warden:'mean',tavi:'flirty',ines:'flirty',devi:'cool',bayu:'mean',junho:'cool',ren:'cool',saya:'mean',gunnar:'mean',noor:'cool',kaito:'flirty',amara:'mean'};
+const TALK_LINES={
+  cool:['{o}, huh? Don\u2019t blink. You\u2019ll miss it.','I didn\u2019t come here to talk. Let\u2019s go.','Relax, {o}. This\u2019ll be over fast.','Nice stance. Too bad it won\u2019t help.',
+    'Neon, rain, and you in my way. Classic night.','Take your best shot, {o}. I\u2019ll wait.','I\u2019ve seen your moves, {o}. I\u2019m not impressed yet.','Stay cool. It hurts less that way.'],
+  mean:['{o}? I\u2019ve knocked out tougher things before breakfast.','Get out of my sight, or get carried out of it.','I\u2019m going to enjoy this a little too much.','Your crew should\u2019ve sent someone who can fight.',
+    'Cry later, {o}. Fight now.','I\u2019ll make this quick. Not painless. Quick.','You\u2019re in the wrong part of town, {o}.','Kneel now and save us both the time.'],
+  flirty:['Well, hello, {o}. Try not to fall for me too fast.','Cute stance. Shame I have to knock it over.','Win or lose, you still owe me a date, {o}.','Careful, {o}. I bite back.',
+    'If you wanted my attention, you\u2019ve got it.','I\u2019ll go easy on that pretty face. Maybe.','Dance with me, {o}. Try to keep up.','You\u2019re cute when you\u2019re nervous, {o}.']};
+const shortName=d=>{let n=d.name;if(n.includes('\u00b7'))n=n.split('\u00b7').pop().trim();if(n.startsWith('Titan '))n=n.slice(6);return n.split(' ')[0];};
+function talkWho(side){
+  if(G.kind==='online'&&G.net){const n=G.net;if(n.coop&&side===1)return '';const host=n.role==='host'?n.me:n.opp,guest=n.role==='host'?n.opp:n.me;return (side===0?host:guest).name||'';}
+  if(G.kind==='pvp')return side===0?'Player 1':'Player 2';
+  return side===0?(SAVE.name||'You'):'';}
+function makeTalk(){
+  if(G.kind==='training'||!G.teams){G.talk=null;return;}
+  let sd=G.kind==='online'&&G.net?seedOf(G.net.id):(Math.random()*1e9)|0;const r=mulberry(sd);
+  const a=active(G.teams[0]),b=active(G.teams[1]),used=new Set();
+  G.talk=[[0,a,b],[1,b,a]].map(([side,f,o])=>{const per=PERSONA[f.def.id]||'cool',L=TALK_LINES[per];let k=Math.floor(r()*L.length);while(used.has(L[k]))k=(k+1)%L.length;used.add(L[k]);
+    return {side,per,name:f.def.name,col:f.def.fx,who:talkWho(side),text:L[k].replace(/\{o\}/g,shortName(o.def))};});
+}
+/* which side is talking right now: 0, 1, or -1 */
+const talkSide=()=>{if(!G.teams||!G.talk||G.intro<=0)return -1;const e=introE()-SHOW_LEN*2;return e>=0&&e<TALK_LEN?(e<TALK_EACH?0:1):-1;};
+function talkStep(e){
+  if(e===0){introLayout();G.teams.forEach((tm,ti)=>tm.members.forEach((m,i)=>{m.state='idle';m.t=0;m.tx0=null;if(ti>1||i!==tm.active){m.x=W/2+(tm.side?1:-1)*4200;m.introGone=false;}}));}
+  const side=e<TALK_EACH?0:1,te=e%TALK_EACH,tm=G.teams[side],f=active(tm),dir=side?-1:1,other=active(G.teams[1-side]);
+  if(te===0){other.x=W/2+(other.team.side?1:-1)*4200;if(f.tx0==null)f.tx0=f.x;f.x=f.tx0-dir*190;f.face=dir;f.yawOv=null;f.state='walk';f.t=0;}
+  if(te<46){f.x=lerp(f.tx0-dir*190,f.tx0,te/45);f.walkT+=1.15;f.state='walk';f.vx=7;f.face=dir;}
+  else if(te===46){f.x=f.tx0;f.vx=0;f.state='idle';f.t=0;f.face=dir;sfx('ui');}
+  for(const T of G.teams)for(const m of T.members){m.t++;updatePose(m);}
+}
+/* the talk camera sits in front of the speaker the whole time, full body, while they walk up to it and talk */
+function talkCamera(){
+  const side=talkSide(),f=active(G.teams[side]),s=f.def.scale,dir=side?-1:1,te=(introE()-SHOW_LEN*2)%TALK_EACH;
+  const fx=(f.tx0!=null?f.tx0:f.x)-W/2,fy=FLOOR-f.y,R=lerp(560,520,clamp(te/TALK_EACH,0,1))*s;
+  const p=[fx+dir*Math.cos(YAW)*R,fy+95*s,Math.sin(YAW)*R],l=[fx,fy+72*s,0];
+  cam.position.set(p[0],p[1],p[2]);cam.lookAt(l[0],l[1],l[2]);
+  camK=clamp(1000/(R*1.05),0.6,4.5);camS.x=l[0];camS.dist=1000;camS.y=0;camS.ph=null;
+}
+function drawTalk(c){
+  const side=talkSide();if(side<0)return;const L=G.talk[side],te=(introE()-SHOW_LEN*2)%TALK_EACH;if(te<30)return;
+  const shown=Math.min(L.text.length,Math.floor((te-30)*1.1)),a=clamp((te-30)/10,0,1)*clamp((TALK_EACH-te)/12,0,1);
+  c.save();c.globalAlpha=a;c.font=`600 22px ${FONT_B}`;const tw=Math.min(W-80,Math.max(360,c.measureText(L.text).width+60)),x=W/2-tw/2,y=H-96;
+  c.fillStyle='rgba(16,10,30,.86)';c.fillRect(x,y,tw,80);c.fillStyle=L.col;c.fillRect(x,y,6,80);
+  c.textAlign='left';c.textBaseline='top';c.font=`16px ${FONT_D}`;c.fillStyle=L.col;
+  c.fillText(L.name.toUpperCase()+(L.who?'  \u00b7  '+L.who:''),x+22,y+12);
+  c.font=`600 22px ${FONT_B}`;c.fillStyle='#f6efe4';c.fillText(L.text.slice(0,shown),x+22,y+40);
+  c.font=`11px ${FONT_D}`;c.fillStyle='rgba(246,239,228,.55)';c.textAlign='right';c.fillText(L.per.toUpperCase(),x+tw-14,y+14);
+  c.restore();}
 const introE=()=>INTRO_LEN-G.intro;
 /* which team is being shown off right now: 0, 1, or -1 when the showcase is over */
 const showSide=()=>G.teams&&G.intro>0&&introE()<SHOW_LEN*2?(introE()<SHOW_LEN?0:1):-1;
@@ -3115,8 +3166,9 @@ function introStep(){
   if(e0===0)showcaseLayout(0);
   if(e0===SHOW_LEN)showcaseLayout(1);
   if(e0<SHOW_LEN*2){if(e0%SHOW_LEN===8)sfx('bell');if(e0%SHOW_LEN===SHOW_LEN-80){const sd=e0<SHOW_LEN?0:1;for(const tm of G.teams)if(tm.side===sd)for(const m of tm.members){m.state='win';m.t=0;}}for(const tm of G.teams)for(const m of tm.members){m.t++;updatePose(m);}return;}
-  if(e0===SHOW_LEN*2)introLayout();
-  const e=e0-SHOW_LEN*2;
+  if(e0<CD0){if(!G.talk){G.intro=INTRO_LEN-CD0-1;introLayout();return;}talkStep(e0-SHOW_LEN*2);return;}
+  if(e0===CD0){introLayout();for(const tm of G.teams)for(const m of tm.members){m.yawOv=null;m.tx0=null;}}
+  const e=e0-CD0;
   if(e===6)G.banner={text:G.kind==='training'?'TRAINING':'VS',t:70,color:'#f6efe4'};
   for(const tm of G.teams)tm.members.forEach((m,i)=>{
     if(i===tm.active){if(e===76){m.state='idle';m.t=0;}return;}
@@ -3596,7 +3648,7 @@ function drawAllyHUD(c,tm){
 }
 /* the three battle challenges, shown during the 3-2-1 countdown */
 function drawChallenges(c){
-  if(!G.chal||G.kind==='training'||G.intro<=0||showSide()>=0)return;const e=introE()-SHOW_LEN*2;if(e<96||e>270)return;
+  if(!G.chal||G.kind==='training'||G.intro<=0||showSide()>=0)return;const e=introE()-CD0;if(e<96||e>270)return;
   const a=clamp((e-96)/12,0,1)*clamp((270-e)/14,0,1),w=360,h=26+G.chal.length*22,x=W/2-w/2,y=H*0.62;
   c.save();c.globalAlpha=a;c.fillStyle='rgba(16,10,30,.82)';c.fillRect(x,y,w,h);c.fillStyle='#ffc94d';c.fillRect(x,y,w,3);
   c.textAlign='center';c.textBaseline='top';otext(c,'BATTLE CHALLENGES',W/2,y+8,13,'#ffc94d',OUT,3);
@@ -3624,6 +3676,7 @@ const camS={x:0,dist:1000,y:0};let camK=1;
 function updateCamera(){
   if(G.mode==='town'){townCamera();return;}
   if(G.ult&&G.mode==='fight'&&G.teams){ultCamera();return;}
+  if(G.mode==='fight'&&G.teams&&talkSide()>=0){talkCamera();return;}
   if(G.mode==='cine'&&CINE.on&&CINE.qte&&CINE.qte.ph==='aim'){qteCamera();return;}
   let tx=0,dist=1000,ty=0;
   if(G.mode==='cine'&&CINE.on){[tx,dist,ty]=cineCam();}
@@ -3633,11 +3686,11 @@ function updateCamera(){
     const half=width/2;tx=clamp((x0+x1)/2-W/2,-500+half,500-half);
     ty=clamp(FLOOR-Math.min(...L.map(f=>f.y)),0,240)*0.45;
     if(a.state==='grab'||b.state==='grab'){dist*=0.8;}
-    const ie=introE()-SHOW_LEN*2;if(G.intro>0&&ie>=0&&ie<114){tx=0;dist=1000;ty=4;}
+    const ie=introE()-CD0;if(G.intro>0&&ie>=0&&ie<114){tx=0;dist=1000;ty=4;}
     if(showSide()>=0){tx=0;dist=G.coop&&showSide()===0?720:470;ty=34;}
     if(G.freeze>0&&G.freezeBy){const f=G.freezeBy;tx=f.x-W/2;dist=560;ty=0;}
   } else if(G.title){tx=0;dist=650;ty=8;} else {tx=Math.sin(G.frame*0.004)*60;dist=820;}
-  const ph=showSide()>=0?showSide():G.intro>0?2:3;if(camS.ph!==ph){if(camS.ph!=null&&ph!==3){camS.x=tx;camS.dist=dist;camS.y=ty;}camS.ph=ph;}
+  const ph=showSide()>=0?showSide():talkSide()>=0?4+talkSide():G.intro>0?2:3;if(camS.ph!==ph){if(camS.ph!=null&&ph!==3){camS.x=tx;camS.dist=dist;camS.y=ty;}camS.ph=ph;}
   camS.x+=(tx-camS.x)*0.1;camS.dist+=(dist-camS.dist)*(G.freeze>0?0.18:0.08);camS.y+=(ty-camS.y)*0.1;
   let sx=0,sy=0;if(G.shake>0.6&&!RM){sx=(Math.random()-.5)*G.shake*1.4;sy=(Math.random()-.5)*G.shake*1.4;}
   const swing=G.mode==='menu'?Math.sin(G.frame*0.006)*120:camS.x*0.18;
@@ -3663,8 +3716,9 @@ function syncScene(){
   for(const r of rigs){r.root.visible=false;r.shadow.visible=false;if(r.beam)r.beam.visible=false;}
   const show=f=>{if(!f.rig)f.rig=makeRig(f,scene,f.isDemo);updateRig(f);};
   if(G.teams&&G.mode!=='menu'){
-    for(const tm of G.teams){const f=active(tm);if(G.ult&&f!==G.ult.a&&f!==G.ult.o)continue;show(f);if(tm.exiting)show(tm.exiting);
-      if(G.intro>0)for(const m of tm.members)if(m!==f&&!m.introGone)show(m);
+    const TS=G.mode==='fight'?talkSide():-1;
+    for(const tm of G.teams){const f=active(tm);if(G.ult&&f!==G.ult.a&&f!==G.ult.o)continue;if(TS>=0&&tm!==G.teams[TS])continue;show(f);if(tm.exiting)show(tm.exiting);
+      if(G.intro>0&&TS<0)for(const m of tm.members)if(m!==f&&!m.introGone)show(m);
       if(!G.ult)for(const m of tm.members)if(m._ast&&m!==f&&m!==tm.exiting)show(m);
       if(f.state==='super'&&f.def.sup==='beam'&&!f.ult&&G.freeze===0&&f.t<62)updateBeam(f);}
   } else if(G.mode==='cine'){for(const f of CINE.actors)if(!f.hidden)show(f);}
@@ -3739,9 +3793,9 @@ function render(){
   if(renderer){syncScene();if(fpsCap()>60)interpScene(Math.min(1,acc/(1000/60)));renderer.render(scene,cam);trackSwoosh();}
   const c=hctx;c.setTransform(hscale,0,0,hscale,OX*hscale,OY*hscale);c.clearRect(-OX,-OY,W+2*OX,H+2*OY);
   drawSwoosh(c);drawFx(c);
-  {const sc=G.mode==='fight'&&showSide()>=0;if(render.sc!==sc){render.sc=sc;document.body.classList.toggle('showcase',sc);}}
+  {const sc=G.mode==='fight'&&(showSide()>=0||talkSide()>=0);if(render.sc!==sc){render.sc=sc;document.body.classList.toggle('showcase',sc);}}
   {const uc=!!(G.ult&&G.mode==='fight');if(render.uc!==uc){render.uc=uc;document.body.classList.toggle('ultcine',uc);}}
-  if(G.teams&&G.mode!=='menu'){if(G.ult&&G.mode==='fight')drawUlt(c);else{if(showSide()>=0)drawShowcase(c);else{drawHUD(c);drawGestures(c);drawChallenges(c);}drawBanner(c);}syncMoveButtons();}
+  if(G.teams&&G.mode!=='menu'){if(G.ult&&G.mode==='fight')drawUlt(c);else{if(showSide()>=0)drawShowcase(c);else if(talkSide()>=0)drawTalk(c);else{drawHUD(c);drawGestures(c);drawChallenges(c);}drawBanner(c);}syncMoveButtons();}
   if(G.mode==='town'&&!townBusy())drawTownTags(c);
   if(G.mode==='cine')drawCine(c);
 }
@@ -4030,7 +4084,7 @@ function startMatch(){
   setStage(G.kind==='online'&&G.net?G.net.stage:G.kind==='raid'?G.raid.boss.stage:G.kind==='event'&&G.evb?G.evb.stage:G.kind==='story'&&STORY[G.chapter]?STORY[G.chapter].stage:'rooftop');
   if(G.kind==='raid')G.timer=180;
   leaveTownView();introLayout();
-  G.chal=pickChallenges();
+  G.chal=pickChallenges();makeTalk();
   G.trainT0=G.frame;Object.assign(G,{ult:null,mode:'fight',projs:[],fx:[],hitstop:0,freeze:0,freezeBy:null,shake:0,timer:150,tf:0,intro:INTRO_LEN,over:null,paused:false,banner:null,supBanner:null,guideT:0,trails:[]});
   if(G.kind==='event'&&G.evb&&G.evb.timer)G.timer=G.evb.timer;
   show(null);document.body.classList.add('fighting');document.body.classList.toggle('pvp',G.kind==='pvp');fit();
