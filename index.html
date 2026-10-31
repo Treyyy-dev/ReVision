@@ -3090,7 +3090,7 @@ function dummyInput(tm,opp){
 }
 
 /* ---------------- match flow ---------------- */
-const SHOW_LEN=480,INTRO_BASE=250,INTRO_LEN=SHOW_LEN*2+INTRO_BASE;
+const SHOW_LEN=300,INTRO_BASE=250,INTRO_LEN=SHOW_LEN*2+INTRO_BASE;
 const introE=()=>INTRO_LEN-G.intro;
 /* which team is being shown off right now: 0, 1, or -1 when the showcase is over */
 const showSide=()=>G.teams&&G.intro>0&&introE()<SHOW_LEN*2?(introE()<SHOW_LEN?0:1):-1;
