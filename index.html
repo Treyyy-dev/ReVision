@@ -281,6 +281,7 @@ body.pvp .mbtn .mn{display:none}
 .btab:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .banner{position:relative;overflow:hidden;border:2px solid var(--bc,var(--gold));background:var(--panel)}
 .banner canvas{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:12/5}
+.btn.fest{background:linear-gradient(90deg,#7a3ad8,#c58bff);color:#fff}
 .binfo-btn{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;display:grid;place-items:center;font:italic 700 20px Georgia,serif;color:#fff;background:rgba(22,15,42,.82);border:2px solid #fff;cursor:pointer;padding:0}
 .binfo-btn:hover,.binfo-btn:focus-visible{background:var(--bc,var(--gold));color:#160f2a;outline:none}
 .bi-grid{list-style:none;margin:6px 0 16px;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
@@ -399,7 +400,11 @@ body.land .sres{grid-template-columns:repeat(10,minmax(0,1fr))}
 .tier span{font-size:12px;color:var(--muted)}
 .tier:hover{border-color:var(--ec)}
 .tier:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.evs{margin:8px 0 0}
+.evs{margin:8px 0 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.evr{margin:6px 0 0;font-size:13px;color:var(--ink)}.evr b{color:var(--ec);font-weight:700}
+.evleft{font-size:12px;color:var(--muted)}
+.evgo{margin-left:auto;padding:8px 22px}
+.evcard.off{opacity:.62}
 .live,.soon{font-family:var(--display);font-size:11px;letter-spacing:.08em;padding:2px 7px}
 .live{background:var(--ok);color:var(--night)}.soon{border:1px solid var(--line);color:var(--muted)}
 .mlist{display:grid;gap:6px}
@@ -1028,11 +1033,43 @@ const STORY=[
 /* ---------------- events, raids, missions ---------------- */
 const DAY=86400000;
 function dayStart(d){const x=new Date(d);x.setHours(0,0,0,0);return x;}
+/* events: each one is a special fight. Win it to collect that event's reward (3 rewarded wins per event per day).
+   Days are weekdays, 0 = Sunday. */
+const EV_WINS=3;
+const evLv=avg=>Math.min(60,Math.max(5,avg+2));
+const randFoes=(pool,n)=>pool.slice().sort(()=>Math.random()-.5).slice(0,n);
 const EVENTS=[
- {id:'dxp',name:'Double XP Weekend',days:[5,6,0],desc:'Every fight pays double XP. Great time to push fighters toward Lv 60.',col:'#9dff7a'},
- {id:'coin',name:'Rebucks Rush',days:[1,2],desc:'All Rebucks rewards are 50% higher.',col:'#ffc94d'},
- {id:'fest',name:'Vision Festival',days:[3,4],desc:'Vision summon rate rises from 5% to 8% on every banner.',col:'#c58bff'},
+ {id:'dxp',name:'Double XP Brawl',days:[5,6,0],col:'#9dff7a',stage:'rooftop',diff:'normal',
+  desc:'The XP Bandits are loose on the rooftops. Beat their crew and the fight pays double XP to your fighters and to you.',
+  rewText:'Double XP for your team and you · 90 Rebucks',rew:{coins:90,xp:120,xpMul:2,pxpMul:2},
+  foes:(P1,avg)=>randFoes(ROSTER.map((_,i)=>i),3).map(i=>({i,c:1,lv:evLv(avg),st:1+Math.floor(evLv(avg)/12)}))},
+ {id:'coin',name:'Rebucks Rush',days:[1,2,0],col:'#ffc94d',stage:'festival',diff:'normal',
+  desc:'A gold-chained crew is flashing cash at the night market. Knock them out and take the pot.',
+  rewText:'450 Rebucks · 60 XP',rew:{coins:450,xp:60},
+  foes:(P1,avg)=>['ozzy','bastion','bruno'].map(id=>({i:RIDX(id),c:2,lv:evLv(avg),st:1+Math.floor(evLv(avg)/12)}))},
+ {id:'fest',name:'Vision Festival',days:[3,4,6],col:'#c58bff',stage:'shrine',diff:'hard',
+  desc:'Three Vision fighters hold the festival grounds. Win and you get a free Festival summon with an 8% Vision rate.',
+  rewText:'1 free Festival summon (8% Vision) · 120 Rebucks · 120 XP',rew:{coins:120,xp:120,fest:1},
+  foes:(P1,avg)=>randFoes(ROSTER.map((d,i)=>d.rarity==='legend'?i:-1).filter(i=>i>=0),3).map(i=>({i,c:0,lv:evLv(avg),st:1+Math.floor(evLv(avg)/12)}))},
+ {id:'titan',name:'Titan Night',days:[1,3,5],col:'#ff6b4a',stage:'subway',diff:'normal',
+  desc:'Three giants walk the underground tonight: bigger, tougher, with 60% more health and 10% more power.',
+  rewText:'350 Rebucks · 300 XP',rew:{coins:350,xp:300},
+  foes:(P1,avg)=>randFoes(ROSTER.map((_,i)=>i),3).map(i=>{const b=ROSTER[i];return {i,c:0,lv:evLv(avg),st:1+Math.floor(evLv(avg)/12),def:Object.assign({},b,{name:'Titan '+b.name.split(' ')[0],hp:b.hp*1.6,power:b.power*1.1,scale:b.scale*1.22})};})},
+ {id:'mirror',name:'Mirror Match',days:[2,4,6],col:'#7fe3ff',stage:'alley',diff:'hard',
+  desc:'Your own crew steps out of the glass, same fighters and same levels, and they fight hard.',
+  rewText:'300 Rebucks · 250 XP',rew:{coins:300,xp:250},
+  foes:(P1)=>P1.map(m=>({i:m.i,c:(m.c+1)%3,lv:m.lv,st:m.st}))},
+ {id:'blitz',name:'Blitz Hour',days:[2,5],col:'#ff9ad8',stage:'bamboo',diff:'normal',
+  desc:'Only 60 seconds on the clock. Knock out the whole crew before time runs out.',
+  rewText:'300 Rebucks · 200 XP',rew:{coins:300,xp:200},timer:60,
+  foes:(P1,avg)=>randFoes(ROSTER.map((_,i)=>i),3).map(i=>({i,c:0,lv:Math.max(1,evLv(avg)-4),st:1}))},
+ {id:'legends',name:'Legends Gauntlet',days:[0,3],col:'#b07cff',stage:'tower',diff:'hard',
+  desc:'Akio Kurogane brings Ren and Saya to the top of the tower, six levels above your crew.',
+  rewText:'600 Rebucks · 500 XP',rew:{coins:600,xp:500},
+  foes:(P1,avg)=>['warden','ren','saya'].map(id=>({i:RIDX(id),c:0,lv:Math.min(60,avg+6),st:2+Math.floor(Math.min(60,avg+6)/12)}))},
 ];
+function evWinsLeft(e){const k=periodKey('daily'),v=SAVE.evw&&SAVE.evw.k===k?SAVE.evw:(SAVE.evw={k,w:{}});return Math.max(0,EV_WINS-(v.w[e.id]|0));}
+function evWinUse(e){evWinsLeft(e);SAVE.evw.w[e.id]=(SAVE.evw.w[e.id]|0)+1;}
 function eventState(e,now){now=now||new Date();const on=e.days.includes(now.getDay());let t=dayStart(now).getTime();
   for(let k=1;k<=8;k++){t+=DAY;const d=new Date(t);if(e.days.includes(d.getDay())!==on)break;}return {on,ms:t-now.getTime()};}
 const evOn=id=>eventState(EVENTS.find(e=>e.id===id)).on;
@@ -2485,6 +2522,8 @@ function stepSpecial(f,o){
       if(f.landed&&f.t>=212) end(); break;
   }
 }
+/* the rival an ultimate would hit; while they're tagging or knocked out the ultimate waits, so it always plays as the full cinematic */
+function ultTarget(tm){const o=G.coop&&tm===G.teams[1]?active(coopTarget()):active(G.teams[1-tm.side]);return o&&o.alive&&!o.dying&&!['tagin','tagout','ko'].includes(o.state)?o:null;}
 function startSuper(f,tm,ult){
   if(ult){const o=G.coop&&tm===G.teams[1]?active(coopTarget()):active(G.teams[1-tm.side]);if(o&&o.alive&&!o.dying&&!['tagin','tagout','ko'].includes(o.state)){if(tm.side===0)track('ults');tm.ults=(tm.ults|0)+1;tm.meter-=ULT_COST;startUlt(f,o);return;}}
   if(tm.side===0)track(ult?'ults':'specials');if(ult)tm.ults=(tm.ults|0)+1;
@@ -2842,7 +2881,7 @@ function stepActive(tm,f,o,inp){
   if(blk&&!f.wasBlk)f.blockStart=G.frame;
   f.wasBlk=blk;f.holdBack=blk;f.crhHeld=!!inp.crh;
   const specials=cancel=>{
-    if(want('ult')&&tm.meter>=ULT_COST){use('ult');startSuper(f,tm,true);return true;}
+    if(want('ult')&&tm.meter>=ULT_COST&&ultTarget(tm)){use('ult');startSuper(f,tm,true);return true;}
     if(want('sp2')&&tm.meter>=SP_COST){use('sp2');startSuper(f,tm,false);return true;}
     if(want('sp1')&&tm.meter>=SP_COST&&f.spCd<=0){use('sp1');startSpecial(f,tm);return true;}
     if(cancel&&want('tag')&&canTag(tm)){use('tag');doTag(tm,false,tm.tagIdx);return true;}
@@ -2975,7 +3014,7 @@ function keyTarget(code){
 }
 function clearInputs(){keysP=[{},{},{}];prevP=[{},{},{}];pulseP=[{},{},{}];for(const p of [1,2]){holdP[p].block=false;holdP[p].crouch=0;}gestures.clear();}
 addEventListener('keydown',e=>{
-  unlock();if(showSide()>=0&&G.mode==='fight'&&!G.paused&&e.code!=='Escape'&&e.code!==SAVE.binds.kb.pause){skipShowcase();e.preventDefault();return;}
+  unlock();if(showSide()>=0&&G.mode==='fight'&&!G.paused&&e.code!=='Escape'&&e.code!==SAVE.binds.kb.pause){e.preventDefault();return;}
   if((e.code===SAVE.binds.kb.pause||e.code==='Escape')&&G.mode==='fight'){togglePause();e.preventDefault();return;}
   const t=keyTarget(e.code);if(t&&G.mode==='fight'&&!G.paused){keysP[t[0]][t[1]]=1;e.preventDefault();}
 });
@@ -2986,7 +3025,6 @@ addEventListener('blur',()=>{keysP=[{},{},{}];});
    Single player uses the whole screen; in PvP each player owns a half. Bench portraits tag. */
 const gestures=new Map();
 const appEl=$('#app');
-appEl.addEventListener('pointerdown',e=>{if(showSide()>=0&&G.mode==='fight'&&!G.paused&&!e.target.closest('#pauseBtn'))skipShowcase();},true);
 function appPoint(e){if(document.body.classList.contains('rot'))return [e.clientY,window.innerWidth-e.clientX];const r=appEl.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
 function hudPoint(ax,ay){const wx=stage.offsetLeft+wrap.offsetLeft,wy=stage.offsetTop+wrap.offsetTop;return [(ax-wx)/HS-OX,(ay-wy)/HS-OY];}
 function pulse(p,k,extra){pulseP[p][k]=1;if(extra)Object.assign(pulseP[p],extra);}
@@ -3066,7 +3104,7 @@ function showcaseLayout(side){
     Object.assign(m,{x:on?W/2+k*175:W/2+(tm.side?1:-1)*4200,z:on?(k?-40:30):0,y:FLOOR,vx:0,vy:0,vz:0,onGround:true,face:1,state:'showoff',t:k===0?0:k<0?18:36,introGone:false,introJump:false,pv:null});
     m.pose=cp(IDLE[m.def.id]||P.idle);});
 }
-function skipShowcase(){if(G.kind==='online'||showSide()<0||G.mode!=='fight'||G.paused)return;G.intro=INTRO_LEN-SHOW_LEN*2;}
+function skipShowcase(){/* match intros always play in full */}
 function introLayout(){
   for(const tm of G.teams)tm.members.forEach((m,i)=>{const k=(i-tm.active+3)%3,ally=tm.ally?1:0;
     Object.assign(m,{x:W/2+(tm.side?1:-1)*(190+k*72+ally*120),z:-k*62-ally*40,y:FLOOR,vx:0,vy:0,vz:0,onGround:true,face:tm.side?-1:1,state:'win',t:0,introGone:false,introJump:false,pv:null});
@@ -3492,7 +3530,6 @@ function drawShowcase(c){
   for(const m of mem){const [x]=proj(m.x,FLOOR,m.z);c.textAlign='center';
     otext(c,m.def.name.split(' ')[0].toUpperCase(),x,H-46,20,m.def.fx,OUT,5);
     otext(c,`LV ${m.lv} · ${m.st}\u2605 · ${m.def.cls.toUpperCase()}`,x,H-24,11,'#e6dcf5',OUT,4);}
-  if(G.kind!=='online'&&e>30){c.textAlign='right';c.globalAlpha=a*0.75;otext(c,IS_TOUCH?'TAP TO SKIP':'PRESS ANY KEY TO SKIP',W-16,H-8,11,'#f6efe4',OUT,3);}
   c.restore();
 }
 function drawHUD(c){
@@ -3899,6 +3936,7 @@ function renderDraft(){
   const head={vs:['Sparring','Choose your team','Flip through your saved teams with the arrows. The fighter marked STARTS opens the fight; the other two heal on the bench.'],
     story:[`Story · Chapter ${G.chapter+1}`,STORY[G.chapter]?STORY[G.chapter].name:'',`Choose one of your teams to face ${STORY[G.chapter]?STORY[G.chapter].foes.map(id=>ROSTER[RIDX(id)].name.split(' ')[0]).join(', '):''}.`],
     training:['Training Hall','Choose your team','Practice against a sparring partner with no timer. Its health never drops, so you can drill combos forever. It stands still by default; change that below or from the pause menu.'],
+    event:['Event',G.evb?G.evb.name:'',G.evb?`${G.evb.desc} Win reward: ${G.evb.rewText}${evWinsLeft(G.evb)?` (${evWinsLeft(G.evb)} left today)`:' (collected today)'}.`:''],
     raid:['Raid boss',G.raid?`${G.raid.boss.name} \u00b7 ${G.raid.tier.name}`:'',G.raid?`Choose a team to face a giant boss at Lv ${G.raid.tier.lv}. It has seven times the health of a normal fighter and fights alone.`:''],
     online:isCoopMode(G.netMode)?[`Online \u00b7 Co-op \u00b7 ${coopModeName(G.netMode)}`,'Pick your duo','Co-op teams have two fighters. Choose Team 7 or 8, then you and an online teammate fight side by side, at your fighters\u2019 own levels and stars.']
       :[`Online \u00b7 PvP \u00b7 ${G.netMode==='ranked'?'Ranked':'Casual'}`,'Pick your team',G.netMode==='ranked'?'Ranked uses your fighters\u2019 own levels and stars. Win to climb the ladder.':'Casual puts every fighter at max power, Lv 60 and 14\u2605, so it comes down to skill.'],
@@ -3957,7 +3995,7 @@ document.querySelectorAll('#dummy button').forEach(b=>b.addEventListener('click'
 $('#selBack').addEventListener('click',()=>{
   if(draft.kind==='pvp'&&draft.step===2){draft.step=1;renderDraft();return;}
   if(draft.kind==='story'){openStoryIntro(G.chapter);return;}
-  if(draft.kind==='raid'){openEvents();return;}
+  if(draft.kind==='raid'||draft.kind==='event'){openEvents();return;}
   if(draft.kind==='online'){openOnline();return;}
   goHome();
 });
@@ -3971,6 +4009,7 @@ $('#goBtn').addEventListener('click',()=>{
   let P2;
   if(pv)P2=draft.p2.map(mine);
   else if(draft.kind==='raid'){const r=G.raid;P2=[{i:RIDX(r.boss.id),c:0,lv:r.tier.lv,st:r.tier.st,def:raidDef(r.boss)}];}
+  else if(draft.kind==='event'){P2=G.evb.foes(P1,avg);}
   else if(draft.kind==='story'){const ch=STORY[G.chapter];P2=ch.foes.map(id=>({i:RIDX(id),c:0,lv:ch.lvl,st:1+Math.floor(ch.lvl/12)}));}
   else P2=ROSTER.map((_,i)=>i).sort(()=>Math.random()-.5).slice(0,3).map(i=>({i,c:0,lv:avg,st:1}));
   for(const m of P2){if(P1.some(o=>o.i===m.i&&o.c===m.c))m.c=(m.c+1)%3;}
@@ -3981,18 +4020,19 @@ $('#goBtn').addEventListener('click',()=>{
 function startMatch(){
   unlock();clearMatchRigs();clearInputs();
   const {P1,P2}=G.lineup;
-  G.diff=G.kind==='online'?(G.net&&G.net.coop?'hard':'normal'):G.kind==='story'?STORY[G.chapter].diff:G.kind==='raid'?G.raid.tier.diff:G.kind==='training'?'normal':G.vsDiff;
+  G.diff=G.kind==='online'?(G.net&&G.net.coop?'hard':'normal'):G.kind==='story'?STORY[G.chapter].diff:G.kind==='raid'?G.raid.tier.diff:G.kind==='event'&&G.evb?G.evb.diff:G.kind==='training'?'normal':G.vsDiff;
   const coop=G.kind==='online'&&G.net&&G.net.coop&&G.lineup.P3;
   if(!coop)G.coop=null;
   G.teams=[makeTeam(0,P1,false),makeTeam(1,P2,G.kind!=='pvp'&&(G.kind!=='online'||coop))];
   if(coop){const C=makeTeam(0,G.lineup.P3,false);C.ally=true;G.teams.push(C);}
   for(const tm of G.teams)for(const m of tm.members){headPortrait(m.def.id,m.costume,'neutral');headPortrait(m.def.id,m.costume,'hurt');}
   mbCache=['',''];G.hudHit=[];
-  setStage(G.kind==='online'&&G.net?G.net.stage:G.kind==='raid'?G.raid.boss.stage:G.kind==='story'&&STORY[G.chapter]?STORY[G.chapter].stage:'rooftop');
+  setStage(G.kind==='online'&&G.net?G.net.stage:G.kind==='raid'?G.raid.boss.stage:G.kind==='event'&&G.evb?G.evb.stage:G.kind==='story'&&STORY[G.chapter]?STORY[G.chapter].stage:'rooftop');
   if(G.kind==='raid')G.timer=180;
   leaveTownView();introLayout();
   G.chal=pickChallenges();
   G.trainT0=G.frame;Object.assign(G,{ult:null,mode:'fight',projs:[],fx:[],hitstop:0,freeze:0,freezeBy:null,shake:0,timer:150,tf:0,intro:INTRO_LEN,over:null,paused:false,banner:null,supBanner:null,guideT:0,trails:[]});
+  if(G.kind==='event'&&G.evb&&G.evb.timer)G.timer=G.evb.timer;
   show(null);document.body.classList.add('fighting');document.body.classList.toggle('pvp',G.kind==='pvp');fit();
   if(document.activeElement)document.activeElement.blur();
 }
@@ -4037,7 +4077,7 @@ function togglePause(){
 $('#pauseBtn').addEventListener('click',()=>{unlock();togglePause();});
 $('#resumeBtn').addEventListener('click',togglePause);
 $('#quitBtn').addEventListener('click',()=>{if(G.kind==='online'&&G.net&&!G.net.finished&&G.mode==='fight'){netForfeit();return;}
-  if(G.kind==='training'&&G.mode==='fight'&&G.frame-(G.trainT0||G.frame)>=1800){const r=addPlayerXP(evOn('dxp')?20:10);persist();if(r.amt)setTimeout(()=>toast(r.to>r.from?`Training done: +${r.amt} player EXP. Player level up! You are now level ${r.to}.`:`Training done: +${r.amt} player EXP.`),300);}
+  if(G.kind==='training'&&G.mode==='fight'&&G.frame-(G.trainT0||G.frame)>=1800){const r=addPlayerXP(10);persist();if(r.amt)setTimeout(()=>toast(r.to>r.from?`Training done: +${r.amt} player EXP. Player level up! You are now level ${r.to}.`:`Training done: +${r.amt} player EXP.`),300);}
   goHome();});
 $('#soundBtn').addEventListener('click',()=>{muted=!muted;syncPauseButtons();});
 $('#dummyBtn').addEventListener('click',()=>{const o=['stand','block','cpu'];G.train.dummy=o[(o.indexOf(G.train.dummy)+1)%3];syncPauseButtons();});
@@ -4069,12 +4109,18 @@ function showResult(){
     if(win&&!(n.coop&&!(G.coop&&G.coop.boss))){for(const m of me.members)SAVE.wins[m.def.id]=(SAVE.wins[m.def.id]||0)+1;track('wins');}
     netRecord(n,win,draw).then(r=>{if(G.mode!=='result')return;line.hidden=false;line.textContent=n.ranked?`${text} Rating ${r.before} \u2192 ${r.after} (${r.delta>=0?'+':''}${r.delta}) \u00b7 ${tierOf(r.after).name}`:text;}).catch(()=>{});
     btns=[['Find another',()=>{G.netMode=n.mode;openDraft('online');}],['Arena',openOnline],['Town',goHome]];
-    if(evOn('dxp'))xpGain*=2;if(evOn('coin'))coins=Math.round(coins*1.5);
   } else {
 
     const win=w===0;t.textContent=win?'Victory':w===1?'Defeated':'Draw';t.className=win?'win':w===1?'lose':'';
     sub=reason||(win?'Rival crew knocked out':'Your crew was knocked out');
     if(k==='vs'){coins=win?{easy:60,normal:90,hard:130}[G.diff]:20;xpGain=win?{easy:40,normal:60,hard:90}[G.diff]:15;btns=[['Rematch',startMatch],['New team',()=>openDraft('vs')],['Town',goHome]];}
+    if(k==='event'){const E=G.evb,R=E.rew;
+      if(win&&evWinsLeft(E)>0){evWinUse(E);coins=R.coins||0;xpGain=(R.xp||0)*(R.xpMul||1);G.evPx=R.pxpMul||1;
+        if(R.fest){SAVE.festPulls=(SAVE.festPulls|0)+R.fest;}
+        text=`${E.name} cleared! ${E.rewText}.${R.fest?' Your free Festival summon is waiting in Summon.':''} ${evWinsLeft(E)?evWinsLeft(E)+' more rewarded '+(evWinsLeft(E)===1?'win':'wins')+' today.':'That was the last rewarded win today.'}`;}
+      else if(win){coins=90;xpGain=60;text=`${E.name} won. Today\u2019s event rewards are collected, so this one paid normal rewards.`;}
+      else{coins=20;xpGain=15;text='The event crew held on. Level up, star up, or try a different team.';}
+      btns=win?[['Fight again',()=>openDraft('event')],['Events',openEvents],['Town',goHome]]:[['Retry',startMatch],['Change team',()=>openDraft('event')],['Events',openEvents]];}
     if(k==='raid'){const T=G.raid.tier;
       if(win){coins=T.coins;tokens=T.tokens;xpGain=T.xp;track('raids');text=`${G.raid.boss.name} is down. Your crew earned ${T.coins} Rebucks.`;btns=[['Fight again',startMatch],['Events',openEvents]];}
       else{coins=40;xpGain=Math.round(T.xp*0.2);text='The boss is still standing. Level up, star up, or bring a different team.';btns=[['Retry',startMatch],['Change team',()=>openDraft('raid')],['Events',openEvents]];}}
@@ -4088,19 +4134,18 @@ function showResult(){
       } else {coins=20;xpGain=Math.round(ch.xp*0.25);text='Regroup, level up your fighters, or try a different crew.';btns=[['Retry',startMatch],['Change crew',()=>openDraft('story')],['Story map',openStory]];}
     }
     if(win){for(const m of me.members)SAVE.wins[m.def.id]=(SAVE.wins[m.def.id]||0)+1;track('wins');if(k==='story')track('chapters');}
-    if(evOn('dxp'))xpGain*=2;if(evOn('coin'))coins=Math.round(coins*1.5);
   }
   const ups=xpGain?me.members.map(m=>[m.def,addXP(m.def.id,xpGain)]):[];
   let pxp;{const won=k==='online'&&G.net?w===G.net.side:w===0,draw=w<0;
     const base=k==='pvp'?30:k==='online'?(G.net&&G.net.coop?70:G.net&&G.net.ranked?60:50):k==='story'?50:k==='raid'?60:({easy:30,normal:45,hard:60}[G.diff]||45);
-    pxp=k==='pvp'?base:won?base:draw?Math.round(base*0.7):Math.round(base*0.45);if(evOn('dxp'))pxp*=2;}
+    pxp=k==='pvp'?base:won?base:draw?Math.round(base*0.7):Math.round(base*0.45);if(k==='event'&&won&&G.evPx>1)pxp*=G.evPx;G.evPx=1;}
   const pup=addPlayerXP(pxp);
   coins+=Math.round(tokens*3);tokens=0;SAVE.coins+=coins;persist();
   $('#resSub').textContent=sub;
   line.hidden=!text;line.textContent=text;
   const standing=me.members.filter(m=>m.alive).length;
   $('#resStats').innerHTML=(k==='pvp'?`<dt>P1 longest combo</dt><dd>${me.maxCombo} hits</dd><dt>P2 longest combo</dt><dd>${G.teams[1].maxCombo} hits</dd>`
-    :`<dt>Longest combo</dt><dd>${me.maxCombo} hits</dd><dt>Damage dealt</dt><dd>${Math.round(me.dmg)}</dd><dt>Fighters standing</dt><dd>${standing} of ${me.members.length}</dd><dt>Rebucks earned</dt><dd>+${coins}${evOn('coin')?' (Rebucks Rush)':''}</dd>`+(evOn('dxp')&&xpGain?`<dt>Event</dt><dd>Double XP</dd>`:''))+(xpGain?`<dt>XP each</dt><dd>+${xpGain}</dd>`+ups.map(([d,r])=>`<dt>${d.name.split(' ')[0]}</dt><dd>${r.to>r.from?`Lv ${r.from} \u2192 ${r.to}`:`Lv ${r.to}`}</dd>`).join(''):'');
+    :`<dt>Longest combo</dt><dd>${me.maxCombo} hits</dd><dt>Damage dealt</dt><dd>${Math.round(me.dmg)}</dd><dt>Fighters standing</dt><dd>${standing} of ${me.members.length}</dd><dt>Rebucks earned</dt><dd>+${coins}</dd>`+(k==='event'&&G.evb?`<dt>Event</dt><dd>${G.evb.name}</dd>`:''))+(xpGain?`<dt>XP each</dt><dd>+${xpGain}</dd>`+ups.map(([d,r])=>`<dt>${d.name.split(' ')[0]}</dt><dd>${r.to>r.from?`Lv ${r.from} \u2192 ${r.to}`:`Lv ${r.to}`}</dd>`).join(''):'');
   {const v=SAVE.plv,pct=v.lv>=PLV_MAX?100:Math.round(v.xp/plvNeed(v.lv)*100);
    $('#resStats').insertAdjacentHTML('beforeend',`<dt>Player EXP</dt><dd>+${pup.amt} · Lv ${v.lv}${v.lv>=PLV_MAX?' (max)':` · ${pct}%`}</dd>`);
    if(pup.to>pup.from)setTimeout(()=>toast(`Player level up! You are now level ${pup.to}.`),400);}
@@ -4217,16 +4262,16 @@ function untilNextBanner(){const ms=DAY-(Date.now()%DAY),h=Math.floor(ms/3600000
 
 let curBanner=0,lastPull=1;
 function openSummon(){toHub();if(!openBanners().includes(BANNERS[curBanner]))curBanner=BANNERS.indexOf(todayBanner());renderBannerList();show('#summon');}
-function bannerRates(b){return (evOn('fest')?'Vision 8% (festival) · Improved 25% · Fresh 67%':'Vision 5% · Improved 25% · Fresh 70%')+(b.feat.length?' · featured fighters take half of their tier':'')+(COS_POOL[b.id]?` · Bonus: ${Math.round(COS_RATE*100)}% per pull for a profile icon or banner (${cosLeft(b).length} left here)`:'');}
+function bannerRates(b){return 'Vision 5% · Improved 25% · Fresh 70%'+(b.feat.length?' · featured fighters take half of their tier':'')+(COS_POOL[b.id]?` · Bonus: ${Math.round(COS_RATE*100)}% per pull for a profile icon or banner (${cosLeft(b).length} left here)`:'');}
 function renderBannerList(){
   const L=$('#blist');L.innerHTML='';BSHOW.cards=[];BSHOW.day=bannerDay();
   openBanners().forEach(b=>{const i=BANNERS.indexOf(b),daily=!!b.feat.length;const card=document.createElement('article');card.className='bcard';card.id='bcard-'+i;card.style.setProperty('--bc',b.col);
     card.innerHTML=`<div class="banner"><canvas width="960" height="400" aria-hidden="true"></canvas><button type="button" class="binfo-btn" aria-label="Everything you can pull on ${esc(b.name)}">i</button><div class="bcopy"><p class="eyebrow">${daily?'Today’s banner · <span class="bnext">new one in '+untilNextBanner()+'</span>':'Always open · standard'}</p><h3>${esc(b.name)}</h3><p>${esc(b.sub)}</p><p class="rates">${bannerRates(b)}</p></div></div>
-      <div class="row sumrow"><button class="btn alt" type="button" data-n="1" ${SAVE.coins<100?'disabled':''}>Summon ×1 · 100 Rebucks</button><button class="btn" type="button" data-n="10" ${SAVE.coins<1000?'disabled':''}>Summon ×10 · 1,000 Rebucks</button></div>`;
+      <div class="row sumrow"><button class="btn alt" type="button" data-n="1" ${SAVE.coins<100?'disabled':''}>Summon ×1 · 100 Rebucks</button><button class="btn" type="button" data-n="10" ${SAVE.coins<1000?'disabled':''}>Summon ×10 · 1,000 Rebucks</button>${(SAVE.festPulls|0)>0?`<button class="btn fest" type="button" data-n="1" data-fest="1">Festival summon · free · 8% Vision (${SAVE.festPulls})</button>`:''}</div>`;
     const cv=card.querySelector('canvas');paintBanner(b,cv);
     BSHOW.cards.push({b,cv,ids:(b.feat.length?b.feat:b.show).slice(0,2),cur:0,t:0,bg:null});
     card.querySelector('.binfo-btn').addEventListener('click',()=>{sfx('ui');openBannerInfo(b);});
-    card.querySelectorAll('[data-n]').forEach(x=>x.addEventListener('click',()=>{curBanner=i;doSummon(+x.dataset.n,!!x.dataset.tok);}));
+    card.querySelectorAll('[data-n]').forEach(x=>x.addEventListener('click',()=>{curBanner=i;doSummon(+x.dataset.n,false,!!x.dataset.fest);}));
     L.appendChild(card);});
 }
 /* ---- live banner showcase: one featured fighter poses for 5 seconds, then performs their ultimate,
@@ -4293,13 +4338,13 @@ function bannerTick(){
     try{bsDraw(C);}catch(e){}});
 }
 /* ---- the "i" box: everything you can pull on a banner, full screen ---- */
-function bannerOdds(b){const lr=evOn('fest')?0.08:0.05,T={legend:lr,epic:0.25,rare:1-lr-0.25},out={};
+function bannerOdds(b){const lr=0.05,T={legend:lr,epic:0.25,rare:1-lr-0.25},out={};
   for(const tier of ['legend','epic','rare']){const pool=ROSTER.filter(d=>d.rarity===tier),fi=pool.filter(d=>b.feat.includes(d.id));
     for(const d of pool)out[d.id]=fi.length?T[tier]*((b.feat.includes(d.id)?0.5/fi.length:0)+0.5/pool.length):T[tier]/pool.length;}
   return out;}
 const pct=v=>(v*100<1?(v*100).toFixed(2):(v*100).toFixed(1))+'%';
 function openBannerInfo(b){
-  const O=bannerOdds(b),el=$('#binfoBody'),lr=evOn('fest')?0.08:0.05;
+  const O=bannerOdds(b),el=$('#binfoBody'),lr=0.05;
   $('#binfoTtl').textContent=b.name;
   const card=d=>{const own=owns(d.id),st=own?((SAVE.stars||{})[d.id]||1):0,feat=b.feat.includes(d.id);
     return `<li class="bi-card r-${d.rarity}${feat?' feat':''}"><img alt="" src="${bustPortrait(d.id,0).toDataURL()}"><div><b>${esc(d.name)}</b><span>${RAR[d.rarity].name}${feat?' · Featured':''}</span><span class="bi-rate">${pct(O[d.id])} per pull</span><span class="bi-own">${own?st+'★ owned':'Not owned yet'}</span></div></li>`;};
@@ -4443,17 +4488,18 @@ function profileCard(cv,o){
 }
 const myProfile=()=>({name:SAVE.name||'Player',icon:SAVE.prof.icon,banner:SAVE.prof.banner});
 
-function rollOne(b,guar){
-  const r=Math.random(),lr=evOn('fest')?0.08:0.05;let tier=r<lr?'legend':r<lr+0.25?'epic':'rare';if(guar&&tier==='rare')tier='epic';
+function rollOne(b,guar,fest){
+  const r=Math.random(),lr=fest?0.08:0.05;let tier=r<lr?'legend':r<lr+0.25?'epic':'rare';if(guar&&tier==='rare')tier='epic';
   const pool=ROSTER.filter(d=>d.rarity===tier),feat=pool.filter(d=>b.feat.includes(d.id)),from=feat.length&&Math.random()<0.5?feat:pool;
   return from[Math.floor(Math.random()*from.length)];
 }
-let lastTok=false;
-function doSummon(n,tok){
-  n=n===10?10:1;tok=false;const cost=n===10?1000:100,have=tok?SAVE.tokens:SAVE.coins;if(have<cost){toast('Not enough Rebucks yet. Win fights, clear missions and beat raid bosses to earn more.');return;}
-  unlock();if(tok)SAVE.tokens-=cost;else SAVE.coins-=cost;lastPull=n;lastTok=!!tok;track('summons',n);const b=BANNERS[curBanner],res=[];
+let lastTok=false,lastFest=false;
+function doSummon(n,tok,fest){
+  n=n===10?10:1;tok=false;if(fest){n=1;if((SAVE.festPulls|0)<1)return;}
+  const cost=fest?0:n===10?1000:100,have=SAVE.coins;if(have<cost){toast('Not enough Rebucks yet. Win fights, clear missions, events and raid bosses to earn more.');return;}
+  unlock();if(fest)SAVE.festPulls--;else SAVE.coins-=cost;lastPull=n;lastTok=false;lastFest=!!fest;track('summons',n);const b=BANNERS[curBanner],res=[];
   for(let i=0;i<n;i++){
-    const guar=n===10&&i===n-1&&!res.some(r=>r.d.rarity!=='rare'),d=rollOne(b,guar);let kind,st;
+    const guar=n===10&&i===n-1&&!res.some(r=>r.d.rarity!=='rare'),d=rollOne(b,guar,fest);let kind,st;
     if(!owns(d.id)){SAVE.owned.push(d.id);SAVE.stars[d.id]=1;kind='new';st=1;}
     else{st=starsOf(d.id);if(st<MAX_STARS){st++;SAVE.stars[d.id]=st;kind='star';}else{SAVE.coins+=50;kind='max';}}
     res.push({d,kind,st});
@@ -4506,10 +4552,10 @@ function showSummonResults(res,cos){
     e.innerHTML=`<span class="tag">NEW</span><canvas width="320" height="400" aria-hidden="true"></canvas><span class="rr">${c.cos==='i'?'PROFILE ICON':'PROFILE BANNER'}</span><span class="nm">${esc(nm)}</span><span class="rk">Equip it in Menu › Account</span>`;
     const x=e.querySelector('canvas').getContext('2d');if(c.cos==='i')drawPIcon(x,c.id,160,200,118,'#7fe3ff');else{x.save();x.translate(160,200);x.rotate(-0.14);drawPBanner(x,c.id,-170,-62,340,124);x.restore();}
     g.appendChild(e);});
-  const c=lastPull===10?1000:100;$('#srAgain').textContent=`Summon ×${lastPull} again · ${c} Rebucks`;$('#srAgain').disabled=(lastTok?SAVE.tokens:SAVE.coins)<c;
+  const c=lastPull===10?1000:100;if(lastFest&&(SAVE.festPulls|0)>0){$('#srAgain').textContent=`Festival summon again · free (${SAVE.festPulls} left)`;$('#srAgain').disabled=false;}else{lastFest=false;$('#srAgain').textContent=`Summon ×${lastPull} again · ${c} Rebucks`;$('#srAgain').disabled=SAVE.coins<c;}
   sfx(best==='legend'?'super':'bell');show('#summonRes');
 }
-$('#srAgain').addEventListener('click',()=>doSummon(lastPull,lastTok));
+$('#srAgain').addEventListener('click',()=>doSummon(lastPull,lastTok,lastFest));
 $('#srDone').addEventListener('click',()=>{sfx('ui');openSummon();});
 $('#sumBack').addEventListener('click',goHome);
 
@@ -4519,8 +4565,13 @@ function renderEvents(){
   const r=raidBoss(),bd=ROSTER[RIDX(r.id)],now=Date.now(),left=weekEnd()-now;
   let h=`<article class="evcard raid" style="--ec:${bd.fx}"><div class="evhead"><canvas width="128" height="128" data-head="${r.id}" data-c="0"></canvas><div><p class="eyebrow">Raid boss \u00b7 rotates in ${fmtLeft(left)}</p><h3>${r.name}</h3><p class="evd">${r.bio} Fight it alone with your best three. Stage: ${STAGE_NAMES[r.stage]}.</p></div></div>
     <div class="tiers">${RAID_TIERS.map((T,i)=>`<button type="button" class="tier" id="raid-${i}" data-i="${i}"><b>${T.name}</b><span>Boss Lv ${T.lv}</span><span>${T.coins} Rebucks + ${T.xp} XP</span></button>`).join('')}</div></article>`;
-  for(const e of EVENTS){const st=eventState(e);h+=`<article class="evcard" style="--ec:${e.col}"><p class="eyebrow">${st.on?'Live now \u00b7 ends in '+fmtLeft(st.ms):'Starts in '+fmtLeft(st.ms)}</p><h3>${e.name}</h3><p class="evd">${e.desc}</p><p class="evs">${st.on?'<span class="live">LIVE</span>':'<span class="soon">UPCOMING</span>'}</p></article>`;}
+  const evs=EVENTS.map(e=>[e,eventState(e)]).sort((x,y)=>(y[1].on-x[1].on)||(x[1].ms-y[1].ms));
+  for(const [e,st] of evs){const left=evWinsLeft(e);
+    h+=`<article class="evcard${st.on?'':' off'}" style="--ec:${e.col}"><p class="eyebrow">${st.on?'Live now \u00b7 ends in '+fmtLeft(st.ms):'Starts in '+fmtLeft(st.ms)}</p><h3>${e.name}</h3><p class="evd">${e.desc}</p>
+      <p class="evr"><b>Win reward:</b> ${e.rewText}</p>
+      <div class="evs">${st.on?`<span class="live">LIVE</span> <span class="evleft">${left?`${left} of ${EV_WINS} rewards left today`:'Rewards collected today. You can still fight for normal rewards.'}</span><button type="button" class="btn evgo" id="ev-${e.id}" data-ev="${e.id}">Fight</button>`:'<span class="soon">UPCOMING</span>'}</div></article>`;}
   $('#evList').innerHTML=h;paintHeads($('#evList'));
+  document.querySelectorAll('.evgo').forEach(b=>b.addEventListener('click',()=>{sfx('ui');G.evb=EVENTS.find(e=>e.id===b.dataset.ev);openDraft('event');}));
   document.querySelectorAll('.tier').forEach(b=>b.addEventListener('click',()=>{sfx('ui');G.raid={boss:raidBoss(),tier:RAID_TIERS[+b.dataset.i]};openDraft('raid');}));
 }
 $('#evBack').addEventListener('click',goHome);
@@ -4934,10 +4985,10 @@ const NPCS=[
   say:()=>SAVE.cleared>=STORY.length?'You finished every chapter. Old stories are still worth replaying, and they still pay XP.':`Ah, you made it. ${PARTS[STORY[SAVE.cleared].part]} is where your crew stands. Next up is Chapter ${SAVE.cleared+1}, ${STORY[SAVE.cleared].name}.`,
   mark:()=>SAVE.cleared<STORY.length},
  {key:'summon',who:'mei',role:'Summon',place:'Summon Shrine',act:'Open the banners',go:()=>openSummon(),
-  say:()=>`Today’s banner is ${todayBanner().name}, with ${todayBanner().feat.map(id=>ROSTER[RIDX(id)].name.split(' ')[0]).join(' and ')}. A new one arrives in ${untilNextBanner()}.${evOn('fest')?' The Vision Festival is on, so Vision fighters answer more often.':''} You have ${SAVE.coins.toLocaleString()} Rebucks.`,
+  say:()=>`Today’s banner is ${todayBanner().name}, with ${todayBanner().feat.map(id=>ROSTER[RIDX(id)].name.split(' ')[0]).join(' and ')}. A new one arrives in ${untilNextBanner()}.${(SAVE.festPulls|0)>0?` You have ${SAVE.festPulls} free Festival summon${SAVE.festPulls>1?'s':''} waiting.`:''} You have ${SAVE.coins.toLocaleString()} Rebucks.`,
   mark:()=>SAVE.coins>=100},
  {key:'events',who:'ozzy',role:'Events',place:'Event Hall',act:'See the events',go:()=>openEvents(),
-  say:()=>{const l=liveEvents();return `Listen up, Harbor City! ${l.length?l.map(e=>e.name).join(' and ')+' is live right now!':'No bonus event today, but Double XP comes back on Friday.'} This week’s raid boss is ${raidBoss().name}. Think your crew can take it?`;},
+  say:()=>{const l=liveEvents();return `Listen up, Harbor City! ${l.length?l.map(e=>e.name).join(', ')+(l.length>1?' are':' is')+' live right now. Win them for big rewards!':'No events right now.'} This week’s raid boss is ${raidBoss().name}. Think your crew can take it?`;},
   mark:()=>liveEvents().length>0},
  {key:'teams',who:'dex',role:'Teams',place:'Dojo',act:'Build teams',go:()=>openCollection(null),
   say:()=>SAVE.teams.some(t=>t.length>=3&&t.slice(0,3).every(id=>id&&owns(id)))?'A fighter is only as good as the team behind them. Want to change your lineups?':'You don’t have a full team yet. Let’s build one before your next fight.',
@@ -5974,7 +6025,7 @@ function padEdges(b,prev,ax){
     else if(hit(P.pause)&&(ui.id==='menu'||ui.id==='pause'))padBack(ui);
     return;
   }
-  if(showSide()>=0&&G.mode==='fight'&&(hit(0)||hit(1))){skipShowcase();return;}
+  if(showSide()>=0&&G.mode==='fight'&&(hit(0)||hit(1)))return;
   if(hit(P.pause)){if(G.mode==='fight')togglePause();else if(G.mode==='town')openMenu();}
   if(G.mode==='town'&&hit(3))townGrabPress();
   if(G.mode==='town'&&hit(P.act)&&!TOWN.talk&&!TOWN.trans&&!TOWN.grab&&(TOWN.near||TOWN.nearDoor))townAction();
