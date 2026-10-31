@@ -782,7 +782,6 @@ body.fighting #townFade{display:none}
               <button type="button" id="dm-block" data-m="block" aria-pressed="false">Block</button>
               <button type="button" id="dm-cpu" data-m="cpu" aria-pressed="false">Fight</button>
             </div>
-            <button class="btn alt" id="lastBtn" type="button">Last team</button>
             <button class="btn" id="goBtn" type="button" disabled>Fight</button>
           </div>
           <div class="cs-side right"><canvas class="big" id="csR" width="320" height="400" aria-hidden="true"></canvas><div class="cs-meta"><span class="cs-tag p2t" id="csRTag">CPU</span><p class="cs-name" id="csRName"></p><p class="cs-who" id="csRWho"></p><div class="cs-team" id="csRTeam"></div></div></div>
@@ -3586,7 +3585,7 @@ function updateFx(){
 }
 
 function tick(){
-  G.frame++;pollPads();tpTick();musicTick();bannerTick();
+  G.frame++;pollPads();tpTick();musicTick();bannerTick();selTick();
   if(G.mode==='menu'){for(const f of menuF())updatePose(f);updateFx();return;}
   if(G.mode==='cine'){cineStep();updateFx();G.shake*=0.86;return;}
   if(G.mode==='town'){townStep();updateFx();return;}
@@ -4119,7 +4118,7 @@ function renderDraft(){
     online:L?[`Online · ${L.coop?'Co-op · '+coopModeName(G.netMode):G.netMode==='ranked'?'Ranked':'Casual'}`,L.coop?'Pick your duo':'Pick your team',L.coop?`You and ${L.opp.name||'your teammate'} pick two fighters each. You can see each other’s picks live.`:`${L.opp.name||'Your rival'} is picking right now. Watch their picks on the right, then lock in.`]:['Online','',''],
     pvp:['2 players',draft.step===1?'Player 1 picks':'Player 2 picks',draft.step===1?'Player 1, tap three fighters. Then Player 2 picks on the right.':'Player 2, tap three fighters. You can pick the same fighters as Player 1.']}[k]||['','',''];
   $('#selEyebrow').textContent=head[0];$('#selTitle').textContent=head[1];$('#selSub').textContent=head[2];
-  $('#diff').hidden=k!=='vs';$('#dummy').hidden=k!=='training';$('#lastBtn').hidden=!!(L&&L.myLock)||!lastTeamIdx().length;
+  $('#diff').hidden=k!=='vs';$('#dummy').hidden=k!=='training';
   document.querySelectorAll('#diff button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===G.vsDiff));
   document.querySelectorAll('#dummy button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===G.train.dummy));
   const g=$('#csGrid');
@@ -4138,8 +4137,20 @@ function pickTile(i){
   else{if(P.length>=needN()){toast('Your team is full. Tap a picked fighter to take them out.');return;}P.push(i);}
   draft.hov[draft.step-1]=at>=0?(P.length?P[P.length-1]:null):i;sfx('ui');updateSel();if(L)livePush();
 }
-function bigArt(cv,id,c,name){const x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);
-  if(id){drawFullBody(cv,id,c);return;}
+/* the picked fighters stand in their idle stance, rendered live on plain black */
+const CSANIM={},CSRIG={};let csCam=null;
+function csFighter(id,c){const k=id+':'+c;if(CSRIG[k])return CSRIG[k];
+  const d=ROSTER[RIDX(id)],f={def:d,costume:c,pose:cp(IDLE[id]||P.idle),x:W/2,y:FLOOR,z:0,face:1,flash:0,state:'idle',t:0,portrait:true,walkT:0,team:{side:0}};
+  f.rig=makeRig(f,ps,true);f.rig.root.visible=false;f.rig.shadow.visible=false;return CSRIG[k]=f;}
+function csDraw(cvId){const A=CSANIM[cvId],cv=document.getElementById(cvId);if(!A||!cv)return;
+  const f=csFighter(A.id,A.c),s=f.def.scale;f.t++;f.state='idle';updatePose(f);updateRig(f);f.rig.shadow.visible=false;
+  const cam=csCam||(csCam=new THREE.PerspectiveCamera(30,320/400,10,4000)),ang=0.62;
+  cam.position.set(Math.sin(ang)*360*s,92*s,Math.cos(ang)*360*s);cam.lookAt(0,84*s,0);
+  pr.render(ps,cam);f.rig.root.visible=false;const x=cv.getContext('2d');x.clearRect(0,0,cv.width,cv.height);x.drawImage(pr.domElement,0,0,cv.width,cv.height);}
+function selTick(){const sc=$('#select');if(!sc||sc.hidden)return;if(!ensurePR())return;try{csDraw(G.frame%2?'csL':'csR');}catch(e){}}
+function bigArt(cv,id,c,name){const x=cv.getContext('2d');
+  if(id){if(ensurePR()){const A=CSANIM[cv.id];if(!A||A.id!==id||A.c!==c){CSANIM[cv.id]={id,c};try{csDraw(cv.id);}catch(e){}}return;}x.clearRect(0,0,cv.width,cv.height);drawFullBody(cv,id,c);return;}
+  CSANIM[cv.id]=null;x.clearRect(0,0,cv.width,cv.height);
   x.save();x.fillStyle='rgba(255,255,255,.08)';x.beginPath();x.ellipse(160,250,90,150,0,0,TAU);x.fill();x.fillStyle='rgba(255,255,255,.55)';x.font=`170px ${FONT_D}`;x.textAlign='center';x.textBaseline='middle';x.fillText('?',160,215);x.restore();}
 function teamSlots(el,ids,n,mask){el.innerHTML=Array.from({length:n},(_,k)=>{const id=ids[k];return `<span class="cs-slot${k?'':' lead'}">${id&&!mask?`<canvas width="96" height="96" data-head="${id}" data-c="${equipped(id)}"></canvas>`:mask&&id!==undefined||mask&&!ids.length?'?':''}</span>`;}).join('');paintHeads(el);}
 function rightSide(){
@@ -4170,11 +4181,9 @@ function updateSel(){
   const go=$('#goBtn');
   if(L){go.disabled=L.myLock;go.textContent=L.myLock?(L.oppLock?'Starting…':`Waiting for ${L.opp.name||'your rival'}…`):mine.length<n?`Lock in (${mine.length}/${n})`:'Lock in';}
   else{go.disabled=mine.length<n;go.textContent=mine.length<n?`Pick ${n-mine.length} more`:k==='pvp'&&draft.step===1?'Next: Player 2':k==='training'?'Start training':'Fight';}
-  $('#lastBtn').hidden=!!(L&&L.myLock)||!lastTeamIdx().length;
 }
 document.querySelectorAll('#diff button').forEach(b=>b.addEventListener('click',()=>{G.vsDiff=b.dataset.d;document.querySelectorAll('#diff button').forEach(x=>x.setAttribute('aria-pressed',x===b));sfx('ui');drawSides();}));
 document.querySelectorAll('#dummy button').forEach(b=>b.addEventListener('click',()=>{G.train.dummy=b.dataset.m;document.querySelectorAll('#dummy button').forEach(x=>x.setAttribute('aria-pressed',x===b));sfx('ui');}));
-$('#lastBtn').addEventListener('click',()=>{const L=draft.live;if(L&&L.myLock)return;const P=curPicks();P.length=0;for(const i of lastTeamIdx().slice(0,needN()))P.push(i);draft.hov[draft.step-1]=P[0]??null;sfx('ui');updateSel();if(L)livePush();});
 $('#selBack').addEventListener('click',()=>{
   if(draft.live){liveLeave();return;}
   if(draft.kind==='pvp'&&draft.step===2){draft.step=1;renderDraft();return;}
